@@ -1,8 +1,5 @@
-;;;; app-menu.lisp
+(in-package :stumpwm)
 
-(in-package #:app-menu)
-
-;;; "app-menu" goes here. Hacks and glory await!
 (export '(show-menu load-menu-file))
 
 (defvar *app-menu* nil "Where the menu structure is held")

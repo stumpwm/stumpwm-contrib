@@ -1,6 +1,28 @@
-;;;; stumptray.lisp
+;;;; System Tray for stumpwm.
 
-(in-package #:stumptray)
+;;;; Note: To run this you need to patch stumpwm to add
+;;;; stumpwm:*event-processing-hook*
+;;;; TODO Do something about the errors that happen when resuming from
+;;;; hibernation
+
+;;;; TODO Modify the modeline command or add a wrapper to start the
+;;;; tray together with the modeline
+
+(asdf:compute-source-registry)
+(declaim (optimize (speed 0) (debug 3) (safety 3)))
+(require :xembed)
+(require :alexandria)
+
+(defpackage :stumptray
+  (:use #:cl #:alexandria)
+  (:export *tray-viwin-background*
+           *tray-hiwin-background*
+
+           add-mode-line-hooks
+           remove-mode-line-hooks
+           ))
+
+(in-package :stumptray)
 
 (defstruct (tray)
   win 		  ;; Main window

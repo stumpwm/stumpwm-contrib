@@ -1,11 +1,9 @@
-;;;; passwd.lisp
-
-(in-package #:passwd)
-
-;;; "passwd" goes here. Hacks and glory await!
+(in-package :stumpwm-user)
 
 (export '(*hmac-static-seed*
           *passphrase-remember-timeout*))
+
+(require 'ironclad)
 
 (defvar *hmac-static-seed* nil
   "Static seed appended to the passphrase to add even more entropy")
