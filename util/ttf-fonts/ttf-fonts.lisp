@@ -1,7 +1,7 @@
 ;;;; ttf-fonts.lisp
 
 (in-package #:ttf-fonts)
-
+(export '(font-exists-p open-font close-font font-ascent font-descent text-line-width draw-image-glyphs))
 ;;; "ttf-fonts" goes here. Hacks and glory await!
 ;;;; TTF fonts
 (defmethod font-exists-p ((font xft:font))
@@ -11,8 +11,7 @@
 (defmethod open-font ((display xlib:display) (font xft:font))
   font)
 
-(defmethod close-font ((font xft:font))
-  )
+(defmethod close-font ((font xft:font)))
 
 (defmethod font-ascent ((font xft:font))
   (xft:font-ascent (screen-number (current-screen)) font))
