@@ -1,5 +1,5 @@
 ;;;; package.lisp
 
-(defpackage #:emacs
+(defpackage #:swm-emacs
   (:use #:cl :stumpwm))
 

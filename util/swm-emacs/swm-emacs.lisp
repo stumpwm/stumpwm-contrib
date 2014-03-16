@@ -1,10 +1,10 @@
-;;;; emacs.lisp
+;;;; swm-emacs.lisp
 
-(in-package #:emacs)
+(in-package #:swm-emacs)
 
-(export '(start-daemon
-          stop-daemon
-          restart-daemon
+(export '(start-emacs-daemon
+          stop-emacs-daemon
+          restart-emacs-daemon
           *emacs-start-daemon*
           *emacs-stop-daemon*
           eval-on-daemon))
@@ -13,6 +13,11 @@
   "Command to start the emacs daemon")
 (defvar *emacs-stop-daemon* "emacsclient -e \"(save-some-buffers)\" \"(kill-emacs)\" "
   "Command to stop the emacs daemon")
+(defvar emacs-module-dir
+  #.(asdf:system-relative-pathname (asdf:find-system :swm-emacs)
+                                   (make-pathname :directory
+                                                  '(:relative "."))))
+
 (defun eval-on-daemon (expr)
   (run-shell-command (concatenate 'string "emacsclient --eval " 
                                   (string-downcase 
@@ -24,22 +29,23 @@
 
 (defun start-daemon-e ()
   ;;TODO load utils for interactive quitting of emacs
+  
   (run-shell-command *emacs-start-daemon* t))
 (defun stop-daemon-e ()
-  (run-shell-command *emacs-stop-daemon*))
+  (run-shell-command *emacs-stop-daemon* t))
 (defun restart-daemon-e ()
   (and (stop-daemon-e)
        (start-daemon-e)))
 
 (add-hook *quit-hook* #'stop-daemon-e)
 
-(defcommand start-daemon () ()
+(defcommand emacs-start-daemon () ()
   (if (start-daemon-e)
       (message "Emacs daemon started!")
       (error "Cannot start daemon!")))
-(defcommand stop-daemon () ()
+(defcommand emacs-stop-daemon () ()
   (if (stop-daemon-e)
       (message "Emacs daemon stopped!")
       (error "Cannot stop daemon!")))
-(defcommand restart-daemon () ()
+(defcommand emacs-restart-daemon () ()
   (restart-daemon-e))
