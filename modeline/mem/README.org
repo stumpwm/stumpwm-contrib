@@ -1,0 +1,14 @@
+** Usage
+
+Put:
+#+BEGIN_SRC lisp
+(load-module "mem")
+#+END_SRC
+
+In your =~/.stumpwmrc=
+
+Then you can use "%M" and/or "%N in your mode line format.
+
+** Notes
+This is specific to Linux.
+

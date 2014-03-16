@@ -1,0 +1,7 @@
+** Usage
+#+BEGIN_SRC lisp
+   (load-module "passwd")
+#+END_SRC
+
+** Tasks
+*** TODO Document this module

@@ -1,0 +1,23 @@
+** Usage
+
+Place the following in your ~/.stumpwmrc file:
+
+#+BEGIN_SRC lisp
+    (load-module "wifi")
+#+END_SRC
+
+Then you can use "%I" in your mode line format (both "w" and "W"
+were taken. Think _I_EEE 802.11 :-)).
+
+** Notes
+This gets information through sysfs, so it only works on Linux with a
+mounted =sysfs=.
+
+* WARNING
+
+This triggers a yet to be discovered bug in SBCL, which causes
+stumpwm to freeze.
+ 
+
+<2014-03-16 Sun> This is a fairly old file, maybe the bug was fixed?
+Can someone confirm?

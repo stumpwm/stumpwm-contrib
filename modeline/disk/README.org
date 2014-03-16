@@ -1,0 +1,26 @@
+** Usage
+
+Put:
+#+BEGIN_SRC 
+    (load-module "disk")
+#+END_SRC
+
+into your =~/.stumpwmrc=
+
+Then you can use "%D" in your mode line format.
+You can customize the modeline format (*disk-modeline-fmt*). 
+
+The default value for displaying disk usage information on the modeline.
+
+|------+----------------------------------|
+| Code | Result                           |
+|------+----------------------------------|
+| %%   | A literal '%'                    |
+| %d   | Filesystem device                |
+| %s   | Filesystem size                  |
+| %u   | Filesystem used space            |
+| %a   | Filesystem available space       |
+| %p   | Filesystem used space in percent |
+| %m   | Filesystem mount point           |
+|------+----------------------------------|
+

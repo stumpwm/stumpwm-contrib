@@ -1,0 +1,6 @@
+** Usage
+#+BEGIN_SRC lisp
+(load-module "app-menu")
+#+END_SRC
+** Tasks
+*** TODO Document this module

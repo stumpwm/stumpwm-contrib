@@ -1,0 +1,51 @@
+** Usage
+This StumpWM module acts as notification monitor for external applications.
+ They can send messages via `stumpish' which will be displayed in the
+ mode-line.  (Thus `stumpish' has to be in your PATH.)
+
+ To use it add this to your ~/.stumpwmrc.lisp:
+#+BEGIN_SRC lisp
+(load-module "notifications")
+#+END_SRC
+
+Then add the formatter %N to your mode-line spec, i.e. like this:
+
+#+BEGIN_SRC lisp
+   (setf *screen-mode-line-format* "[%W] {%g} (%N)")
+#+END_SRC
+
+You might want to bind *notifications-map* to a key:
+
+#+BEGIN_SRC lisp
+   (define-key *root-map* (kbd "N") '*notifications-map*)
+#+END_SRC
+
+ With this map you can add notifications with a, reset them with r, delete
+ the first/last with d/D or show them in a popup with s.
+
+ External applications can add notification messages using stumpish:
+#+BEGIN_SRC sh
+   $ stumpish notifications-add 'Foo Bar Baz'
+#+END_SRC
+
+For example this is the elisp code that I use to let rcirc (an Emacs IRC
+client) notify me when a message with my nickname or a IM message arrives:
+#+BEGIN_SRC lisp
+ (defun th-rcirc-notification (process sender response target text)
+   (let ((my-nick (rcirc-nick process)))
+     (when (and (string= response "PRIVMSG")
+                (not (string= sender my-nick))
+                (or
+                 ;; BitlBee IM messages
+                 (string-match "localhost" (format "%s" process))
+                 ;; Messages that mention my name
+                 (string-match my-nick text)))
+       (th-notifications-add (concat "rcirc: " target)))))
+
+ (add-hook 'rcirc-print-hooks 'th-rcirc-notification)
+
+ (defun th-notifications-add (str)
+   (interactive "sNotification: ")
+   (start-process "notifications-add" nil
+                  "stumpish" "notifications-add" str))
+#+END_SRC

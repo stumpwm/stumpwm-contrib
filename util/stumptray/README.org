@@ -1,0 +1,13 @@
+System Tray for stumpwm.
+
+** Usage
+Add 
+#+BEGIN_SRC lisp
+(load-module "stumptray")
+#+END_SRC
+to =.stumpwmrc=
+
+** Tasks
+*** TODO Do something about the errors that happen when resuming from hibernation
+*** TODO Modify the modeline command or add a wrapper to start the tray together with the modeline
+
