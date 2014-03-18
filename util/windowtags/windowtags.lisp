@@ -11,6 +11,8 @@
 ;; This file is part of stumpwm.
 ;;
 
+(export '(window-tags clear-tags))
+
 ; String parsing for commands
 
 (defun string-split-by-spaces (x)
@@ -105,19 +107,6 @@
       (remove-if-not condition windows))))
 
 ; Window manipulations using tags
-
-; General function
-
-(defun move-windows-to-group (windows &optional (arggroup nil))
-  "Move all windows from the list to the group"
-  (let*
-    ((group 
-       (if (stringp arggroup) 
-	 (or 
-	   (find-group (current-screen) arggroup) 
-	   (add-group (current-screen) arggroup))
-	 (or arggroup (current-group)))))
-    (mapcar (lambda (w) (move-window-to-group w group)) windows)))
 
 ; And convenient instances
 
