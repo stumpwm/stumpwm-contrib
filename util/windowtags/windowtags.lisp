@@ -181,7 +181,7 @@
 	      ((window (car (select-by-tags tag))))
 	      (if window
 		(progn
-		  (move-window-to-group window (current-group))
+		  (move-window-to-groups (list window))
 		  (really-raise-window window)
 		  window)
 		nil)))
