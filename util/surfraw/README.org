@@ -1,4 +1,4 @@
-Commentary:
+** Commentary
 
 I like surfraw (http://surfraw.alioth.debian.org). If you're
 reading this, you probably like surfraw. I've got surfraw-related
@@ -7,11 +7,12 @@ for RC files early on in my use of stumpwm) I know that I'm not the
 only one. So it seemed like a good idea to just put that code in
 a library.
 
-Usage:
+** Usage
 
-Just add the following line to your .stumpwmrc file:
-
-(load "/path/to/stumpwm/contrib/surfraw.lisp")
+Just add the following line to your =.stumpwmrc= file:
+#+BEGIN_SRC lisp
+(load-module "surfraw")
+#+END_SRC
 
 ...and then either call the functions here with "colon" (C-t ;) or
 bind them to a key. I figure other people will probably have
@@ -19,8 +20,8 @@ different key preferences than I have, so I leave them entirely up
 to you.
 
 If you want to use the bookmark functions, don't forget to tell
-stumpwm where your *surfraw-bookmark-file* is.
+stumpwm where your =*surfraw-bookmark-file*= is.
 
-Note that there are also "surfraw-selection" variants on each
+Note that there are also "=surfraw-selection=" variants on each
 command that work on the X selection.
 

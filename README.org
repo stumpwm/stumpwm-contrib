@@ -1,0 +1,25 @@
+* A collection of StumpWM modules
+** Media 
+- [[./media/amixer/README.org][amixer]]
+- [[./media/aumix/README.org][aumix]]
+** Minor Modes
+- [[./minor-mode/mpd/README.org][mpd]]
+- [[./minor-mode/notifications/README.org][notifications]]
+** Modeline
+- [[./modeline/battery-portable/README.org][portable]]
+- [[./modeline/battery/README.org][battery]]
+- [[./modeline/cpu/README.org][cpu]]
+- [[./modeline/disk/README.org][disk]]
+- [[./modeline/maildir/README.org][maildir]]
+- [[./modeline/mem/README.org][mem]]
+- [[./modeline/net/README.org][net]]
+- [[./modeline/wifi/README.org][wifi]]
+** Utilities 
+- [[./util/app-menu/README.org][menu]]
+- [[./util/logitech-g15-keysyms/README.org][keysyms]]
+- [[./util/passwd/README.org][passwd]]
+- [[./util/productivity/README.org][productivity]]
+- [[./util/stumptray/README.org][stumptray]]
+- [[./util/surfraw/README.org][surfraw]]
+- [[./util/undocumented/README.org][undocumented]]
+- [[./util/windowtags/README.org][windowtags]]

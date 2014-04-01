@@ -1,0 +1,11 @@
+** Usage
+ Put:
+#+BEGIN_SRC lisp
+(load-module "logitech-g15-keysyms")
+;; depending of the model you have.
+(g15-original)
+(g15-revised)  
+#+END_SRC
+In your =~/.stumpwmrc=
+
+

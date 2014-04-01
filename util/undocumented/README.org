@@ -1,0 +1,8 @@
+** Commentary
+ Look for stuff that should probably be in the manual that isn't
+** Usage
+#+BEGIN_SRC lisp
+(load-module "undocumented")
+#+END_SRC
+** Tasks
+*** TODO Document this module
