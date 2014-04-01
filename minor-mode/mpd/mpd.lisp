@@ -811,6 +811,15 @@ Passed an argument of zero and if crossfade is on, toggles crossfade off."
 (defvar *mpd-add-map* nil)
 (defvar *mpd-map* nil)
 
+(defmacro fill-keymap (map &rest bindings)
+  `(unless ,map
+     (setf ,map
+           (let ((m (make-sparse-keymap)))
+             ,@(loop for i = bindings then (cddr i)
+                    while i
+                    collect `(define-key m ,(first i) ,(second i)))
+             m))))
+
 ;;Key map
 (fill-keymap *mpd-search-map*
              (kbd "a") "mpd-search-artist"
@@ -862,4 +871,3 @@ Passed an argument of zero and if crossfade is on, toggles crossfade off."
 ;;; End of file
 
 ;;; "mpd" goes here. Hacks and glory await!
-
