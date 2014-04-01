@@ -39,13 +39,13 @@
 
 (add-hook *quit-hook* #'stop-daemon-e)
 
-(defcommand emacs-start-daemon () ()
+(defcommand start-emacs-daemon () ()
   (if (start-daemon-e)
       (message "Emacs daemon started!")
       (error "Cannot start daemon!")))
-(defcommand emacs-stop-daemon () ()
+(defcommand stop-emacs-daemon () ()
   (if (stop-daemon-e)
       (message "Emacs daemon stopped!")
       (error "Cannot stop daemon!")))
-(defcommand emacs-restart-daemon () ()
+(defcommand restart-emacs-daemon () ()
   (restart-daemon-e))
