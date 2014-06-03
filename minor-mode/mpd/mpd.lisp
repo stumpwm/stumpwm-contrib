@@ -260,8 +260,7 @@
     (mpd-minutes-seconds elapsed)))
 
 (defun mpd-get-length ()
-  (let ((time (parse-integer (assoc-value :time *mpd-current-song*)))
-	(minutes) (seconds))
+  (let ((time (parse-integer (assoc-value :time *mpd-current-song*))))
     (mpd-minutes-seconds time)))
 
 (defun mpd-get-status ()
@@ -430,7 +429,7 @@ Volume
                                                              0))
       (cond
         ((null choice)
-         (throw 'stumpwm::error "Abort."))
+         (throw 'error "Abort."))
         (t (values choice selection))))))
 
 (defun mpd-selected-item (menu)
@@ -438,8 +437,6 @@ Volume
 
 (defun mpd-menu-action (action-type)
   (lambda (menu)
-    (declare (ignore menu))
-    (setf *current-menu-input* "")
     (throw :menu-quit
       (values action-type
               (mpd-selected-item menu)))))
