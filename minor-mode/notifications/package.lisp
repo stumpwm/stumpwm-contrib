@@ -1,5 +1,6 @@
 ;;;; package.lisp
 
 (defpackage #:notifications
-  (:use #:cl :stumpwm))
+  (:use #:cl :stumpwm)
+  (:export #:*notifications-map*))
 
