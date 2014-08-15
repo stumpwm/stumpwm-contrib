@@ -6,6 +6,7 @@
 #+END_SRC
  ...in your =~/.stumpwmrc=, followed by some keybindings (according
  to your preference)
+
 Example keybindings:
 #+BEGIN_SRC lisp
             (define-key *top-map* (kbd "XF86AudioLowerVolume") "amixer-Front-1-")
