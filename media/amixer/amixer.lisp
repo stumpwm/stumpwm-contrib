@@ -10,21 +10,21 @@
 ;;;
 ;;; Code:
 
-(defun volcontrol (channel amount)
+(defun volcontrol (device channel amount)
   (let ((percent (parse-integer
-		  (run-shell-command
-		   (concat "amixer sset " channel " " (or amount "toggle")
-			   "| tail -1"
-			   "| sed 's/^.*\\[\\([[:digit:]]\\+\\)%\\].*$/\\1/'")
-		   t))))
+                  (run-shell-command
+                   (concat "amixer -D " (or device "default") " sset " channel " " (or amount "toggle")
+                           "| tail -1"
+                           "| sed 's/^.*\\[\\([[:digit:]]\\+\\)%\\].*$/\\1/'")
+                   t))))
     (message
      (concat "Mixer: " channel " " (or amount "toggled")
-	     (format nil "~C^B~A%" #\Newline percent) "^b [^[^7*"
+             (format nil "~C^B~A%" #\Newline percent) "^b [^[^7*"
              (bar percent 50 #\# #\:) "^]]"))))
 
 (defmacro defvolcontrol (name channel valence)
-  `(defcommand ,name () ()
-     (volcontrol ,channel ,valence)))
+  `(defcommand ,name (&optional device) ((:string))
+     (volcontrol device ,channel ,valence)))
 
 (defvolcontrol amixer-PCM-1- "PCM" "1-")
 (defvolcontrol amixer-PCM-1+ "PCM" "1+")
