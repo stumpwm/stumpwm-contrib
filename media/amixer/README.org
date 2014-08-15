@@ -2,10 +2,18 @@
  Make sure you have your media keys (or whatever) mapped to the appropriate
  keysyms (using =xmodmap=), then put:
 #+BEGIN_SRC lisp
-     (load "/path/to/amixer.lisp")
+            (load "/path/to/amixer.lisp")
 #+END_SRC
  ...in your =~/.stumpwmrc=, followed by some keybindings (according
  to your preference)
+Example keybindings:
+#+BEGIN_SRC lisp
+            (define-key *top-map* (kbd "XF86AudioLowerVolume") "amixer-Front-1-")
+            (define-key *top-map* (kbd "XF86AudioRaiseVolume") "amixer-Front-1+")
+            (define-key *top-map* (kbd "XF86AudioMute") "amixer-Master-toggle pulse")
+#+END_SRC
+ =amixer= commands take an optional parameter, the device parameter
+ as passed to the =-D=. This can be useful if you are running pulseaudio.
 
 ** Tasks
 
