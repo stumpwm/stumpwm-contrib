@@ -1,7 +1,7 @@
 #!/usr/bin/install-menu
 #
 # Generates a stumpwm menu file
-# BE CERTAIN to chenge the pathnames as appropriate BEFORE using
+# BE CERTAIN to change the pathnames as appropriate BEFORE using
 outputencoding="LOCALE"
 
 !include menu.h

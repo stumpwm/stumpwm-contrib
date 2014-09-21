@@ -669,8 +669,8 @@ passed to `xlib:process-event'."
   nil)
 
 (defun remove-mode-line-hooks ()
-  (stumpwm:add-hook stumpwm:*new-mode-line-hook* #'new-mode-line-hook)
-  (stumpwm:add-hook stumpwm:*destroy-mode-line-hook* #'destroy-mode-line-hook)
+  (stumpwm:remove-hook stumpwm:*new-mode-line-hook* #'new-mode-line-hook)
+  (stumpwm:remove-hook stumpwm:*destroy-mode-line-hook* #'destroy-mode-line-hook)
   nil)
 
 (stumpwm:defcommand stumptray () ()

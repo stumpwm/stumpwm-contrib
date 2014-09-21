@@ -260,8 +260,7 @@
     (mpd-minutes-seconds elapsed)))
 
 (defun mpd-get-length ()
-  (let ((time (parse-integer (assoc-value :time *mpd-current-song*)))
-	(minutes) (seconds))
+  (let ((time (parse-integer (assoc-value :time *mpd-current-song*))))
     (mpd-minutes-seconds time)))
 
 (defun mpd-get-status ()
@@ -424,22 +423,20 @@ Volume
 (defvar *mpd-volume-step* 5)
 
 (defun mpd-menu (title options keymap &optional initial-selection)
-  (let ((*menu-map* keymap))
-    (multiple-value-bind (choice selection)
-        (select-from-menu (current-screen) options title (or initial-selection
-                                                             0))
-      (cond
-        ((null choice)
-         (throw 'stumpwm::error "Abort."))
-        (t (values choice selection))))))
+  (multiple-value-bind (choice selection)
+      (select-from-menu (current-screen) options title
+                        (or initial-selection 0)
+                        keymap)
+    (cond
+      ((null choice)
+       (throw 'error "Abort."))
+      (t (values choice selection)))))
 
 (defun mpd-selected-item (menu)
   (nth (menu-state-selected menu) (menu-state-table menu)))
 
 (defun mpd-menu-action (action-type)
   (lambda (menu)
-    (declare (ignore menu))
-    (setf *current-menu-input* "")
     (throw :menu-quit
       (values action-type
               (mpd-selected-item menu)))))
@@ -449,15 +446,8 @@ Volume
 (when (null *mpd-playlist-menu-map*)
   (setf *mpd-playlist-menu-map*
         (let ((m (make-sparse-keymap)))
-          (define-key m (kbd "C-p") 'menu-up)
-          (define-key m (kbd "Up") 'menu-up)
           (define-key m (kbd "k") 'menu-up)
-
-          (define-key m (kbd "C-n") 'menu-down)
-          (define-key m (kbd "Down") 'menu-down)
           (define-key m (kbd "j") 'menu-down)
-          (define-key m (kbd "C-g") 'menu-abort)
-          (define-key m (kbd "ESC") 'menu-abort)
 
           (define-key m (kbd "S-Up") (mpd-menu-action :mpd-playlist-move-up))
           (define-key m (kbd "S-Down") (mpd-menu-action :mpd-playlist-move-down))
@@ -512,15 +502,8 @@ Volume
 (when (null *mpd-browse-menu-map*)
   (setf *mpd-browse-menu-map*
         (let ((m (make-sparse-keymap)))
-          (define-key m (kbd "C-p") 'menu-up)
-          (define-key m (kbd "Up") 'menu-up)
           (define-key m (kbd "k") 'menu-up)
-
-          (define-key m (kbd "C-n") 'menu-down)
-          (define-key m (kbd "Down") 'menu-down)
           (define-key m (kbd "j") 'menu-down)
-          (define-key m (kbd "C-g") 'menu-abort)
-          (define-key m (kbd "ESC") 'menu-abort)
 
           (define-key m (kbd "RET") (mpd-menu-action :mpd-browse-add-and-quit))
           (define-key m (kbd "S-RET") (mpd-menu-action :mpd-browse-add))

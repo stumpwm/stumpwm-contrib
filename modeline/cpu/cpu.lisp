@@ -81,7 +81,7 @@ not available). Don't make calculation more than once a second."
 utilization."
   (declare (ignore ml))
   (let ((cpu (truncate (* 100 (current-cpu-usage)))))
-    (bar cpu width full empty)))
+    (stumpwm::bar cpu width full empty)))
 
 (defun get-proc-file-field (fname field)
   (with-open-file (s fname :if-does-not-exist nil) ;

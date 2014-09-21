@@ -10,37 +10,37 @@
 ;;;
 ;;; Code:
 
-(defun volcontrol (channel amount)
+(defun volcontrol (device channel amount)
   (let ((percent (parse-integer
-		  (run-shell-command
-		   (concat "amixer sset " channel " " (or amount "toggle")
-			   "| tail -1"
-			   "| sed 's/^.*\\[\\([[:digit:]]\\+\\)%\\].*$/\\1/'")
-		   t))))
+                  (run-shell-command
+                   (concat "amixer -D " (or device "default") " sset " channel " " (or amount "toggle")
+                           "| tail -1"
+                           "| sed 's/^.*\\[\\([[:digit:]]\\+\\)%\\].*$/\\1/'")
+                   t))))
     (message
      (concat "Mixer: " channel " " (or amount "toggled")
-	     (format nil "~C^B~A%" #\Newline percent) "^b [^[^7*"
+             (format nil "~C^B~A%" #\Newline percent) "^b [^[^7*"
              (bar percent 50 #\# #\:) "^]]"))))
 
 (defmacro defvolcontrol (name channel valence)
-  `(defcommand ,name () ()
-     (volcontrol ,channel ,valence)))
+  `(defcommand ,name (&optional device) ((:string))
+     (volcontrol device ,channel ,valence)))
 
 (defvolcontrol amixer-PCM-1- "PCM" "1-")
 (defvolcontrol amixer-PCM-1+ "PCM" "1+")
-(defvolcontrol amixer-PCM-toggle "PCM" "toggle")
+(defvolcontrol amixer-PCM-toggle "PCM" "1+ toggle")
 
 (defvolcontrol amixer-Front-1- "Front" "1-")
 (defvolcontrol amixer-Front-1+ "Front" "1+")
-(defvolcontrol amixer-Front-toggle "Front" "toggle")
+(defvolcontrol amixer-Front-toggle "Front" "1+ toggle")
 
 (defvolcontrol amixer-Master-1- "Master" "1-")
 (defvolcontrol amixer-Master-1+ "Master" "1+")
-(defvolcontrol amixer-Master-toggle "Master" "toggle")
+(defvolcontrol amixer-Master-toggle "Master" "1+ toggle")
 
 (defvolcontrol amixer-Headphone-1- "Headphone" "1-")
 (defvolcontrol amixer-Headphone-1+ "Headphone" "1+")
-(defvolcontrol amixer-Headphone-toggle "Headphone" "toggle")
+(defvolcontrol amixer-Headphone-toggle "Headphone" "1+ toggle")
 
 (defcommand amixer-sense-toggle () ()
   (message
