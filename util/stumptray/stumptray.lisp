@@ -66,6 +66,10 @@ first on the list by default.")
 (defvar *tray-cursor-thickness* 2)
 (defvar *tray-cursor-icon-distance* 1)
 
+(defun trayicon-height (tray)
+  "Returns the height of the icons embedded in the TRAY."
+  (screen-tray-icon-height (tray-screen tray)))
+
 (defun screen-tray-height (screen)
   "Calculates the total tray height based on the height of the
 SCREEN's modeline."
@@ -81,10 +85,6 @@ the height of the SCREEN's modeline."
 (defun tray-height (tray)
   "Returns the TRAY height."
   (screen-tray-height (tray-screen tray)))
-
-(defun tray-icon-height (tray)
-  "Returns the height of the icons embedded in the TRAY."
-  (screen-tray-icon-height (tray-screen tray)))
 
 (defun tray-width (tray)
   "Calculates the total width of the TRAY."
@@ -260,7 +260,7 @@ ending to the last visible icon."
 (defun make-icon-socket (tray parent)
   "Creates and returns an xembed socket"
   (let ((root (xlib:drawable-root parent))
-	(icon-height (tray-icon-height tray)))
+	(icon-height (trayicon-height tray)))
     (xembed:create-socket nil :parent parent :depth (xlib:drawable-depth root)
 			  :background :PARENT-RELATIVE
 			  :x 0 :y 0
@@ -343,7 +343,7 @@ protocol."
 (defun icon-container-width (tray visibility)
   "Returns the width of the appropriate TRAY icon container
 based on VISIBILITY."
-  (max (tray-icon-height tray)
+  (max (trayicon-height tray)
        (reduce #'+ (tray-icons tray visibility) :key #'xlib:drawable-width)))
 
 (defun update-icon-containers-geometry (tray)
@@ -373,7 +373,7 @@ the icon over it."
 					(tray-win tray))
 	  (setf (xlib:drawable-x curwin) dx)
 	  (setf (xlib:drawable-y curwin) (+ *tray-cursor-icon-distance*
-				       (tray-icon-height tray)))
+				       (trayicon-height tray)))
 	  (setf (xlib:drawable-height curwin) *tray-cursor-thickness*)
 	  (setf (xlib:drawable-width curwin) (xlib:drawable-width icon)))))))
 
@@ -495,12 +495,12 @@ instead of its current position in the list."
   (tray-update tray))
 
 ;;; Icon scaling to tray size
-(defun scale-icon-width (tray-icon-height width height)
-  "Scales the icon keeping its aspect ratio so that its height is TRAY-ICON-HEIGHT."
+(defun scale-icon-width (tray-icon-height-i width height)
+  "Scales the icon keeping its aspect ratio so that its height is TRAY-ICON-HEIGHT-I."
   (let ((aspect-ratio (if (or (zerop height) (zerop width)) 
 			   1 ; some icons are initially mapped with zero width or height, assume square
 			   (/ width height))))
-    (ceiling (* tray-icon-height (max 1 aspect-ratio))))) ;; assume 1 as minimum aspect ratio
+    (ceiling (* tray-icon-height-i (max 1 aspect-ratio))))) ;; assume 1 as minimum aspect ratio
 
 ;;;; Xembed requirements
 (defun xembed-tray-init (tray)
@@ -595,7 +595,7 @@ protocol."
 									 (elt data 3))))
 					(remove-icon tray socket)))))))
 			      ((:configure-notify) (event-window window width height)
-			       (let ((iheight (tray-icon-height tray)))
+			       (let ((iheight (trayicon-height tray)))
 				 (when (and (member event-window (append (tray-vicons tray)
 									(tray-hicons tray))
 						    :test #'xlib:window-equal)
@@ -622,6 +622,21 @@ passed to `xlib:process-event'."
   (xembed-tray-init tray)
   (tray-update tray nil))
 
+(defun tray-window-list (tray)
+  (append (tray-viwin tray)
+	  (tray-hiwin tray)
+	  (tray-sowin tray)
+	  (tray-curwin tray)
+	  (tray-win tray)
+	  (tray-fpwin tray)))
+
+(defun tray-socket-list (tray)
+  (append (tray-vicons tray)
+	  (tray-hicons tray)))
+
+(defun tray-client-list (tray)
+  (mapcar #'xembed:client (tray-socket-list tray)))
+;(in-package :stumpwm)
 (defun new-mode-line-hook (mode-line)
   "If *tray-autoshow*, then creates tray window"
   (let ((stumpwm-screen (stumpwm::mode-line-screen mode-line)))
@@ -719,19 +734,4 @@ passed to `xlib:process-event'."
     (show-hiwin tray)
     (move-icon-right tray)
     (tray-update tray)))
-
-(defun tray-window-list (tray)
-  (append (tray-viwin tray)
-	  (tray-hiwin tray)
-	  (tray-sowin tray)
-	  (tray-curwin tray)
-	  (tray-win tray)
-	  (tray-fpwin tray)))
-
-(defun tray-socket-list (tray)
-  (append (tray-vicons tray)
-	  (tray-hicons tray)))
-
-(defun tray-client-list (tray)
-  (mapcar #'xembed:client (tray-socket-list tray)))
 	  
