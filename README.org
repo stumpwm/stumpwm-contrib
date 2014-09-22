@@ -1,6 +1,16 @@
 * A collection of StumpWM modules
 Documentation on modules can be found [[https://github.com/stumpwm/stumpwm/wiki/Modules][on our wiki]].  
 ** How to write a module
+*** General guidelines
+- Create your own package and optionally import the stumpwm
+  package. Don't use the stumpwm package. If you need a symbol
+  exported, [[https://github.com/stumpwm/stumpwm/issues][open an issue]].
+- Use =asdf=.
+- Document exported symbols and commands.
+- Stay organized!  Put things in neat little directories.  A distro
+  might want to package your module.
+
+*** A pseudo-tutorial
 The path of least resistance is to use `quickproject` and its helper
 functions.  Specifically (get [[http://www.quicklisp.org/beta/][quicklisp]]):
 #+BEGIN_SRC lisp
