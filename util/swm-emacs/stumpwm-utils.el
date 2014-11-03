@@ -8,8 +8,6 @@
     (rename-buffer "*sbcl-stumpwm-repl*")
     (slime-eval '(in-package :stumpwm))))
 
-(mapcar #'buffer-name (buffer-list))
-
 (defun stumpwm-disconnect
   "Disconnects from the swank server currently open."
   (with-current-buffer 
