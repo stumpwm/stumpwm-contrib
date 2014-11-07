@@ -1,0 +1,27 @@
+** Commentary
+To define a new layout, copy a current layout and modify the keys that
+are non standard. The first element of the alist is the numpad
+keycode, the second is a dotted pair of the keycode and modifier state
+that the numpad key should represent. In most cases, this will be 16
+(just numlock pressed), however if you need to represent a shift+key,
+then use 17. If you are unsure of the keycode, use the console program
+=xev= and press the keys in order to get the appropriate code.
+
+The layout name should be a symbol that is the result of:
+#+BEGIN_SRC sh
+setxkbmap -query | grep layout | awk '{print $2}'
+#+END_SRC
+This is so that it will be easy to parse the output of =setxkbmap= if
+someone decides to extend this module to make setting the layout
+happen automatically.
+
+** Usage
+Put this in your =.stumpwmrc=:
+#+BEGIN_SRC lisp
+(load-module "numpad-layouts")
+#+END_SRC
+Then, choose a supported layout.  If yours doesn't exist, add it and
+open a pull request.  You can set the layout with:
+#+BEGIN_SRC lisp
+(numpad-layouts:set-numpad-layout 'us) ; substitute us with the appropriate name
+#+END_SRC
