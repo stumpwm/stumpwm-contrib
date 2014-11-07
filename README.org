@@ -67,6 +67,7 @@ to the world!
 - [[./modeline/net/README.org][net]]
 - [[./modeline/wifi/README.org][wifi]]
 ** Utilities 
+- [[./util/numpad-layouts/README.org][numpad-layouts]]
 - [[./util/app-menu/README.org][menu]]
 - [[./util/logitech-g15-keysyms/README.org][keysyms]]
 - [[./util/passwd/README.org][passwd]]
