@@ -1,5 +1,6 @@
 ** Commentary
-To define a new layout, copy a current layout and modify the keys that
+To define a new layout, copy a current layout in the =*layouts*= 
+variable defined in =numpad-layouts.lisp= and modify the keys that
 are non standard. The first element of the alist is the numpad
 keycode, the second is a dotted pair of the keycode and modifier state
 that the numpad key should represent. In most cases, this will be 16
