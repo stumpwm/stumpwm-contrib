@@ -49,7 +49,7 @@
   "Use SURFRAW to surf the net; reclaim heathen lands."
   (check-type engine string)
   (check-type search string)
-  (run-shell-command (concat "exec surfraw -g " engine " '" search "'")))
+  (run-shell-command (concat "exec surfraw -g " engine " " search)))
 
 ;;; Bookmarks
 
