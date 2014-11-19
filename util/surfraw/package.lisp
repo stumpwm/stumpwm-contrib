@@ -1,5 +1,5 @@
 ;;;; package.lisp
 
 (defpackage #:surfraw
-  (:use #:cl))
+  (:use #:cl :stumpwm))
 
