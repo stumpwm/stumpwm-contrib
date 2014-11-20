@@ -7,5 +7,6 @@
   :license "GPLv3"
   :depends-on (#:stumpwm)
   :components ((:file "package")
-               (:file "surfraw")))
+               (:file "macros" :depends-on ("package"))
+               (:file "surfraw" :depends-on ("macros"))))
 
