@@ -27,7 +27,6 @@
                          (split-string (run-shell-command "surfraw -elvi" :collect-output-p)
                                        '(#\Newline)))))
 
-(auto-define-surfraw-commands-from-elvis-list)
 ;;; Regular surfraw commands
 
 (defcommand surfraw (engine search)
