@@ -43,22 +43,11 @@ prev-val."
   (or (loop
          for path in (list-directory "/sys/class/net/")
          thereis (let ((device-name (car (last (pathname-directory path)))))
-                   (if (probe-file (merge-pathnames (make-pathname :directory '(:relative "wireless")
-                                                                   :name "status")
+                   (if (probe-file (merge-pathnames (make-pathname :directory '(:relative "wireless"))
                                                     path))
                        device-name
                        nil)))
       (error "No wireless device found.")))
-
-(defun read-wifi-info (device what)
-  (let ((path (make-pathname :directory `(:absolute "sys" "class" "net" ,device "wireless"))))
-    (with-open-file (in (merge-pathnames (make-pathname :name what)
-                                         path))
-      (read-line-from-sysfs in))))
-
-(defun read-wifi-info-int (device what)
-  (parse-integer (read-wifi-info device what)))
-
 
 (defun-cached fmt-wifi 5 (ml)
   "Formatter for wifi status. Displays the ESSID of the access point
@@ -67,18 +56,22 @@ is found, just displays nil."
   (declare (ignore ml))
   (handler-case
       (let* ((device (or *wireless-device* (guess-wireless-device)))
+             (iwconfig (run-shell-command (format nil "~A ~A 2>/dev/null"
+                                                  *iwconfig-path*
+                                                  device)
+                                          t))
              (essid (multiple-value-bind (match? sub)
-                        (cl-ppcre:scan-to-strings "ESSID:\"(.*)\""
-                                                  (run-shell-command (format nil "~A ~A 2>/dev/null"
-                                                                             *iwconfig-path*
-                                                                             device)
-                                                                     t))
+                        (cl-ppcre:scan-to-strings "ESSID:\"(.*)\"" iwconfig)
                       (if match?
                           (aref sub 0)
-                          (return-from fmt-wifi "no link")))))
-        (let* ((qual (read-wifi-info-int device "link")))
-          (format nil "~A ^[~A~D%^]"
-                  essid (bar-zone-color qual 40 30 15 t) qual)))
+                          (return-from fmt-wifi "no link"))))
+             (qual (multiple-value-bind (match? sub)
+                       (cl-ppcre:scan-to-strings "Link Quality=(\\d+)/(\\d+)" iwconfig)
+                     (truncate (float (* (/ (parse-integer (aref sub 0))
+                                            (parse-integer (aref sub 1)))
+                                         100))))))
+        (format nil "~A ^[~A~D%^]"
+                essid (bar-zone-color qual 80 60 40 t) qual))
     ;; CLISP has annoying newlines in their error messages... Just
     ;; print a string showing our confusion.
     (t (c) (format nil "~A" c))))
