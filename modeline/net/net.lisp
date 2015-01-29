@@ -29,7 +29,10 @@
 (defconstant +gateway+ 2)
 (defconstant +flags+ 3)
 (defconstant +mask+ 7)
-(defconstant +ipv4-zero+ "00000000")
+(handler-bind
+    #+sbcl ((SB-EXT:DEFCONSTANT-UNEQL
+                #'(lambda (condition) (continue))))
+    (defconstant +ipv4-zero+ "00000000"))
 
 (defun now ()
   (/ (get-internal-real-time) internal-time-units-per-second))
