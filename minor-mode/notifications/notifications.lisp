@@ -29,7 +29,7 @@ added anew."
   (setf notifications nil))
 
 (defcommand notifications-delete (str)
-  ()
+  ((:rest "Notification: "))
   "Delete the specified notification."
   (setf notifications (delete str notifications :test #'string=)))
 
