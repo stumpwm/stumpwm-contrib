@@ -1,0 +1,5 @@
+** Usage
+Add this to your =.stumpwmrc=:
+#+BEGIN_SRC lisp
+(load-module "screenshot")
+#+END_SRC
