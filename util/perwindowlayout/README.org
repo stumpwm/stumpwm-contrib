@@ -1,0 +1,21 @@
+** Usage
+Add this to your =.stumpwmrc=:
+#+BEGIN_SRC lisp
+(load-module "perwindowlayout")
+(run-commands "enable-per-window-layout")
+#+END_SRC
+
+Then it begins maintaining per-window keyboard layout statuses.
+
+Use the code below to turn it off:
+#+BEGIN_SRC lisp
+(run-commands "disable-per-window-layout")
+#+END_SRC
+
+** Notes
+This is in some way specific to Emacs.
+
+** Tasks
+*** TODO Try to generalize for other specific applications (other than Emacs)
+
+
