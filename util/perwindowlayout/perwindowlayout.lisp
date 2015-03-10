@@ -1,10 +1,14 @@
 (in-package #:perwindowlayout)
 
 (export '(
+  *emacs-toggle-input-method-key*
   switch-window-layout
   enable-per-window-layout
   disable-per-window-layout
   ))
+
+(defparameter *emacs-toggle-input-method-key* "C-\\"
+  "Emacs keybinding being used to toggle its internal keyboard layout (input method)")
 
 (defun get-current-layout (display)
   (xlib:device-state-locked-group (xlib:get-state display)))
@@ -39,7 +43,7 @@
     (when cur-window
       (let ((current-window-class (window-class cur-window)))
         (if (string= current-window-class "Emacs")
-            (meta (kbd "C-\\"))
+            (meta (kbd *emacs-toggle-input-method-key*))
             (progn
               (let ((current-layout (get-current-layout *display*)))
                 (if (= current-layout 0)
