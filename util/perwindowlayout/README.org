@@ -1,0 +1,65 @@
+** Problem
+Default keyboard layout switching mechanism within X session has one
+specific trait - it toggles layouts systemwide, so for example, you
+may fall into following:
+
+1) having firefox window active, change keyboard layout for the one
+other than English
+2) switch to another opened window and have the layout that you chose
+in firefox window
+3) change layout / switch window as many times as you want, and have
+the same picture
+
+Some of us find this acceptable, but other people find this rather
+distracting, so those last ones might want to preserve each keyboard
+layout for each open window over time, until they want to change it
+manually.
+
+But then there is another problem, which is specific to Emacs editor -
+there are two independent ways of changing keyboard layout. One way
+is to use internal Emacs machinery and another is to lay on systemwide
+mechanism that was described above. The problem itself is about using
+the system wide switcher breaks whole Emacs hotkeys functionality as
+for example "C-x b" changes to C-<1> <2>, whatever keys are binded to
+<1> and <2> respectively in one's alternate keyboard layout, so barely
+all Emacs keybindings stop working.
+
+The solution here is to not use systemwide layout switcher and rely on
+Emacs switcher instead. But we must be careful not to forward keypresses
+to Emacs, when changing the keyboard layout. On the other hand, it is
+pretty handy to have one keybinding for switching layouts in all
+applications including Emacs (rather than have separate keybinding for
+Emacs only)
+
+This contrib extension was written with purpose of addressing the
+described problems.
+
+** Usage
+Add this to your =.stumpwmrc=:
+#+BEGIN_SRC lisp
+(load-module "perwindowlayout")
+#+END_SRC
+
+For extension to start maintaining per-window keyboard layouts, add
+this, to your =.stumpwmrc=:
+#+BEGIN_SRC lisp
+(run-commands "enable-per-window-layout")
+#+END_SRC
+
+Then, to actually switch keyboard layout, issue the command
+"switch-window-layout", or bind it to a key, for example:
+#+BEGIN_SRC lisp
+(define-key *top-map* (kbd "C-\\") "switch-window-layout")
+#+END_SRC
+
+To stop maintaining per-window keyboard layouts, add
+this somewhere else, to your =.stumpwmrc= (in some hook, for example):
+#+BEGIN_SRC lisp
+(run-commands "disable-per-window-layout")
+#+END_SRC
+
+** Notes
+This is in some way specific to Emacs.
+
+** Tasks
+*** TODO Try to generalize for other specific applications (other than Emacs)
