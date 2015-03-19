@@ -62,6 +62,7 @@ to the world!
 - [[./modeline/battery/README.org][battery]]
 - [[./modeline/cpu/README.org][cpu]]
 - [[./modeline/disk/README.org][disk]]
+- [[file:modeline/hostname/README.org][hostname]]
 - [[./modeline/maildir/README.org][maildir]]
 - [[./modeline/mem/README.org][mem]]
 - [[./modeline/net/README.org][net]]
