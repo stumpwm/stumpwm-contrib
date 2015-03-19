@@ -1,0 +1,24 @@
+* hostname
+
+** Usage
+
+Put %h in your StumpWM mode-line format string (*screen-mode-line-format*) to
+show the hostname up to the first '.'.
+
+** FAQ
+
+Q: What do I need to put in my ~/.stumpwmrc to get this working?
+
+A: First, make sure the source is in your load-path.  To add it, use something
+like
+#+BEGIN_SRC lisp
+    (add-to-load-path "~/stumpwm/contrib/modeline/hostname")
+#+END_SRC
+Next, load the module with
+#+BEGIN_SRC lisp
+    (load-module "hostname")
+#+END_SRC
+Finally create a mode-line format string with %h in it, e.g.,
+#+BEGIN_SRC lisp
+    (setf *screen-mode-line-format* "^[^B^7*%h^]")
+#+END_SRC
