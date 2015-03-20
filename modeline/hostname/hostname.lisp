@@ -3,6 +3,9 @@
 ;; Put %h in your modeline format string to show your hostname
 ;;
 
+(defpackage #:hostname
+  (:use #:cl :stumpwm))
+
 (in-package #:hostname)
 
 (defun fmt-hostname (ml)

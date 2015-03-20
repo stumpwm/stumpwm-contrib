@@ -6,6 +6,5 @@
   :license "2-CLAUSE BSD (see COPYRIGHT file for details)"
   :depends-on (#:stumpwm)
   :serial t
-  :components ((:file "package")
-               (:file "hostname")))
+  :components ((:file "hostname")))
 
