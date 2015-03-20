@@ -17,6 +17,6 @@ Finally create a mode-line format string with %h in it, e.g.,
 
 ** Notes
 
-This module uses `MACHINE-INSTANCE`, which isn't guaranteed to return a
+This module uses =MACHINE-INSTANCE=, which isn't guaranteed to return a
 hostname.  It should work with ABCL, ACL, CCL, CLISP, CMUCL, ECL, SBCL.  If it
 doesn't please report the issue.
