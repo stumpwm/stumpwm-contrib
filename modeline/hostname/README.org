@@ -1,0 +1,22 @@
+* hostname
+
+** Usage
+
+Add the source to your load-path with something like
+#+BEGIN_SRC lisp
+    (add-to-load-path "~/stumpwm/contrib/modeline/hostname")
+#+END_SRC
+Next, load the module with
+#+BEGIN_SRC lisp
+    (load-module "hostname")
+#+END_SRC
+Finally create a mode-line format string with %h in it, e.g.,
+#+BEGIN_SRC lisp
+    (setf *screen-mode-line-format* "^[^B^7*%h^]")
+#+END_SRC
+
+** Notes
+
+This module uses =MACHINE-INSTANCE=, which isn't guaranteed to return a
+hostname.  It should work with ABCL, ACL, CCL, CLISP, CMUCL, ECL, SBCL.  If it
+doesn't please report the issue.
