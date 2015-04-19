@@ -22,6 +22,8 @@
 ;;; <http://www.gnu.org/licenses/>.
 ;;;
 
+;;; Various changes in this file by Tom Hunt, 2012-2015.
+
 ;;; CODE:
 
 #-(or sbcl clisp lispworks6 ccl)
@@ -36,20 +38,24 @@
 	  *mpd-modeline-fmt*
 	  *mpd-volume-step*
 	  *mpd-port*
+	  *mpd-server*
 	  mpd-browse-playlist
 	  select-song-from-playlist
 	  mpd-play
 	  mpd-toggle-repeat
 	  mpd-toggle-random
+	  mpd-toggle-single
 	  mpd-toggle-pause
 	  mpd-kill
 	  mpd-disconnect
 	  mpd-connect
           *mpd-browse-menu-map*
+	  *mpd-playlist-menu-map*
 	  mpd-browse-artists
 	  mpd-browse-albums
           mpd-browse-genres
           mpd-browse-tracks
+          mpd-browse-database
 	  mpd-update
 	  mpd-clear
 	  mpd-volume-down
@@ -225,6 +231,7 @@
 
 (defparameter *mpd-current-song* nil)
 (defparameter *mpd-status* nil)
+(defparameter *mpd-did-repeat* nil)
 
 (defun mpd-update-current-song ()
   (setf *mpd-current-song* (mpd-send-command "currentsong")))
@@ -241,32 +248,45 @@
   (assoc-value :date *mpd-current-song*))
 
 (defun mpd-minutes-seconds (time)
-  (let ((minutes) (seconds))
+  (let ((minutes) (seconds) (hours))
     (if (< time 60)
 	(progn
+	  (setf hours 0)
 	  (setf minutes 0)
 	  (setf seconds time))
-      (progn
-	(setf minutes (write-to-string (floor time 60)))
-	(setf seconds (rem time 60))))
+      (multiple-value-bind (min sec) (floor time 60)
+			   (setf minutes min)
+			   (setf seconds sec)))
+    (if (> minutes 59)
+	(multiple-value-bind (hr min) (floor minutes 60)
+			     (setf hours hr)
+			     (setf minutes min))
+      (setf hours 0))
     (when (< seconds 10)
       (setf seconds (concat "0" (write-to-string seconds))))
-    (format nil "~a:~a" minutes seconds)))
+    (if (> hours 0)
+	(format nil "~a:~2,,,'0@a:~a" hours minutes seconds)
+      (format nil "~a:~a" minutes seconds))))
 
 (defun mpd-get-elapsed ()
-  (let* ((total (assoc-value :time *mpd-current-song*))
-	 (time (assoc-value :time *mpd-status*))
-	 (elapsed (parse-integer (subseq time 0 (- (length time) (length total) 1)))))
+  (let* ((time (assoc-value :time *mpd-status*))
+	 (pos (position #\: time))
+	 (elapsed (parse-integer (subseq time 0 pos))))
     (mpd-minutes-seconds elapsed)))
 
 (defun mpd-get-length ()
-  (let ((time (parse-integer (assoc-value :time *mpd-current-song*))))
+  (let ((time (parse-integer (or (assoc-value :time *mpd-current-song*) "0"))))
     (mpd-minutes-seconds time)))
 
 (defun mpd-get-status ()
   (cond ((equal (assoc-value :state *mpd-status*) "play") "Playing")
 	((equal (assoc-value :state *mpd-status*) "pause") "Paused")
 	((equal (assoc-value :state *mpd-status*) "stop") "Stopped")))
+
+(defun mpd-get-shortstatus () 
+  (cond ((equal (assoc-value :state *mpd-status*) "play") "->")
+	((equal (assoc-value :state *mpd-status*) "pause") "||")
+	((equal (assoc-value :state *mpd-status*) "stop") "[]")))  
 
 (defun mpd-get-file ()
   (assoc-value :file *mpd-current-song*))
@@ -282,8 +302,10 @@
 (defun mpd-get-genre ()
   (assoc-value :genre *mpd-current-song*))
 
+;; This function used to error out when called when nothing was playing, and
+;; this fact caused me much strife and confusion. >:(
 (defun mpd-get-number ()
-  (write-to-string (1+ (parse-integer (assoc-value :song *mpd-status*)))))
+  (write-to-string (1+ (parse-integer (or (assoc-value :song *mpd-status*) "-1")))))
 
 (defun mpd-get-playlistlength ()
   (assoc-value :playlistlength *mpd-status*))
@@ -302,8 +324,22 @@
 (defun mpd-get-shuffle ()
   (if (mpd-shuffle-p) "S" "_"))
 
+(defun mpd-single-p ()
+  (if (string= (assoc-value :single *mpd-status*) "1")
+      t nil))
+
+(defun mpd-get-single ()
+  (if (mpd-single-p) "1" "_"))
+
 (defun mpd-get-title ()
   (assoc-value :title *mpd-current-song*))
+
+(defun mpd-get-label ()
+  (let* ((title (assoc-value :title *mpd-current-song*))
+         (filename (assoc-value :file *mpd-current-song*))
+         (basename (subseq filename (1+ (or (position #\/ filename :from-end t) -1)) (position #\. filename :from-end t)))
+         (realname (if (null title) basename title)))
+    realname))
 
 (defun mpd-get-track ()
   (assoc-value :track *mpd-current-song*))
@@ -351,13 +387,15 @@
     (#\f mpd-get-file)
     (#\F mpd-get-xfade)
     (#\g mpd-get-genre)
+    (#\i mpd-get-single)
     (#\l mpd-get-length)
+    (#\L mpd-get-shortstatus)
     (#\n mpd-get-number)
     (#\p mpd-get-playlistlength)
     (#\r mpd-get-repeat)
     (#\s mpd-get-shuffle)
     (#\S mpd-get-status)
-    (#\t mpd-get-title)
+    (#\t mpd-get-label)
     (#\T mpd-get-track)
     (#\v mpd-get-volume)
     (#\m mpd-get-song-name)))
@@ -446,22 +484,24 @@ Volume
 (when (null *mpd-playlist-menu-map*)
   (setf *mpd-playlist-menu-map*
         (let ((m (make-sparse-keymap)))
-          (define-key m (kbd "k") 'menu-up)
-          (define-key m (kbd "j") 'menu-down)
+          (define-key m (kbd "k") 'stumpwm::menu-up)
+          (define-key m (kbd "j") 'stumpwm::menu-down)
 
           (define-key m (kbd "S-Up") (mpd-menu-action :mpd-playlist-move-up))
           (define-key m (kbd "S-Down") (mpd-menu-action :mpd-playlist-move-down))
+	  (define-key m (kbd "S-k") (mpd-menu-action :mpd-playlist-move-up))
+	  (define-key m (kbd "S-j") (mpd-menu-action :mpd-playlist-move-down))
           (define-key m (kbd "d") (mpd-menu-action :mpd-playlist-delete))
           (define-key m (kbd "RET") (mpd-menu-action :mpd-playlist-play))
           m)))
 
-(defun mpd-uniq-and-sort-list (list criteria &optional do-sort)
+(defun mpd-uniq-and-sort-list (list criteria &optional do-sort case-insensitive)
   (let ((lst (mapcar #'cadr (remove-if (lambda (item)
 					 (not (equal criteria
 						     (first item))))
 				       list))))
     (if do-sort
-	(sort lst #'string<)
+	(sort lst (if case-insensitive #'string-lessp #'string<))
 	lst)))
 
 (defcommand mpd-browse-playlist (&optional current-song) ()
@@ -497,13 +537,34 @@ Volume
 
 (defcommand-alias select-song-from-playlist browse-playlist)
 
+(defvar *mpd-select-playlist-map* nil)
+(when (null *mpd-select-playlist-map*)
+  (setf *mpd-select-playlist-map*
+        (let ((m (make-sparse-keymap)))
+          (define-key m (kbd "k") 'stumpwm::menu-up)
+          (define-key m (kbd "j") 'stumpwm::menu-down)
+
+          (define-key m (kbd "RET") (mpd-menu-action :mpd-playlist-load))
+          m)))
+
+(defcommand mpd-select-playlist (&optional current) ()
+  (let* ((response (mpd-send-command "listplaylists"))
+	 (list (mpd-uniq-and-sort-list response :playlist t)))
+    (multiple-value-bind (action choice)
+			 (mpd-menu "Playlists" list *mpd-select-playlist-map*
+				   (if current current 0))
+			 (let ((index (position choice list)))
+			   (case action
+				 (:mpd-playlist-load
+				  (mpd-format-command "load ~a" choice)))))))
+
 ;; database  browsing
 (defvar *mpd-browse-menu-map* nil)
 (when (null *mpd-browse-menu-map*)
   (setf *mpd-browse-menu-map*
         (let ((m (make-sparse-keymap)))
-          (define-key m (kbd "k") 'menu-up)
-          (define-key m (kbd "j") 'menu-down)
+          (define-key m (kbd "k") 'stumpwm::menu-up)
+          (define-key m (kbd "j") 'stumpwm::menu-down)
 
           (define-key m (kbd "RET") (mpd-menu-action :mpd-browse-add-and-quit))
           (define-key m (kbd "S-RET") (mpd-menu-action :mpd-browse-add))
@@ -513,75 +574,101 @@ Volume
           m)))
 
 
-(defcommand mpd-browse-artists (&optional genre) ()
+(defcommand mpd-browse-artists (&optional genre (startpos 0) waspos) ()
   (let* ((response (mpd-send-command
                     (if genre
                         (format nil "list artist genre \"~a\"" genre)
                           "list artist")))
          (options (mpd-uniq-and-sort-list response :artist t)))
         (multiple-value-bind (action choice)
-            (mpd-menu "Select artist" options *mpd-browse-menu-map*)
+            (mpd-menu "Select artist" options *mpd-browse-menu-map* startpos)
           (case action
             (:mpd-browse-add-and-quit
              (mpd-search-and-add-artist choice t))
             (:mpd-browse-add
              (mpd-search-and-add-artist choice t)
-             (mpd-browse-artists genre))
+             (mpd-browse-artists genre (1+ (or (position choice options) 0)) waspos))
             (:mpd-browse-previous
              (unless %interactivep%
-               (mpd-browse-genres)))
+               (mpd-browse-genres (or (car waspos) 0) (cdr waspos))))
             (:mpd-browse-next
-               (mpd-browse-albums choice genre))))))
+             (mpd-browse-albums choice genre 0 (cons (or (position choice options) 0) waspos)))))))
 
-(defcommand mpd-browse-genres () ()
+(defcommand mpd-browse-genres (&optional (startpos 0) waspos) ()
     (let* ((response (mpd-send-command "list genre"))
            (options (mpd-uniq-and-sort-list response :genre t)))
         (multiple-value-bind (action choice)
-            (mpd-menu "Select genre" options *mpd-browse-menu-map*)
+            (mpd-menu "Select genre" options *mpd-browse-menu-map* startpos)
           (case action
             (:mpd-browse-add-and-quit
              (mpd-search-and-add-genre choice t))
             (:mpd-browse-add
              (mpd-search-and-add-genre choice t)
-             (mpd-browse-genres))
+             (mpd-browse-genres (1+ (or (position choice options) 0)) waspos))
             (:mpd-browse-next
-               (mpd-browse-artists choice))))))
+               (mpd-browse-artists choice 0 (cons (or (position choice options) 0) waspos)))))))
 
-(defcommand mpd-browse-albums (&optional artist genre) ((:string "Artist: "))
+(defcommand mpd-browse-albums (&optional artist genre (startpos 0) waspos) ((:string "Artist: "))
     (let* ((response (mpd-send-command
                       (if artist
                           (format nil "list album artist \"~a\"" artist)
                           "list album")))
            (options (mpd-uniq-and-sort-list response :album)))
         (multiple-value-bind (action choice)
-            (mpd-menu "Select album" options *mpd-browse-menu-map*)
+            (mpd-menu "Select album" options *mpd-browse-menu-map* startpos)
           (case action
             (:mpd-browse-add-and-quit
              (mpd-search-and-add-album choice t))
             (:mpd-browse-add
              (mpd-search-and-add-album choice t)
-             (mpd-browse-albums artist genre))
+             (mpd-browse-albums artist genre (1+ (or (position choice options) 0)) waspos))
             (:mpd-browse-previous
              (unless %interactivep%
-               (mpd-browse-artists genre)))
+               (mpd-browse-artists genre (or (car waspos) 0) (cdr waspos))))
             (:mpd-browse-next
-               (mpd-browse-tracks choice artist))))))
+               (mpd-browse-tracks choice artist 0 (cons (or (position choice options) 0) waspos)))))))
 
-(defcommand mpd-browse-tracks (album &optional artist) ((:string "Album: "))
+(defcommand mpd-browse-tracks (album &optional artist (startpos 0) waspos) ((:string "Album: "))
     (let* ((response (mpd-send-command
-                          (format nil "list title album \"~a\"" album)))
+                      (format nil "find album \"~a\"" album)))
            (options (mpd-uniq-and-sort-list response :title)))
         (multiple-value-bind (action choice)
-            (mpd-menu "Select track" options *mpd-browse-menu-map*)
+            (mpd-menu "Select track" options *mpd-browse-menu-map* startpos)
           (case action
             (:mpd-browse-add-and-quit
              (mpd-search-and-add-title choice t))
             (:mpd-browse-add
              (mpd-search-and-add-title choice t)
-             (mpd-browse-tracks album artist))
+             (mpd-browse-tracks album artist (1+ (or (position choice options) 0)) waspos))
             (:mpd-browse-previous
              (unless %interactivep%
-               (mpd-browse-albums artist)))))))
+               (mpd-browse-albums artist () (or (car waspos) 0) (cdr waspos))))))))
+
+(defcommand mpd-browse-database (&optional dir (startpos 0) waspos) ()
+  (let* ((response (mpd-send-command
+                    (if dir
+                        (format () "lsinfo \"~a\"" dir) "lsinfo")))
+         (basename (lambda (x) (subseq x (1+ (or (position #\/ x :from-end t) -1)))))
+         (pathjoin (lambda (x) (if dir (concatenate 'string dir "/" x) x)))
+         (dirs (mapcar basename (mpd-uniq-and-sort-list response :directory t t)))
+         (files (mapcar basename (mpd-uniq-and-sort-list response :file t t)))
+         (options (concatenate 'list (mapcar (lambda (x) (cons x :directory)) dirs) (mapcar (lambda (x) (cons x :file)) files))))
+    (multiple-value-bind (action choice)
+                         (mpd-menu "Select option" options *mpd-browse-menu-map* startpos)
+                         (case action
+                               (:mpd-browse-add-and-quit
+                                (mpd-add-file (funcall pathjoin (car choice))))
+                               (:mpd-browse-add
+                                (mpd-add-file (funcall pathjoin (car choice)))
+                                (mpd-browse-database dir (1+ (or (position choice options) 0)) waspos))
+                               (:mpd-browse-previous
+                                (unless %interactivep%
+                                  (mpd-browse-database (caar waspos) (cdar waspos) (cdr waspos))))
+                               (:mpd-browse-next
+                                (if (equal :file (cdr choice))
+                                    (mpd-browse-database dir (or (position choice options) 0) waspos)
+                                  (mpd-browse-database (funcall pathjoin (car choice)) 0 (cons (cons dir (or (position choice options) 0)) waspos))))))))
+
 
 ;;misc. commands
 (defcommand mpd-connect () ()
@@ -618,6 +705,20 @@ Volume
   (if (mpd-repeating-p)
       (mpd-send-command "repeat 0")
     (mpd-send-command "repeat 1")))
+
+;; If single is turned on we want to turn repeat off. (If we actually want to
+;; repeat a single we can send the command manually. :P)
+(defcommand mpd-toggle-single () ()
+  (mpd-update-status)
+  (if (mpd-single-p)
+      (progn
+	(if *mpd-did-repeat*
+	    (mpd-send-command "repeat 1"))
+	(mpd-send-command "single 0"))
+    (progn
+      (setf *mpd-did-repeat* (mpd-repeating-p))
+      (mpd-send-command "repeat 0")
+      (mpd-send-command "single 1"))))
 
 (defvar *mpd-xfade-default* 5
   "The value to which to set crossfade by default.
@@ -685,17 +786,54 @@ Passed an argument of zero and if crossfade is on, toggles crossfade off."
   (message "~a"
 	   (format-expand *mpd-formatters-alist* *mpd-status-fmt*)))
 
+(defun mpd-output-process (inlist)
+  (let ((outlist ())
+	(celem ()))
+    (dolist (ie inlist)
+      (if (equal (car ie) :file)
+	  (progn
+	    (if celem
+		(setf outlist (append outlist (list celem))))
+	    (setf celem ie))
+	(setf celem (append celem ie))))
+    (setf outlist (append outlist (list celem)))
+    outlist))
+
+(defun mpd-create-label (infunc)
+  (let* ((title (getf infunc :title))
+         (filename (getf infunc :file))
+         (basename (subseq filename (1+ (position #\/ filename :from-end t)) (position #\. filename :from-end t)))
+         (realname (if (null title) basename title)))
+    realname))
+
 (defcommand mpd-playlist () ()
-  (let* ((response (mpd-send-command "playlistinfo"))
-         (result (mapcar #'cadr (remove-if (lambda (item)
-                                             (not (equal :file
-                                                         (first item))))
-                                           response))))
-    (if (< (length result) 80)
-        (message "Current playlist (~a): ~%^7*~{~a~%~}"
-                 (length result)
-                 result)
-      (message "~a files in playlist" (length result)))))
+  (let* ((response (mpd-output-process (mpd-send-command "playlistinfo")))
+         (result (mapcar (lambda (infunc) 
+			   (list (mpd-create-label infunc)
+				 (read-from-string (let ((tv (getf infunc :time))) (if (null tv) "0" tv)))))
+			 response))
+	 ;; The field width which the song names should fill
+	 (mlen (max 50 (+ 10 (apply #'max (mapcar (lambda (istr) (length (car istr))) result)))))
+	 ;; Total playing length of the playlist
+	 (tplay (mpd-minutes-seconds (apply #'+ (mapcar #'cadr result)))))
+    (message "Current playlist (~a, ~a): ~%^7*~{~{~:[~;^B~]~3d. ~Va~a~:[~;^b~]~%~}~}" ;; This is now far less horrible than my first version, which had a format-to-string
+    	     (length result)                                                          ;; generating the format string for the format-to-output. *shudder*
+    	     tplay
+    	     (let* ((pn (1- (let ((n (mpd-get-number))) (if (null n) 0 (read-from-string n)))))
+    	       	    (outlist (let ((cn 0))
+    	       			(mapcar (lambda (in) 
+    	       				  (setf cn (1+ cn))
+    	       				  (list (= cn (+ 1 pn)) cn mlen (car in) (mpd-minutes-seconds (cadr in)) (= cn (+ 1 pn))))
+    	       				result))))
+    	       (if (< (length outlist) 55)
+    	       	   outlist
+    	       	 (let* ((ii (max 0 (- pn 25)))
+    	       		(ai (min (length outlist) (+ pn 25))))
+    	       	   (if (< (- ai ii) 50)
+    	       	       (progn
+    	       		 (setf ii (max 0 (- ii (- 50 (- ai ii)))))
+    	       		 (setf ai (min (length outlist) (+ ai (- 50 (- ai ii)))))))
+    	       	   (subseq outlist ii ai)))))))
 
 (defcommand mpd-add-file (file) ((:rest "Add file to playlist: "))
   (mpd-format-command "add \"~a\"" file))
