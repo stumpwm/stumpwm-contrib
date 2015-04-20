@@ -280,13 +280,13 @@
 
 (defun mpd-get-status ()
   (cond ((equal (assoc-value :state *mpd-status*) "play") "Playing")
-	((equal (assoc-value :state *mpd-status*) "pause") "Paused")
-	((equal (assoc-value :state *mpd-status*) "stop") "Stopped")))
+        ((equal (assoc-value :state *mpd-status*) "pause") "Paused")
+        ((equal (assoc-value :state *mpd-status*) "stop") "Stopped")))
 
 (defun mpd-get-shortstatus () 
   (cond ((equal (assoc-value :state *mpd-status*) "play") "->")
-	((equal (assoc-value :state *mpd-status*) "pause") "||")
-	((equal (assoc-value :state *mpd-status*) "stop") "[]")))  
+        ((equal (assoc-value :state *mpd-status*) "pause") "||")
+        ((equal (assoc-value :state *mpd-status*) "stop") "[]")))  
 
 (defun mpd-get-file ()
   (assoc-value :file *mpd-current-song*))
@@ -295,9 +295,9 @@
   (assoc-value :volume *mpd-status*))
 
 (defun mpd-get-xfade ()
-  (let ((xfade (assoc-value :xfade *mpd-status*)))
+  (let ((xfade (or (assoc-value :xfade *mpd-status*) "0")))
     (if (> (parse-integer xfade) 0)
-	(format nil "F=~a" (assoc-value :xfade *mpd-status*)) "_")))
+        (format nil"F=~a" xfade) "_")))
 
 (defun mpd-get-genre ()
   (assoc-value :genre *mpd-current-song*))
@@ -373,10 +373,10 @@
       (with-mpd-connection
        (mpd-update-status)
        (if (equal "Stopped" (mpd-get-status))
-	   (format-expand *mpd-formatters-alist* *mpd-status-fmt*)
-	 (progn
-	   (mpd-update-current-song)
-	   (format-expand *mpd-formatters-alist* *mpd-modeline-fmt*))))
+           (format-expand *mpd-formatters-alist* *mpd-status-fmt*)
+         (progn
+           (mpd-update-current-song)
+           (format-expand *mpd-formatters-alist* *mpd-modeline-fmt*))))
       "Not connected to mpd"))
 
 (defvar *mpd-formatters-alist*
@@ -497,12 +497,12 @@ Volume
 
 (defun mpd-uniq-and-sort-list (list criteria &optional do-sort case-insensitive)
   (let ((lst (mapcar #'cadr (remove-if (lambda (item)
-					 (not (equal criteria
-						     (first item))))
-				       list))))
+                                         (not (equal criteria
+                                                     (first item))))
+                                       list))))
     (if do-sort
-	(sort lst (if case-insensitive #'string-lessp #'string<))
-	lst)))
+        (sort lst (if case-insensitive #'string-lessp #'string<))
+      lst)))
 
 (defcommand mpd-browse-playlist (&optional current-song) ()
   (let* ((status (mpd-send-command "status"))
@@ -549,14 +549,14 @@ Volume
 
 (defcommand mpd-select-playlist (&optional current) ()
   (let* ((response (mpd-send-command "listplaylists"))
-	 (list (mpd-uniq-and-sort-list response :playlist t)))
+         (list (mpd-uniq-and-sort-list response :playlist t)))
     (multiple-value-bind (action choice)
-			 (mpd-menu "Playlists" list *mpd-select-playlist-map*
-				   (if current current 0))
-			 (let ((index (position choice list)))
-			   (case action
-				 (:mpd-playlist-load
-				  (mpd-format-command "load ~a" choice)))))))
+        (mpd-menu "Playlists" list *mpd-select-playlist-map*
+                  (if current current 0))
+      (let ((index (position choice list)))
+        (case action
+          (:mpd-playlist-load
+           (mpd-format-command "load ~a" choice)))))))
 
 ;; database  browsing
 (defvar *mpd-browse-menu-map* nil)
@@ -652,22 +652,27 @@ Volume
          (pathjoin (lambda (x) (if dir (concatenate 'string dir "/" x) x)))
          (dirs (mapcar basename (mpd-uniq-and-sort-list response :directory t t)))
          (files (mapcar basename (mpd-uniq-and-sort-list response :file t t)))
-         (options (concatenate 'list (mapcar (lambda (x) (cons x :directory)) dirs) (mapcar (lambda (x) (cons x :file)) files))))
+         (playlists (mapcar basename (mpd-uniq-and-sort-list response :playlist t t)))
+         (options (concatenate 'list (mapcar (lambda (x) (cons x :directory)) dirs) (mapcar (lambda (x) (cons x :file)) files) (mapcar (lambda (x) (cons x :playlist)) playlists))))
     (multiple-value-bind (action choice)
-                         (mpd-menu "Select option" options *mpd-browse-menu-map* startpos)
-                         (case action
-                               (:mpd-browse-add-and-quit
-                                (mpd-add-file (funcall pathjoin (car choice))))
-                               (:mpd-browse-add
-                                (mpd-add-file (funcall pathjoin (car choice)))
-                                (mpd-browse-database dir (1+ (or (position choice options) 0)) waspos))
-                               (:mpd-browse-previous
-                                (unless %interactivep%
-                                  (mpd-browse-database (caar waspos) (cdar waspos) (cdr waspos))))
-                               (:mpd-browse-next
-                                (if (equal :file (cdr choice))
-                                    (mpd-browse-database dir (or (position choice options) 0) waspos)
-                                  (mpd-browse-database (funcall pathjoin (car choice)) 0 (cons (cons dir (or (position choice options) 0)) waspos))))))))
+        (mpd-menu "Select option" options *mpd-browse-menu-map* startpos)
+      (case action
+        (:mpd-browse-add-and-quit
+         (if (equal :playlist (cdr choice))
+             (mpd-format-command "load \"~a\"" (funcall pathjoin (car choice)))
+           (mpd-add-file (funcall pathjoin (car choice)))))
+        (:mpd-browse-add
+         (if (equal :playlist (cdr choice))
+             (mpd-format-command "load \"~a\"" (funcall pathjoin (car choice)))
+           (mpd-add-file (funcall pathjoin (car choice))))
+         (mpd-browse-database dir (1+ (or (position choice options) 0)) waspos))
+        (:mpd-browse-previous
+         (unless %interactivep%
+           (mpd-browse-database (caar waspos) (cdar waspos) (cdr waspos))))
+        (:mpd-browse-next
+         (if (not (equal :directory (cdr choice)))
+             (mpd-browse-database dir (or (position choice options) 0) waspos)
+           (mpd-browse-database (funcall pathjoin (car choice)) 0 (cons (cons dir (or (position choice options) 0)) waspos))))))))
 
 
 ;;misc. commands
@@ -809,31 +814,31 @@ Passed an argument of zero and if crossfade is on, toggles crossfade off."
 (defcommand mpd-playlist () ()
   (let* ((response (mpd-output-process (mpd-send-command "playlistinfo")))
          (result (mapcar (lambda (infunc) 
-			   (list (mpd-create-label infunc)
-				 (read-from-string (let ((tv (getf infunc :time))) (if (null tv) "0" tv)))))
-			 response))
-	 ;; The field width which the song names should fill
-	 (mlen (max 50 (+ 10 (apply #'max (mapcar (lambda (istr) (length (car istr))) result)))))
-	 ;; Total playing length of the playlist
-	 (tplay (mpd-minutes-seconds (apply #'+ (mapcar #'cadr result)))))
+   (list (mpd-create-label infunc)
+ (read-from-string (let ((tv (getf infunc :time))) (if (null tv) "0" tv)))))
+ response))
+ ;; The field width which the song names should fill
+ (mlen (max 50 (+ 10 (apply #'max (mapcar (lambda (istr) (length (car istr))) result)))))
+ ;; Total playing length of the playlist
+ (tplay (mpd-minutes-seconds (apply #'+ (mapcar #'cadr result)))))
     (message "Current playlist (~a, ~a): ~%^7*~{~{~:[~;^B~]~3d. ~Va~a~:[~;^b~]~%~}~}" ;; This is now far less horrible than my first version, which had a format-to-string
-    	     (length result)                                                          ;; generating the format string for the format-to-output. *shudder*
-    	     tplay
-    	     (let* ((pn (1- (let ((n (mpd-get-number))) (if (null n) 0 (read-from-string n)))))
-    	       	    (outlist (let ((cn 0))
-    	       			(mapcar (lambda (in) 
-    	       				  (setf cn (1+ cn))
-    	       				  (list (= cn (+ 1 pn)) cn mlen (car in) (mpd-minutes-seconds (cadr in)) (= cn (+ 1 pn))))
-    	       				result))))
-    	       (if (< (length outlist) 55)
-    	       	   outlist
-    	       	 (let* ((ii (max 0 (- pn 25)))
-    	       		(ai (min (length outlist) (+ pn 25))))
-    	       	   (if (< (- ai ii) 50)
-    	       	       (progn
-    	       		 (setf ii (max 0 (- ii (- 50 (- ai ii)))))
-    	       		 (setf ai (min (length outlist) (+ ai (- 50 (- ai ii)))))))
-    	       	   (subseq outlist ii ai)))))))
+         (length result)                                                          ;; generating the format string for the format-to-output. *shudder*
+         tplay
+         (let* ((pn (1- (let ((n (mpd-get-number))) (if (null n) 0 (read-from-string n)))))
+                (outlist (let ((cn 0))
+                           (mapcar (lambda (in) 
+                                     (setf cn (1+ cn))
+                                     (list (= cn (+ 1 pn)) cn mlen (car in) (mpd-minutes-seconds (cadr in)) (= cn (+ 1 pn))))
+                                   result))))
+           (if (< (length outlist) 55)
+               outlist
+             (let* ((ii (max 0 (- pn 25)))
+                    (ai (min (length outlist) (+ pn 25))))
+               (if (< (- ai ii) 50)
+                   (progn
+                     (setf ii (max 0 (- ii (- 50 (- ai ii)))))
+                     (setf ai (min (length outlist) (+ ai (- 50 (- ai ii)))))))
+               (subseq outlist ii ai)))))))
 
 (defcommand mpd-add-file (file) ((:rest "Add file to playlist: "))
   (mpd-format-command "add \"~a\"" file))
