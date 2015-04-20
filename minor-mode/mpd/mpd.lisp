@@ -295,9 +295,9 @@
   (assoc-value :volume *mpd-status*))
 
 (defun mpd-get-xfade ()
-  (let ((xfade (assoc-value :xfade *mpd-status*)))
+  (let ((xfade (or (assoc-value :xfade *mpd-status*) "0")))
     (if (> (parse-integer xfade) 0)
-	(format nil "F=~a" (assoc-value :xfade *mpd-status*)) "_")))
+	(format nil "F=~a" xfade) "_")))
 
 (defun mpd-get-genre ()
   (assoc-value :genre *mpd-current-song*))
