@@ -652,20 +652,25 @@ Volume
          (pathjoin (lambda (x) (if dir (concatenate 'string dir "/" x) x)))
          (dirs (mapcar basename (mpd-uniq-and-sort-list response :directory t t)))
          (files (mapcar basename (mpd-uniq-and-sort-list response :file t t)))
-         (options (concatenate 'list (mapcar (lambda (x) (cons x :directory)) dirs) (mapcar (lambda (x) (cons x :file)) files))))
+	 (playlists (mapcar basename (mpd-uniq-and-sort-list response :playlist t t)))
+         (options (concatenate 'list (mapcar (lambda (x) (cons x :directory)) dirs) (mapcar (lambda (x) (cons x :file)) files) (mapcar (lambda (x) (cons x :playlist)) playlists))))
     (multiple-value-bind (action choice)
                          (mpd-menu "Select option" options *mpd-browse-menu-map* startpos)
                          (case action
                                (:mpd-browse-add-and-quit
-                                (mpd-add-file (funcall pathjoin (car choice))))
+				(if (equal :playlist (cdr choice))
+					   (mpd-format-command "load \"~a\"" (funcall pathjoin (car choice)))
+					   (mpd-add-file (funcall pathjoin (car choice)))))
                                (:mpd-browse-add
-                                (mpd-add-file (funcall pathjoin (car choice)))
+				(if (equal :playlist (cdr choice))
+					   (mpd-format-command "load \"~a\"" (funcall pathjoin (car choice)))
+					   (mpd-add-file (funcall pathjoin (car choice))))
                                 (mpd-browse-database dir (1+ (or (position choice options) 0)) waspos))
                                (:mpd-browse-previous
                                 (unless %interactivep%
                                   (mpd-browse-database (caar waspos) (cdar waspos) (cdr waspos))))
                                (:mpd-browse-next
-                                (if (equal :file (cdr choice))
+                                (if (not (equal :directory (cdr choice)))
                                     (mpd-browse-database dir (or (position choice options) 0) waspos)
                                   (mpd-browse-database (funcall pathjoin (car choice)) 0 (cons (cons dir (or (position choice options) 0)) waspos))))))))
 
