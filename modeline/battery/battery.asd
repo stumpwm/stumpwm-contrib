@@ -1,11 +1,13 @@
 ;;;; battery.asd
 
 (asdf:defsystem #:battery
-  :serial t
   :description "Describe battery here"
   :author "Vitaly Mayatskikh"
+  :maintainer "Julian Stecklina"
   :license "GPLv3"
-  :depends-on (#:stumpwm)
-  :components ((:file "package")
-               (:file "battery")))
+  :version "0.2.0"
+  :depends-on (#:stumpwm
+               #:cl-ppcre
+               #:uiop)
+  :components ((:file "battery")))
 

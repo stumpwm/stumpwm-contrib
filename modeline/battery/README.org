@@ -10,3 +10,6 @@ Then you can use "%b" in your mode line format.
 ** Notes
 This is specific to Linux.
 
+** Possible Improvements
+- [ ] figure out how to signal a recalculation when charger is plugged.
+- [ ] Benchmark the use of Hashtables of alists or plists.
