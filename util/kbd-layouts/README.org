@@ -1,0 +1,9 @@
+Keyboard layout switcher for StumpWM
+
+** Usage
+Add 
+#+BEGIN_SRC lisp
+(load-module "kbd-layouts")
+#+END_SRC
+to =.stumpwmrc=
+
