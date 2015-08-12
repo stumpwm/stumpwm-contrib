@@ -64,13 +64,14 @@ the command has printed on stdout as string."
 	       (let ((child
 		      ;; Any nicer way to do this?
 		      (sb-sys:without-gcing
-			(sb-impl::with-c-strvec (c-argv simplified-args)
-			  (sb-impl::with-c-strvec (c-env simplified-env)
+			(sb-impl::with-args (c-argv simplified-args)
+			  (sb-impl::with-environment (c-env simplified-env)
 			    (sb-impl::spawn  progname c-argv devnull
 					     pipe-write ; stdout
 					     devnull 1 c-env
 					     nil ; PTY
 					     1 ; wait? (seems to do nothing)
+					     nil ; stay in current directory
 					     ))))))
 		 (when (= child -1)
 		   (error "Starting ~A failed." name))
