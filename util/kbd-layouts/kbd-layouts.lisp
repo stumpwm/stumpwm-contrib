@@ -8,9 +8,6 @@
 
 (defvar *available-keyboard-layouts* nil)
 
-;; Output from 'setxkbmap -print' is authoritative
-(defvar *current-keyboard-layout* nil)
-
 ;; Available options:
 ;; :normal -> CapsLock
 ;; :ctrl   -> Ctrl
@@ -42,18 +39,22 @@
 ;;;;;;;;;;;;;;
 
 (defcommand switch-keyboard-layout () ()
-            (let* ((layout (pop *available-keyboard-layouts*))
-                   (cmd (format nil "setxkbmap ~a" layout)))
-              
+  (let* ((layout (pop *available-keyboard-layouts*))
+         (caps (case
+                   *caps-lock-behavior*
+                 (:normal "")
+                 (:ctrl "-option ctrl:nocaps")))
+
+         (cmd (format nil "setxkbmap ~a ~a" layout caps)))
+    (run-shell-command cmd t)
+    (message (format nil "Keyboard layout switched to: ~a" layout))))
+
+(define-key *top-map* (kbd "s-SPC") "switch-keyboard-layout")
+
 ;;;;;;;;;;;;;;
 ;; Defaults ;;
 ;;;;;;;;;;;;;;
 
-(keyboard-layout-list "us")
-
 (setf *caps-lock-behavior* :normal)
 
-(define-key *top-map* (kbd "S-space") "switch-keyboard-layout")
-
-;; Run it once to set the default layout
-;; (switch-keyboard-layout)
+(keyboard-layout-list "us")

@@ -2,7 +2,7 @@
 
 (defpackage #:kbd-layouts
   (:use #:cl #:stumpwm)
-  (:export 
-           ))
+  (:export *caps-lock-behavior*
+           keyboard-layout-list))
 
 
