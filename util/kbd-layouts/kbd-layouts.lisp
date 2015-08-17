@@ -11,6 +11,7 @@
 ;; Available options:
 ;; :normal -> CapsLock
 ;; :ctrl   -> Ctrl
+;; :swapped-> Swap Ctrl and CapsLock
 (defvar *caps-lock-behavior* nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -40,16 +41,14 @@
 
 (defcommand switch-keyboard-layout () ()
   (let* ((layout (pop *available-keyboard-layouts*))
-         (caps (case
+         (caps (ecase
                    *caps-lock-behavior*
-                 (:normal "")
-                 (:ctrl "-option ctrl:nocaps")))
-
-         (cmd (format nil "setxkbmap ~a ~a" layout caps)))
+                 (:normal "caps:capslock")
+                 (:ctrl "ctrl:nocaps")
+                 (:swapped "ctrl:swapcaps")))
+         (cmd (format nil "setxkbmap ~a -option ~a" layout caps)))
     (run-shell-command cmd t)
     (message (format nil "Keyboard layout switched to: ~a" layout))))
-
-(define-key *top-map* (kbd "s-SPC") "switch-keyboard-layout")
 
 ;;;;;;;;;;;;;;
 ;; Defaults ;;
@@ -58,3 +57,5 @@
 (setf *caps-lock-behavior* :normal)
 
 (keyboard-layout-list "us")
+
+(define-key *top-map* (kbd "s-SPC") "switch-keyboard-layout")
