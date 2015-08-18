@@ -1,0 +1,18 @@
+** Usage
+
+Put:
+
+#+BEGIN_SRC lisp
+(load-module "alert-me")
+#+END_SRC
+
+In your =~/.stumpwmrc=, and the =alert-me-at= command will be available.
+
+** Example
+
+Run =C-t :=, type =alert-me-at=, then =18=, =52=, =meeting with
+foo=. At 18:52, stumpwm will remind you 3 times every 10 seconds that
+you have a meeting with foo.
+
+The remainder 3 times is because stumpwm might hide the message if
+you're switching between windows.
