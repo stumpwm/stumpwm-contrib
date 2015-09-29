@@ -1,44 +1,94 @@
-;;;; battery.lisp
+;;; Copyright 2008 Vitaly Mayatskikh
+;;; Copyright 2015 Javier Olaechea
+;;;
+
+(in-package #:cl-user)
+
+(defpackage #:battery
+  (:use #:cl #:stumpwm)
+  (:export #:*battery-name
+           #:*battery-charge-refresh-time*)
+  (:documentation "Battery charge formatters for the mode-line."))
 
 (in-package #:battery)
-
-;;; "battery" goes here. Hacks and glory await!
-
-;;; Battery charge formatters for the mode-line
-;;;
-;;; Copyright 2008 Vitaly Mayatskikh
-;;;
-;;; Maintainer: Julian Stecklina
-;;;
-
-(export '(*battery-name*))
 
 (dolist (a '((#\b fmt-bat-charge)))
   (pushnew a *screen-mode-line-formatters* :test 'equal))
 
-(defvar *bat-state* nil)
+(defvar *bat-state* nil "Is the battery charging or discharging?")
+
 (defvar *bat-remain* 0)
+
 (defvar *bat-remain-time* nil)
+
 (defvar *bat-prev-time* 0)
 
-(defvar *battery-name* "BAT0")
+(defvar *battery-charge-refresh-time* 15
+  "The minimum interval of time, in seconds, that has to pass before
+recalculating the battery charge.")
+
+(defvar *battery-name* "BAT0"
+  "The name of the battery")
+(defvar *battery-path* "/proc/acpi/battery/"
+  "The path where to look for batteries.")
+
+(defun list-subdirectories (directory)
+  "List the name, relative to the `directory' of the sub-directories contained
+in the `directory'"
+  (mapcar (lambda (subdir)
+            (multiple-value-bind
+                  (abs-or-rel file-parts)
+                (uiop:split-unix-namestring-directory-components
+                 (uiop:native-namestring subdir))
+              (declare (ignore abs-or-rel))
+              (car (last file-parts))))
+          (uiop:subdirectories directory)))
+
+(define-condition battery-not-found (stumpwm-error file-error)
+  ((battery-name :initarg :battery-name :reader battery-name
+                 :documentation "The battery-name that was searched for."))
+  (:report (lambda (condition stream)
+             (format stream
+                     "The Battery ~A was not found. Valid Battery names are:~{ ~A~^,~}."
+                     (battery-name condition)
+                     (list-subdirectories *battery-path*))))
+  (:documentation "Signaled when the battery was not found in
+  `*battery-path*'"))
+
+(defun %read-battery-file (battery)
+  "Reads the content of the battery file. To be called by `read-battery-file'"
+  (let ((fields (make-hash-table :test #'equal)))
+    (loop
+      :for line := (read-line battery nil 'eof)
+      :until (eql line 'eof)
+      :for split-line := (cl-ppcre:split ":\\s*" line)
+      :do
+         (setf (gethash (string-trim '(#\Space) (car split-line)) fields)
+               (string-trim '(#\Space) (cadr split-line))))
+    fields))
 
 (defun read-battery-file (battery fname)
-  (let ((fields (make-hash-table :test #'equal)))
-    (with-open-file (s (concatenate 'string "/proc/acpi/battery/" battery "/" fname) 
-		       :if-does-not-exist nil)
-      (if s
-          (do ((line (read-line s nil nil) (read-line s nil nil)))
-              ((null line) fields)
-            (let ((split (cl-ppcre:split ":\\s*" line)))
-              (setf (gethash (string-trim '(#\Space) (car split)) fields)
-                    (string-trim '(#\Space) (cadr split)))))
-          ""))))
+  (handler-bind
+      ;; Resignal file-error as a battery-not-found error.
+      ((file-error (lambda (c)
+                     (declare (ignore c))
+                     (error 'battery-not-found :battery-name battery))))
+    (restart-case
+        (with-open-file (battery-file (concatenate 'string *battery-path* battery "/" fname))
+          (%read-battery-file battery-file))
+      (chose-new-battery-name (new-battery)
+        :report (lambda (stream)
+                  (format stream "The battery ~A was not found. Choose a new battery name:" battery))
+        :interactive (lambda ()
+                       (format *query-io* "~@<Enter the new battery name: ~@:>")
+                       (finish-output *query-io*)
+                       (list (read *query-io*)))
+        (read-battery-file new-battery fname)))))
 
 (defun current-battery-charge ()
-  "Calculate remaining battery charge. Don't make calculation more than once in 15 seconds."
+  "Calculate remaining battery charge."
   (let ((now (/ (get-internal-real-time) internal-time-units-per-second)))
-    (when (or (= 0 *bat-prev-time*) (>= (- now *bat-prev-time*) 15))
+    (when (or (= 0 *bat-prev-time*) (>= (- now *bat-prev-time*) *battery-charge-refresh-time*))
       (setf *bat-prev-time* now)
       (let ((battery-state (read-battery-file *battery-name* "state"))
             (battery-info (read-battery-file *battery-name* "info")))
