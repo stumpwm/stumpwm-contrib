@@ -21,3 +21,9 @@
          (dump-name
           group-number
           (incf (gethash group-number *current-ids*)))))))
+
+(stumpwm:add-hook stumpwm:*quit-hook* (lambda ()
+                                        (mapcar #'delete-file
+                                                (directory (merge-pathnames
+                                                            #p"stumpwm-winner-mode-*"
+                                                            *tmp-folder*)))))
