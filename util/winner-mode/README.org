@@ -27,13 +27,14 @@ needs to hook into stumpwm to dump layouts.
 
 You *have* to add the hooks yourself.
 
-Here are the minimum hooks you want to add:
+For convenience, =winner-mode= provides a list of commands in
+=winner-mode:*default-commands*=, so you can just add this hook to
+start off:
 
 #+BEGIN_SRC lisp
-(add-hook *new-frame-hook* #'winner-mode:dump-group-to-file)
-(add-hook *new-window-hook* #'winner-mode:dump-group-to-file)
-(add-hook *destroy-window-hook* #'winner-mode:dump-group-to-file)
-(add-hook *place-window-hook* #'winner-mode:dump-group-to-file)
+(add-hook *post-command-hook* (lambda (command)
+                                (when (member command winner-mode:*default-commands*)
+                                  (winner-mode:dump-group-to-file))))
 #+END_SRC
 
 ** Example
