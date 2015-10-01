@@ -1,0 +1,56 @@
+* winner-mode
+
+** Usage
+
+This only works per group.
+
+Put:
+
+#+BEGIN_SRC lisp
+(load-module "winner-mode")
+#+END_SRC
+
+In your =~/.stumpwmrc=, then the =winner-undo= and =winner-redo=
+commands will be available. I recommend binding these keys like this:
+
+#+BEGIN_SRC lisp
+(defvar *winner-map* (make-sparse-keymap))
+
+(define-key *root-map* (kbd "c") '*winner-map*)
+
+(define-key *winner-map* (kbd "Left") "winner-undo")
+(define-key *winner-map* (kbd "Right") "winner-redo")
+#+END_SRC
+
+=winner-mode= works by dumping layouts and restoring them. It means it
+needs to hook into stumpwm to dump layouts.
+
+You *have* to add the hooks yourself.
+
+For convenience, =winner-mode= provides a list of commands in
+=winner-mode:*default-commands*=, so you can just add this hook to
+start off:
+
+#+BEGIN_SRC lisp
+(add-hook *post-command-hook* (lambda (command)
+                                (when (member command winner-mode:*default-commands*)
+                                  (winner-mode:dump-group-to-file))))
+#+END_SRC
+
+** Example
+
+- Be with 4 frames
+- Hit =C-t Q= (aka =only=) to have a single one
+- Hit =C-t c <left-arrow>= to go back to the 4-frames setup
+- Hit =C-t c <right-arrow>= to go back to the 1-frame setup
+
+** API
+
+By default, =winner-mode= stores dumps of layouts in =/tmp/=. If you
+want to change this folder, you can override
+=winner-mode:*tmp-folder*=, e.g.:
+
+#+BEGIN_SRC lisp
+(load-module "winner-mode")
+(setf winner-mode:*tmp-folder* (merge-pathnames #p"tmp/" (user-homedir-pathname)))
+#+END_SRC
