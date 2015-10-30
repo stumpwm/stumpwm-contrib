@@ -2,9 +2,9 @@
 
 (asdf:defsystem #:numpad-layouts
   :serial t
-  :description "Describe numpad-layouts here"
-  :author "Your Name <your.name@example.com>"
-  :license "Specify license here"
+  :description "A module for handling different keyboards numpad layouts"
+  :author "David Bjergaard"
+  :license "GPLv3"
   :depends-on (#:stumpwm)
   :components ((:file "package")
                (:file "numpad-layouts")))

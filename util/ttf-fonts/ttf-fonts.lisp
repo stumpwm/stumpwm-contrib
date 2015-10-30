@@ -1,7 +1,13 @@
 ;;;; ttf-fonts.lisp
 
 (in-package #:ttf-fonts)
-(export '(font-exists-p open-font close-font font-ascent font-descent text-line-width draw-image-glyphs))
+(export '(font-exists-p 
+	  open-font
+	  close-font
+	  font-ascent
+	  font-descent
+	  text-line-width
+	  draw-image-glyphs))
 ;;; "ttf-fonts" goes here. Hacks and glory await!
 ;;;; TTF fonts
 (defmethod font-exists-p ((font xft:font))
@@ -32,7 +38,8 @@
                               gcontext
                               (font xft:font)
                               x y
-                              sequence &rest keys &key (start 0) end translate width size)
+                              sequence &rest keys
+			      &key (start 0) end translate width size)
   (declare (ignorable start end translate width size))
   (apply 'xft:draw-text-line 
          drawable
