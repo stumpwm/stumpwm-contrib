@@ -82,7 +82,7 @@
 
 (defun maildir-get-new ()
   (let ((total-new (reduce #'+ *maildir-new*)))
-    (format nil "~D" total-new)))
+    (format nil "^[~A~D^]" (if (plusp total-new) "^B" "") total-new)))
 
 (defun maildir-get-cur ()
   (let ((total-cur (reduce #'+ *maildir-cur*)))
