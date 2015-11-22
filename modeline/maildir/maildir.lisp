@@ -42,7 +42,7 @@
 (defun maildir-mailbox-dir (mailbox dir-name)
   "Returns the specified sub-directory pathname for the provided mailbox."
   (merge-pathnames (make-pathname :directory (list :relative dir-name)
-                                  :name :wild)
+                                  :name :wild :type :wild)
                    mailbox))
 
 
