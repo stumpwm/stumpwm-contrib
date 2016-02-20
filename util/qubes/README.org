@@ -1,0 +1,26 @@
+** Commentary
+Qubes OS (https://www.qubes-os.org/) is a security-oriented, open-source operating system for personal computers.
+It provides "reasonable security" through security by compartmentalization. Compartmentalization in Qubes OS is accomplished through virtualization.
+This module comes with absolutely no guarantees. I am not a lisp coder. It runs on my machine though.
+
+** Usage
+
+Just add the following line to your .stumpwmrc file:
+#+BEGIN_SRC lisp
+(load-module "qubes")
+#+END_SRC
+
+When you activate the qubes module your windows borders will get colored
+depending on what Qubes label they have rather than your settings for border color.
+Also, your window names will be prefixed by [Domain]. (e.g. [Dom0] [sys-net] etc.)
+
+** Configuration
+
+There is currently no way to configure the qubes module.
+
+** Tasks
+*** TODO 
+- [ ] Make qubes select your chosen focus and unfocus color for Dom0 rather than using pink1
+- [ ] Make the code pretty (please do suggest improvments)
+- [ ] Add a feature to customize the *frame-indicator-text* depending on Qubes label of contained window
+- [ ] Test it out in a multi-monitor setup
