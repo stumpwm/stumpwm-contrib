@@ -26,20 +26,20 @@
   `(defcommand ,name (&optional device) ((:string))
      (volcontrol device ,channel ,valence)))
 
-(defvolcontrol amixer-PCM-1- "PCM" "1-")
-(defvolcontrol amixer-PCM-1+ "PCM" "1+")
+(defvolcontrol amixer-PCM-1- "PCM" "1%-")
+(defvolcontrol amixer-PCM-1+ "PCM" "1%+")
 (defvolcontrol amixer-PCM-toggle "PCM" "toggle")
 
-(defvolcontrol amixer-Front-1- "Front" "1-")
-(defvolcontrol amixer-Front-1+ "Front" "1+")
+(defvolcontrol amixer-Front-1- "Front" "1%-")
+(defvolcontrol amixer-Front-1+ "Front" "1%+")
 (defvolcontrol amixer-Front-toggle "Front" "toggle")
 
-(defvolcontrol amixer-Master-1- "Master" "1-")
-(defvolcontrol amixer-Master-1+ "Master" "1+")
+(defvolcontrol amixer-Master-1- "Master" "1%-")
+(defvolcontrol amixer-Master-1+ "Master" "1%+")
 (defvolcontrol amixer-Master-toggle "Master" "toggle")
 
-(defvolcontrol amixer-Headphone-1- "Headphone" "1-")
-(defvolcontrol amixer-Headphone-1+ "Headphone" "1+")
+(defvolcontrol amixer-Headphone-1- "Headphone" "1%-")
+(defvolcontrol amixer-Headphone-1+ "Headphone" "1%+")
 (defvolcontrol amixer-Headphone-toggle "Headphone" "toggle")
 
 (defcommand amixer-sense-toggle () ()
