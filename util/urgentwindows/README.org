@@ -1,0 +1,32 @@
+** Problem
+Almost all of is in these modern days have to (or want to) deal with
+more than one application simultaneously. This way, we want to start
+some activity in one app, go to another, do something here, and so on.
+At some moment a particular application activated previously, finishes
+its activity and you want to be aware of this fact to be able to activate
+it again and maybe start another activity after all. Luckily X Window
+system allows us to do this by mean of EWMH standard implementation.
+
+Namely, application windows expecting rather immediate user action
+should indicate this using the urgency bit in the WM_HINTS.flags property,
+as defined in the ICCCM.
+
+This contrib extension was written with purpose of providing the
+appropriate handles for this low-level xorg functionality to StumpWM.
+
+** Usage
+Add this to your =.stumpwmrc=:
+
+Load contrib module:
+#+BEGIN_SRC lisp
+  (load-module "urgentwindows")
+#+END_SRC
+
+Then customize message text, if needed:
+#+BEGIN_SRC lisp
+  (setf urgentwindows:*urgent-window-message* "application ~a has just finished its business!")
+#+END_SRC
+Make sure the proper formatting is used (single value placeholder needed, see above), otherwise error occurs.
+
+And finally, use =raise-urgent= to focus urgent windows.
+

@@ -1,0 +1,26 @@
+** Problem
+Out of the box StumpWM provides tools to navigate windows only within
+group bounds - "windowlist" function seems to be the main, and maybe
+only useful here.
+But sometimes the user wants to manage or even simply overview *all*
+application windows present in X session.
+
+So, this contrib extension was written with purpose of providing the
+way to manage global windows list in rather straightforward manner.
+
+** Usage
+Add this to your =.stumpwmrc=:
+
+Load contrib module:
+#+BEGIN_SRC lisp
+  (load-module "globalwindows")
+#+END_SRC
+
+And then use functions for global windows navigation:
+#+BEGIN_SRC lisp
+  (define-key *top-map* (kbd "M-1") "global-windowlist")
+  (define-key *top-map* (kbd "M-2") "global-pull-windowlist")
+#+END_SRC
+
+Moreover there is a couple of util functions exported for the aim of
+user-defined extensions - see source code.
