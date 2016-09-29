@@ -27,8 +27,7 @@
 
 ;;; CODE:
 
-(dolist (a '((#\D disk-modeline)))
-  (pushnew a *screen-mode-line-formatters* :test 'equal))
+(add-screen-mode-line-formatter #\D 'disk-modeline)
 
 (defvar *disk-usage* nil)
 

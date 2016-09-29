@@ -12,8 +12,7 @@
 ;;;
 
 ;; Install formatters.
-(dolist (a '((#\l fmt-net-usage)))
-  (pushnew a *screen-mode-line-formatters* :test 'equal))
+(add-screen-mode-line-formatter #\l 'fmt-net-usage)
 
 (defvar *net-device* nil) ; nil means auto. or specify explicitly, i.e. "wlan0"
 (defvar *net-last-rx* 0)

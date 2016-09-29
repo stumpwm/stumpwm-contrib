@@ -226,8 +226,7 @@
 ;;; Formatting
 ;;; ------------------------------------------------------------------
 
-(dolist (a '((#\m mpd-modeline)))
-  (pushnew a *screen-mode-line-formatters* :test 'equal))
+(add-screen-mode-line-formatter #\m 'mpd-modeline)
 
 (defparameter *mpd-current-song* nil)
 (defparameter *mpd-status* nil)
