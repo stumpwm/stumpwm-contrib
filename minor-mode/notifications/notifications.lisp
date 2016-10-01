@@ -6,7 +6,7 @@
 ;;
 
 ;;; Code:
-(pushnew '(#\N notifications-as-string) *screen-mode-line-formatters* :test 'equal)
+(add-screen-mode-line-formatter #\N 'notifications-as-string)
 
 (defparameter *notifications-delimiters* '("[" "]"))
 

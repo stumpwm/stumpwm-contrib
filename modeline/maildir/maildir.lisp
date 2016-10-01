@@ -13,8 +13,7 @@
 
 ;;; CODE:
 
-(dolist (a '((#\M maildir-modeline)))
-  (pushnew a *screen-mode-line-formatters* :test 'equal))
+(add-screen-mode-line-formatter #\M 'maildir-modeline)
 
 (defvar *maildir-timer* nil)
 (defvar *maildir-update-time* 900

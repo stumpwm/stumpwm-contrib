@@ -14,11 +14,10 @@
 (export '(*acpi-thermal-zone*))
 
 ;; Install formatters.
-(dolist (a '((#\c fmt-cpu-usage)
-             (#\C fmt-cpu-usage-bar)
-             (#\f fmt-cpu-freq)
-             (#\t fmt-cpu-temp)))
-  (pushnew a *screen-mode-line-formatters* :test 'equal))
+(add-screen-mode-line-formatter #\c 'fmt-cpu-usage)
+(add-screen-mode-line-formatter #\C 'fmt-cpu-usage-bar)
+(add-screen-mode-line-formatter #\f 'fmt-cpu-freq)
+(add-screen-mode-line-formatter #\t 'fmt-cpu-temp)
 
 ;; Defaults arguments for fmt-cpu-usage-bar
 (defvar *cpu-usage-bar-width* 10)

@@ -12,8 +12,7 @@
 
 (in-package #:battery)
 
-(dolist (a '((#\b fmt-bat-charge)))
-  (pushnew a *screen-mode-line-formatters* :test 'equal))
+(add-screen-mode-line-formatter #\b 'fmt-bat-charge)
 
 (defvar *bat-state* nil "Is the battery charging or discharging?")
 
