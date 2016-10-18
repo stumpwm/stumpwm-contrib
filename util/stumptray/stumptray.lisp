@@ -673,6 +673,22 @@ passed to `xlib:process-event'."
   (stumpwm:remove-hook stumpwm:*destroy-mode-line-hook* #'destroy-mode-line-hook)
   nil)
 
+;;; Mode line placeholder
+
+(defparameter *tray-placeholder-pixels-per-space* 9)
+
+(defun mode-line-tray-placeholder (ml)
+  (let ((tray (screen-tray (stumpwm::mode-line-screen ml))))
+    (if (and tray (eq ml (tray-mode-line tray)))
+        (make-string (floor (tray-width tray)
+                            *tray-placeholder-pixels-per-space*)
+                     :initial-element #\Space)
+        "")))
+
+(stumpwm:add-screen-mode-line-formatter #\T 'mode-line-tray-placeholder)
+
+;;; Commands
+
 (stumpwm:defcommand stumptray () ()
   "Enable tray for current screen"
   (if (current-tray)
