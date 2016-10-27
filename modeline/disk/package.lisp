@@ -1,5 +1,7 @@
 ;;;; package.lisp
 
 (defpackage #:disk
-  (:use #:cl :stumpwm))
+  (:use #:cl :stumpwm)
+  (:export
+   #:*disk-modeline-fmt*))
 
