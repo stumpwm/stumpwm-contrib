@@ -12,8 +12,7 @@
 
 (in-package #:battery)
 
-(dolist (a '((#\b fmt-bat-charge)))
-  (pushnew a *screen-mode-line-formatters* :test 'equal))
+(add-screen-mode-line-formatter #\b 'fmt-bat-charge)
 
 (defvar *bat-state* nil "Is the battery charging or discharging?")
 
@@ -99,12 +98,18 @@ in the `directory'"
                                          :junk-allowed t))
                   (rate (/ (or (parse-integer (gethash "present rate" battery-state "0")
                                               :junk-allowed t) 0) 60))
-                  (full (parse-integer (gethash "last full capacity" battery-info "100")
-                                       :junk-allowed t)))
+		  (full (let ((battery-cap (parse-integer
+					    (gethash "last full capacity" battery-info "0")
+					    :junk-allowed t))
+			      (design-cap (parse-integer
+					   (gethash "design capacity" battery-info "1")
+					   :junk-allowed t)))
+			  (if (> battery-cap 0)
+		  	      battery-cap
+		  	      design-cap))))
               (setf *bat-remain* (round (/ (* 100 remain) full))
                     *bat-state* charge-state
                     *bat-remain-time* nil)
-
               (when (> rate 0)
                 (let* ((online (round (/ (if (string= "charging" *bat-state*)
                                              (- full remain) remain)

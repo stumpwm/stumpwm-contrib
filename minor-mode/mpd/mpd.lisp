@@ -226,8 +226,7 @@
 ;;; Formatting
 ;;; ------------------------------------------------------------------
 
-(dolist (a '((#\m mpd-modeline)))
-  (pushnew a *screen-mode-line-formatters* :test 'equal))
+(add-screen-mode-line-formatter #\m 'mpd-modeline)
 
 (defparameter *mpd-current-song* nil)
 (defparameter *mpd-status* nil)
@@ -975,7 +974,7 @@ Passed an argument of zero and if crossfade is on, toggles crossfade off."
              (kbd "r") "mpd-toggle-repeat"
              (kbd "f") "mpd-toggle-xfade"
              (kbd "F") "mpd-set-xfade"
-             (kbd "S") "mpd-current-song"
+             (kbd "i") "mpd-current-song"
              (kbd "p") "mpd-play"
              (kbd "q") "mpd-browse-playlist"
              (kbd "o") "mpd-stop"

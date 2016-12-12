@@ -1,0 +1,59 @@
+** Problem
+While being connected to Internet, there is the need to search something raising
+quite regularly. But doing it "manually" is often tedious and error-prone.
+Imagine, to search something on Google for example, you should open/switch to
+your browser, open Google tab in it, type Enter ... PROFIT!.
+
+Most of us know the motto "Lean on your tools and automate everything you can"
+by ESR. So this contrib extension aims on exactly this - it automates internet
+searches as far as it can. With it you can define search engine parameters - its
+template url, stumpwm keybindings, and maybe something more in the future.
+
+** Usage
+Add this to your =.stumpwmrc=:
+#+BEGIN_SRC lisp
+(load-module "searchengines")
+#+END_SRC
+
+Then you should define the browser (with appropriate parameters) to be used by
+this extension, for example:
+#+BEGIN_SRC lisp
+(setf searchengines:*search-browser-executable* "firefox")
+(setf searchengines:*search-browser-params* "-new-tab")
+#+END_SRC
+
+Then you are to define one or more search engine url templates:
+#+BEGIN_SRC lisp
+(defparameter *URL-GOOGLE* "http://www.google.com/search?num=100&q=~a")
+#+END_SRC
+Where #'format parameter placeholder will be later substituted by actual search term.
+
+And finally now on you can define three types of search engines, namely
+"selection", "prompt" and "augmented":
+#+BEGIN_SRC lisp
+(searchengines:make-searchengine-selection "search-google-selection" *URL-GOOGLE* "Google search" :map *search-keymap* :key "s-g")
+(searchengines:make-searchengine-prompt "search-google-prompt" "Google" *URL-GOOGLE* "Google search" :map *search-keymap* :key "s-C-g")
+(searchengines:make-searchengine-augmented "search-google-augmented" "Augmented Google" *URL-GOOGLE* "Google search" :map *search-keymap* :key "C-g")
+#+END_SRC
+
+"Selection" type will use primary clipboard contents as a search term and "prompt" will
+use a prompt to ask for it. "Augmented" search type uses primary clipboard
+contents, but augments it with additional term(s), being typed in with prompt,
+so in fact it is a mix of the previous two.
+All above macros have common lambda lists - here are the details:
+- name defines StumpWM command name to be created
+- caption sets the prompt text to be used
+- url is the actual search engine URI template
+- docstring is self-describing, I hope ;)
+There is a bit more parameters to be considered, all of them are keyword
+parameters:
+- map defines StumpWM keymap where the keybinding will be defined
+- key stands for actual keybinding to be used
+- binded is boolean parameter which tells if search engine will ever be binded
+  to a key.
+
+These keyword paramaters are used exclusively to define search engine
+keybinding. If you are not planning to bind it to some key, you may omit these
+parameters. In this case you can always define the keybinding for search engine
+command manually later.
+

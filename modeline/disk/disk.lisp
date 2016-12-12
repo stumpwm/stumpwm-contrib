@@ -27,8 +27,7 @@
 
 ;;; CODE:
 
-(dolist (a '((#\D disk-modeline)))
-  (pushnew a *screen-mode-line-formatters* :test 'equal))
+(add-screen-mode-line-formatter #\D 'disk-modeline)
 
 (defvar *disk-usage* nil)
 
@@ -44,7 +43,8 @@
              while i
              collect (disk-usage-tokenize i)))))
 
-(defvar *disk-usage-paths* '("/"))
+(defvar *disk-usage-paths* '("/")
+  "The list of mount points to report the disk usage of.")
 
 
 (defun disk-usage-get-field (path field-number)

@@ -13,8 +13,7 @@
 
 ;;; CODE:
 
-(dolist (a '((#\M maildir-modeline)))
-  (pushnew a *screen-mode-line-formatters* :test 'equal))
+(add-screen-mode-line-formatter #\M 'maildir-modeline)
 
 (defvar *maildir-timer* nil)
 (defvar *maildir-update-time* 900
@@ -42,7 +41,7 @@
 (defun maildir-mailbox-dir (mailbox dir-name)
   "Returns the specified sub-directory pathname for the provided mailbox."
   (merge-pathnames (make-pathname :directory (list :relative dir-name)
-                                  :name :wild)
+                                  :name :wild :type :wild)
                    mailbox))
 
 
@@ -82,7 +81,7 @@
 
 (defun maildir-get-new ()
   (let ((total-new (reduce #'+ *maildir-new*)))
-    (format nil "~D" total-new)))
+    (format nil "^[~A~D^]" (if (plusp total-new) "^B" "") total-new)))
 
 (defun maildir-get-cur ()
   (let ((total-cur (reduce #'+ *maildir-cur*)))

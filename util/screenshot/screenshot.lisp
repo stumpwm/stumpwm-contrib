@@ -41,7 +41,7 @@
     (filename)
   ((:rest "Filename: "))
   "Make screenshot of root window"
-  (%screenshot-window (stumpwm:screen-root (stumpwm:current-screen)) filename))
+  (%screenshot-window (xlib:screen-root (stumpwm:screen-number (stumpwm:current-screen))) filename))
 
 (stumpwm:defcommand screenshot-window
     (filename)
