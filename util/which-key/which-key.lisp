@@ -20,12 +20,15 @@
     :initial-value '())))
 
 (defun get-kmaps-at-key-seq (kmaps key-seq)
+  "get a list of kmaps that are activated when pressing KEY-SEQ when
+KMAPS are enabled"
   (if (= 1 (length key-seq))
       (get-kmaps-at-key kmaps (first key-seq))
       (get-kmaps-at-key-seq (get-kmaps-at-key kmaps (first key-seq))
                             (rest key-seq))))
 
 (defun key-press-hook (key key-seq cmd)
+  "which-key replacement for *key-press-hook*"
   (declare (ignore key))
   (unless (eq *top-map* *resize-map*)
     (let ((maps (get-kmaps-at-key-seq (dereference-kmaps (top-maps))
@@ -34,6 +37,7 @@
         (apply 'display-bindings-for-keymaps (reverse (cdr key-seq)) maps)))))
 
 (defmacro replace-hook (hook fn)
+  "Easily replace a hook with a new function"
   `(remove-hook ,hook ,fn)
   `(add-hook ,hook ,fn))
 
