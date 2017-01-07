@@ -16,7 +16,7 @@ command mpd-current-song (*mpd-current-song-fmt*). See the documentation for
 
 ** Notes
 
-See http://mpd.wikia.com/wiki/Protocol_Reference for full protocol
+See [[https://www.musicpd.org/doc/protocol/][The Music Player Daemon protocol]] for more details.
 
 ** Tasks
 *** TODO Implement optional shortening for formatting functions
