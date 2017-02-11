@@ -28,7 +28,7 @@ prev-val."
     (multiple-value-bind (body decls docstring)
         (alexandria:parse-body body :documentation t)
       `(let ((,prev-time 0)
-             (,prev-val nil))
+             (,prev-val "no link"))
          (defun ,name ,arglist
            ,@(when docstring
                (list docstring))
