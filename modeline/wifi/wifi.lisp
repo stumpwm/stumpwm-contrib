@@ -24,20 +24,21 @@ written in a functional style - the value returned is set as the
 prev-val."
   (let ((prev-time (gensym "PREV-TIME"))
         (prev-val (gensym "PREV-VAL"))
-        (now (gensym "NOW"))
-        (docstring (when (stringp (car body))
-                     (pop body))))
-    `(let ((,prev-time 0)
-           (,prev-val nil))
-       (defun ,name ,arglist
-         ;; if no docstring, return nothing (not even nil)
-         ,@(when docstring (list docstring))
-         (let ((,now (get-internal-real-time)))
-           (when (>= (- ,now ,prev-time)
-                     (* ,interval internal-time-units-per-second))
-             (setf ,prev-time ,now)
-             (setf ,prev-val (locally ,@body)))
-           ,prev-val)))))
+        (now (gensym "NOW")))
+    (multiple-value-bind (body decls docstring)
+        (alexandria:parse-body body :documentation t)
+      `(let ((,prev-time 0)
+             (,prev-val nil))
+         (defun ,name ,arglist
+           ,@(when docstring
+               (list docstring))
+           ,@decls
+           (let ((,now (get-internal-real-time)))
+             (when (>= (- ,now ,prev-time)
+                       (* ,interval internal-time-units-per-second))
+               (setf ,prev-time ,now)
+               (setf ,prev-val (progn ,@body)))
+             ,prev-val))))))
 
 (defun guess-wireless-device ()
   (or (loop

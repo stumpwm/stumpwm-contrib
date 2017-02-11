@@ -5,7 +5,8 @@
   :description "Describe wifi here"
   :author "John Li"
   :license "GPLv3"
-  :depends-on (#:stumpwm)
+  :depends-on (#:stumpwm
+               #:alexandria)
   :components ((:file "package")
                (:file "wifi")))
 
