@@ -24,20 +24,21 @@ written in a functional style - the value returned is set as the
 prev-val."
   (let ((prev-time (gensym "PREV-TIME"))
         (prev-val (gensym "PREV-VAL"))
-        (now (gensym "NOW"))
-        (docstring (when (stringp (car body))
-                     (pop body))))
-    `(let ((,prev-time 0)
-           (,prev-val nil))
-       (defun ,name ,arglist
-         ;; if no docstring, return nothing (not even nil)
-         ,@(when docstring (list docstring))
-         (let ((,now (get-internal-real-time)))
-           (when (>= (- ,now ,prev-time)
-                     (* ,interval internal-time-units-per-second))
-             (setf ,prev-time ,now)
-             (setf ,prev-val (locally ,@body)))
-           ,prev-val)))))
+        (now (gensym "NOW")))
+    (multiple-value-bind (body decls docstring)
+        (alexandria:parse-body body :documentation t)
+      `(let ((,prev-time 0)
+             (,prev-val "no link"))
+         (defun ,name ,arglist
+           ,@(when docstring
+               (list docstring))
+           ,@decls
+           (let ((,now (get-internal-real-time)))
+             (when (>= (- ,now ,prev-time)
+                       (* ,interval internal-time-units-per-second))
+               (setf ,prev-time ,now)
+               (setf ,prev-val (progn ,@body)))
+             ,prev-val))))))
 
 (defun guess-wireless-device ()
   (or (loop
@@ -54,27 +55,28 @@ prev-val."
 you're connected to as well as the signal strength. When no valid data
 is found, just displays nil."
   (declare (ignore ml))
-  (handler-case
-      (let* ((device (or *wireless-device* (guess-wireless-device)))
-             (iwconfig (run-shell-command (format nil "~A ~A 2>/dev/null"
-                                                  *iwconfig-path*
-                                                  device)
-                                          t))
-             (essid (multiple-value-bind (match? sub)
-                        (cl-ppcre:scan-to-strings "ESSID:\"(.*)\"" iwconfig)
-                      (if match?
-                          (aref sub 0)
-                          (return-from fmt-wifi "no link"))))
-             (qual (multiple-value-bind (match? sub)
-                       (cl-ppcre:scan-to-strings "Link Quality=(\\d+)/(\\d+)" iwconfig)
-                     (truncate (float (* (/ (parse-integer (aref sub 0))
-                                            (parse-integer (aref sub 1)))
-                                         100))))))
-        (format nil "~A ^[~A~D%^]"
-                essid (bar-zone-color qual 80 60 40 t) qual))
-    ;; CLISP has annoying newlines in their error messages... Just
-    ;; print a string showing our confusion.
-    (t (c) (format nil "~A" c))))
+  (block fmt-wifi
+    (handler-case
+        (let* ((device (or *wireless-device* (guess-wireless-device)))
+               (iwconfig (run-shell-command (format nil "~A ~A 2>/dev/null"
+                                                    *iwconfig-path*
+                                                    device)
+                                            t))
+               (essid (multiple-value-bind (match? sub)
+                          (cl-ppcre:scan-to-strings "ESSID:\"(.*)\"" iwconfig)
+                        (if match?
+                            (aref sub 0)
+                            (return-from fmt-wifi "no link"))))
+               (qual (multiple-value-bind (match? sub)
+                         (cl-ppcre:scan-to-strings "Link Quality=(\\d+)/(\\d+)" iwconfig)
+                       (truncate (float (* (/ (parse-integer (aref sub 0))
+                                              (parse-integer (aref sub 1)))
+                                           100))))))
+          (format nil "~A ^[~A~D%^]"
+                  essid (bar-zone-color qual 80 60 40 t) qual))
+      ;; CLISP has annoying newlines in their error messages... Just
+      ;; print a string showing our confusion.
+      (t (c) (format nil "~A" c)))))
 
 ;;; Add mode-line formatter
 
