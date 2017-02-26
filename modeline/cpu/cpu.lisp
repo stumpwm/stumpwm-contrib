@@ -128,4 +128,4 @@ utilization."
                       (get-proc-file-field (cdr *acpi-thermal-zone*) "temperature")
                       :junk-allowed t))
             (:sysfs   (with-open-file (f (cdr *acpi-thermal-zone*))
-                        (/ (read f) 1000))))))
+                        (/ (read f) 1000.0))))))
