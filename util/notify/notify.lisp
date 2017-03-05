@@ -63,7 +63,7 @@
   (setf *notify-server-thread*
 	(make-thread #'notifications-listen :name "listener"))
   (setf *notify-server-is-on* t)
-  (stmupwm:message *notify-server-start-message*))
+  (stumpwm:message *notify-server-start-message*))
 
 (defun notify-server-off ()
   "Turns off notify server"
