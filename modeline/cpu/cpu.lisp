@@ -122,7 +122,7 @@ utilization."
 (defun fmt-cpu-temp (ml)
   "Returns a string representing the current CPU temperature."
   (declare (ignore ml))
-  (format nil "~a°C"
+  (format nil "~,1F°C"
           (case (car *acpi-thermal-zone*)
             (:procfs (parse-integer
                       (get-proc-file-field (cdr *acpi-thermal-zone*) "temperature")
