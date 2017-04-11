@@ -53,9 +53,9 @@ first on the list by default.")
 
 (defun screen-mode-line (screen)
   "Returns the mode-line that will contain the tray for SCREEN."
-  (stumpwm::head-mode-line 
-   (funcall *tray-head-selection-fn* 
-	    (stumpwm::screen-heads screen))))
+  (let ((heads (stumpwm:screen-heads screen)))
+    (stumpwm::head-mode-line
+     (funcall *tray-head-selection-fn* heads))))
 
 (defun current-tray ()
   (screen-tray (stumpwm:current-screen)))
