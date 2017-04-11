@@ -12,11 +12,15 @@
 
 (defun volcontrol (device channel amount)
   (let* ((output (run-shell-command
-                  (concat "amixer -D " (or device "default") " sset " channel " " (or amount "toggle")
-                          "| tail -1")
+                  (concat "amixer -D "
+                          (or device "default")
+                          " sset "
+                          channel
+                          " "
+                          (or amount "toggle"))
                   t))
          (percent-status (nth-value 1
-                                    (cl-ppcre:scan-to-strings ".*\\[([0-9]+)%\\].*\\[(on|off)\\]"
+                                    (cl-ppcre:scan-to-strings "^.*\\[([0-9]+)%\\].*\\[(on|off)\\]\\n"
                                                               output)))
          (percent (if (string= (aref percent-status 1) "off")
                       0
