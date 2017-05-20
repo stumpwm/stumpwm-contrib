@@ -54,18 +54,20 @@ not available). Don't make calculation more than once a second."
                (iowait (or (ignore-errors (read in)) 0))
                (step-denom (- (+ user sys idle iowait)
                               (+ *prev-user-cpu* *prev-sys-cpu* *prev-idle-cpu* *prev-iowait*))))
-          (setf cpu-result (/ (- (+ user sys)
-                                 (+ *prev-user-cpu* *prev-sys-cpu*))
-                              step-denom)
-                sys-result (/ (- sys *prev-sys-cpu*)
-                              step-denom)
-                io-result (/ (- iowait *prev-iowait*)
-                             step-denom)
-                *prev-user-cpu* user
-                *prev-sys-cpu* sys
-                *prev-idle-cpu* idle
-                *prev-iowait* iowait
-                *prev-result* (list cpu-result sys-result io-result))))))
+          (unless (zerop step-denom)    ; This should never happen, but in some
+                                        ; environments it does.
+            (setf cpu-result (/ (- (+ user sys)
+                                   (+ *prev-user-cpu* *prev-sys-cpu*))
+                                step-denom)
+                  sys-result (/ (- sys *prev-sys-cpu*)
+                                step-denom)
+                  io-result (/ (- iowait *prev-iowait*)
+                               step-denom)
+                  *prev-user-cpu* user
+                  *prev-sys-cpu* sys
+                  *prev-idle-cpu* idle
+                  *prev-iowait* iowait
+                  *prev-result* (list cpu-result sys-result io-result)))))))
   (apply 'values *prev-result*))
 
 (defun fmt-cpu-usage (ml)
