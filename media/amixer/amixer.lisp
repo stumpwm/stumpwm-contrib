@@ -20,7 +20,7 @@
                           (or amount "toggle"))
                   t))
          (percent-status (nth-value 1
-                                    (cl-ppcre:scan-to-strings "^.*\\[([0-9]+)%\\].*\\[(on|off)\\]\\n"
+                                    (cl-ppcre:scan-to-strings ".*\\[([0-9]+)%\\].*\\[(on|off)\\]\\n"
                                                               output)))
          (percent (if (string= (aref percent-status 1) "off")
                       0
