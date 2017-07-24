@@ -1,0 +1,13 @@
+Clipboard history for StumpWM.
+
+Implements a simple clipboard history (text only) manager by polling the clipboard selection periodically and keeping a stack of latest clippings.
+
+** Usage
+Add
+#+BEGIN_SRC lisp
+(load-module "clipboard-history")
+
+(define-key *root-map* (kbd "C-y") "show-clipboard-history")
+;; start the polling timer process
+(clipboard-history:start-clipboard-manager)
+#+END_SRC
