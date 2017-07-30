@@ -1,0 +1,28 @@
+#+TITLE: swm-gaps
+
+Pretty (useless) gaps for [[https://stumpwm.github.io/][StumpWM]].
+
+[[./screen.png]]
+
+This is a packed version of *useless-gaps* by [[https://gist.github.com/vlnx/5651256][vlnx]] with added outer borders.
+Credit goes to the original author.
+
+#+BEGIN_QUOTE
+This modifies StumpWM's internal functions ~maximize-window~ and ~neighbour~, so
+might not work as expected if those definitions change in the core. Currently
+works with ~v1.0.0~.
+#+END_QUOTE
+
+#+BEGIN_SRC common-lisp
+(load-module "swm-gaps")
+
+;; Inner gaps run along all the 4 borders of a frame
+(setf swm-gaps:*inner-gaps-size* 10)
+
+;; Outer gaps add more padding to the outermost borders
+;; (touching the screen border)
+(setf swm-gaps:*outer-gaps-size* 20)
+
+;; Call command
+;; toggle-gaps
+#+END_SRC
