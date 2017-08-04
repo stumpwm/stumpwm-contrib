@@ -44,14 +44,11 @@
       (let ((current-window-class (window-class cur-window)))
         (if (string= current-window-class "Emacs")
             (meta (kbd *emacs-toggle-input-method-key*))
-            (progn
-              (let ((current-layout (get-current-layout *display*)))
-                (if (= current-layout 0)
-                    (xlib:lock-group *display* :group 1)
-                    (xlib:lock-group *display* :group 0)))
-              (let ((current-layout (get-current-layout *display*)))
-                (setf (getf (xlib:window-plist (window-xwin (current-window)))
-                            :keyboard-layout) current-layout))))))))
+            (let* ((current-layout (get-current-layout *display*))
+                   (toggled-layout (logxor 1 current-layout)))
+              (xlib:lock-group *display* :group toggled-layout)
+              (setf (getf (xlib:window-plist (window-xwin cur-window))
+                          :keyboard-layout) toggled-layout)))))))
 
 (defcommand switch-window-layout () ()
   "Switches keyboard layout for current window"
