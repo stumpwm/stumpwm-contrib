@@ -21,3 +21,8 @@ stumpwm to freeze.
 
 <2014-03-16 Sun> This is a fairly old file, maybe the bug was fixed?
 Can someone confirm?
+
+<2017-08-11 Fri> I've had this running all day and not had any problems yet:
+Debian Jessie 8.8 x86_64
+SBCL 1.3.17
+stumpwm 1.0.0-111-gb740b04
