@@ -5,7 +5,14 @@ Put:
 #+END_SRC
 In your =~/.stumpwmrc=
 
-Then you can use "%c %t" in your mode line format.
+Then you can use:
+
+%c (CPU usage as %)
+%C (CPU usage as bar graph)
+%t (CPU temperature)
+%f (CPU frequency)
+
+in your mode line format.
 
 ** Notes
 

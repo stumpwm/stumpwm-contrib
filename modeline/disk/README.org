@@ -8,6 +8,9 @@ Put:
 into your =~/.stumpwmrc=
 
 Then you can use "%D" in your mode line format.
+
+Filesystem(s) to be displayed can be customized by modifying the *disk-usage-paths* list.
+
 You can customize the modeline format (*disk-modeline-fmt*). 
 
 The default value for displaying disk usage information on the modeline.
@@ -23,4 +26,3 @@ The default value for displaying disk usage information on the modeline.
 | %p   | Filesystem used space in percent |
 | %m   | Filesystem mount point           |
 |------+----------------------------------|
-
