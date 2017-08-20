@@ -19,7 +19,7 @@
                                (url-encode search :utf-8)))
          (uri (format nil url search-processed)))
     (if (eql *search-browser-executable* nil)
-        (message-no-timeout "stumpwm::*search-browser-executable* is nil, set it first")
+        (message-no-timeout "searchengines:*search-browser-executable* is nil, set it first")
         (run-shell-command
          (concatenate 'string
                       *search-browser-executable*
