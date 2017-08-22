@@ -2,6 +2,7 @@
 
 (defpackage #:searchengines
   (:use #:cl :stumpwm :drakma)
+  (:import-from #:stumpwm #:message-no-timeout)
   (:export #:*search-browser-executable*
            #:*search-browser-params*
            #:make-searchengine-prompt
@@ -9,11 +10,3 @@
            #:make-searchengine-augmented))
 
 (in-package #:searchengines)
-
-(import '(
-          drakma:url-encode
-          stumpwm::defcommand
-          stumpwm::get-x-selection
-          stumpwm::message-no-timeout
-          stumpwm::run-shell-command
-          ))
