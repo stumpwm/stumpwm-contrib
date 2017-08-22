@@ -1,12 +1,5 @@
 (in-package #:searchengines)
 
-(export '(
-          *search-browser-executable*
-          *search-browser-params*
-          make-searchengine-prompt
-          make-searchengine-selection
-          make-searchengine-augmented
-          ))
 
 (defvar *search-browser-executable* nil
   "Browser to use while performing searches")
