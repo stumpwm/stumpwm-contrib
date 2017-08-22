@@ -7,20 +7,19 @@
   "Additional executable parameters for searching browser")
 
 (defun preprocess-and-search (url search &optional (raw-search nil) (raise-browser t))
+  (unless *search-browser-executable*
+    (message-no-timeout "searchengines:*search-browser-executable* is nil, set it first."))
   (let* ((search-processed (if raw-search
                                search
                                (url-encode search :utf-8)))
          (uri (format nil url search-processed)))
-    (if (eql *search-browser-executable* nil)
-        (message-no-timeout "searchengines:*search-browser-executable* is nil, set it first")
-        (progn
-          (run-shell-command
-           (concatenate 'string
-                        *search-browser-executable*
-                        " " (format nil "~{~A~^ ~}" *search-browser-params*)
-                        " \"" uri "\""))
-          (when raise-browser
-            (funcall (intern (string-upcase *search-browser-executable*))))))))
+    (run-shell-command
+     (concatenate 'string
+                  *search-browser-executable*
+                  " " (format nil "~{~A~^ ~}" *search-browser-params*)
+                  " \"" uri "\""))
+    (when raise-browser
+      (funcall (intern (string-upcase *search-browser-executable*))))))
 
 (defmacro make-searchengine-prompt (name caption url docstring
                                     &key (map nil) (key nil) (binded t))
