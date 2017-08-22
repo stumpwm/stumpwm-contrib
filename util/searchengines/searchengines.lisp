@@ -8,9 +8,9 @@
           make-searchengine-augmented
           ))
 
-(defparameter *search-browser-executable* nil
+(defvar *search-browser-executable* nil
   "Browser to use while performing searches")
-(defparameter *search-browser-params* nil
+(defvar *search-browser-params* nil
   "Additional executable parameters for searching browser")
 
 (defun preprocess-and-search (url search &optional (raw-search nil) (raise-browser t))
