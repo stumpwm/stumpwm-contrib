@@ -1,0 +1,15 @@
+** Usage
+
+Put the following in your =~/.stumpwmrc=:
+
+#+BEGIN_SRC lisp
+(load-module "pinentry")
+#+END_SRC
+
+And set the following in your =~/.gnupg/gpg-agent.conf=:
+
+#+BEGIN_SRC
+pinentry-program /absolute/path/to/stumpwm-contrib/util/pinentry/stumpwm-pinentry
+#+END_SRC
+
+GnuPG Agent will now use StumpWM to ask for your password.

@@ -78,3 +78,4 @@ to the world!
 - [[./util/undocumented/README.org][undocumented]]
 - [[./util/windowtags/README.org][windowtags]]
 - [[./util/kbd-layouts/README.org][kbd-layouts]]
+- [[./util/pinentry/README.org][pinentry]]
