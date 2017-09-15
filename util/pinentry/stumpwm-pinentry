@@ -5,8 +5,6 @@ echo OK Your orders please
 while IFS="\n" read -r command; do
     if [ "$command" == "GETINFO flavor" ]; then
         echo D stumpwm
-    elif [ "$command" == "GETINFO pid" ]; then
-        echo D $PID
     elif [ "$command" == GETPIN ]; then
         password=$(echo -n "" | nc 127.0.0.1 22222)
         echo D "$password"
