@@ -8,7 +8,7 @@
     (rename-buffer "*sbcl-stumpwm-repl*")
     (slime-eval '(in-package :stumpwm))))
 
-(defun stumpwm-disconnect
+(defun stumpwm-disconnect ()
   "Disconnects from the swank server currently open."
   (with-current-buffer 
       (switch-to-buffer "*sbcl-stumpwm-repl*")
