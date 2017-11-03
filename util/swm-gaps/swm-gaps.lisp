@@ -2,7 +2,7 @@
 
 (in-package #:swm-gaps)
 
-(export '(*inner-gaps-size* *outer-gaps-size* toggle-gaps))
+(export '(*inner-gaps-size* *outer-gaps-size* *gaps-on* toggle-gaps))
 
 (defvar *inner-gaps-size* 5)
 (defvar *outer-gaps-size* 10)
