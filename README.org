@@ -58,8 +58,7 @@ to the world!
 - [[./minor-mode/mpd/README.org][mpd]]
 - [[./minor-mode/notifications/README.org][notifications]]
 ** Modeline
-- [[./modeline/battery-portable/README.org][portable]]
-- [[./modeline/battery/README.org][battery]]
+- [[./modeline/battery-portable/README.org][battery (portable)]]
 - [[./modeline/cpu/README.org][cpu]]
 - [[./modeline/disk/README.org][disk]]
 - [[file:modeline/hostname/README.org][hostname]]
