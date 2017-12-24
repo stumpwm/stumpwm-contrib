@@ -39,7 +39,7 @@
              ((stringp (second selection))
               (run-shell-command (second selection)))
              ((and (symbolp (second selection))
-                  (commandp (second selection)))
+                   (commandp (second selection)))
               (funcall (second selection)))
              (t
               (if (equalp ".." (first selection))
