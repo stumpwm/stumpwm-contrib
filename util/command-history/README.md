@@ -1,6 +1,6 @@
 # command-history
 
-*** Problem
+** Problem
 After quiting StumpWM, you command history is gone.
 This simple plugin saves the *stumpwm::*input-history* to ~/.stumpwm.d/history and loads it again when starting StumpWM.
 
