@@ -1,13 +1,10 @@
 # command-history
 
-## Problem
+*** Problem
 After quiting StumpWM, you command history is gone.
-This simple plugin saves the
-#+BEGIN_SRC lisp
-*stumpwm::*input-history* to ~/.stumpwm.d/history and loads it again when starting StumpWM.
-#+END_SRC
+This simple plugin saves the lisp =*stumpwm::*input-history*= to =~/.stumpwm.d/history= and loads it again when starting StumpWM.
 
-## Usage
+** Usage
 Add this to your =.stumpwmrc=:
 
 Load contrib module:
