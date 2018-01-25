@@ -15,17 +15,35 @@
       (dotimes (i strip) (setf list (mapcan #'cdr list)))
       (setf *app-menu* (nconc *app-menu* list)))))
 
+(defun commandp (command-name)
+  (loop
+    :for command :being :the :hash-keys :of stumpwm::*command-hash*
+    :when (string= (symbol-name command-name)
+                   (symbol-name command ))
+      :return command))
+
 (defcommand show-menu () ()
   "Show the application menu"
-  (let ((stack (list *app-menu*)))
-    (loop
-       (let ((choice
-              (cdr (select-from-menu (current-screen)
-                                     (append (first stack)
-                                             (list (cons "Up a level" :up)))))))
-         (cond
-           ((not choice) (return))
-           ((eq choice :up) (pop stack) (unless stack (return)))
-           ((stringp choice) (run-shell-command choice) (return))
-           (t (push choice stack)))))))
-
+  (labels
+      ((pick (options)
+         (let ((selection
+                 (select-from-menu
+                  (current-screen) ; screen
+                  options          ; table
+                  nil              ; prompt
+                  0                ; initial-selection
+                  )))
+           (cond
+             ((null selection)
+              nil)
+             ((stringp (second selection))
+              (run-shell-command (second selection)))
+             ((and (symbolp (second selection))
+                   (commandp (second selection)))
+              (funcall (second selection)))
+             (t
+              (if (equalp ".." (first selection))
+                  (pick (second selection))
+                  (pick (append (list (list ".." options))
+                                (cdr selection)))))))))
+    (pick *app-menu*)))
