@@ -36,6 +36,14 @@ Returns true when yes is selected"
                             '(("No" :no) ("Yes" :yes))
                             query-string))))
 
+
+(defcommand suspend-computer () ()
+  "Suspends the computer"
+  (let ((choice (yes-no-diag "Really suspend?")))
+    (when choice
+      (echo-str (current-screen) "Suspending...")
+      (run-shell-command "systemctl suspend"))))
+
 (defun close-all-apps ()
   "Closes all windows managed by stumpwm gracefully"
   ;; yes, this uses an external tool instead of stumpwm internals
