@@ -36,6 +36,14 @@ Returns true when yes is selected"
                             '(("No" :no) ("Yes" :yes))
                             query-string))))
 
+
+(defcommand suspend-computer () ()
+  "Suspends the computer"
+  (let ((choice (yes-no-diag "Really suspend?")))
+    (when choice
+      (echo-string (current-screen) "Suspending...")
+      (run-shell-command "systemctl suspend"))))
+
 (defun close-all-apps ()
   "Closes all windows managed by stumpwm gracefully"
   ;; yes, this uses an external tool instead of stumpwm internals
@@ -77,6 +85,7 @@ Returns true when yes is selected"
 (defvar *end-session-menu*
   (list (list "Logout" #'logout)
         (list "Shutdown" #'shutdown-computer)
-        (list "Restart"  #'restart-computer))
+        (list "Restart"  #'restart-computer)
+        (list "Suspend" #'suspend-computer))
   "The options that are available to quit a stumpwm session.
 Entries in the list has the format of (\"item in menu\" #'function-to-call)")
