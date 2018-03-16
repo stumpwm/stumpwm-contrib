@@ -1,0 +1,21 @@
+** end-session
+   This module provides commands to gracefully close all open programs
+   and shutdown or reboot the computer. A logout command is also
+   provided.
+
+   This module requires the use of =systemD=, and requires the =polkit=
+   package to be installed, as well as the =wmctl= command.
+** Usage
+   Add these lines to your =.stumprc= file:
+   #+BEGIN_SRC lisp
+     ;; if you haven't added to load path yet:
+     (add-to-load-path #p"path-to-contrib/util/end-session")
+     ;; actually load the module
+     (load-module "end-session")
+   #+END_SRC
+*** Commands Provided:
+  - =end-session= Prompts for shutdown, restart, or logoff. You can
+     customize what this shows with =*end-session-menu*=. See [[file:session-ending.lisp::77]]
+  - shutdown-computer
+  - restart-computer
+  - logout
