@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:battery-portable
   :serial t
-  :description "Describe battery-portable here"
+  :description "Add battery information to the modeline in a portable way."
   :author "Julian Stecklina"
   :license "GPLv3"
   :depends-on (#:stumpwm)

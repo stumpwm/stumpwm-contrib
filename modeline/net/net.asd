@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:net
   :serial t
-  :description "Describe net here"
+  :description "Displays information about the current network connection."
   :author "Vitaly Mayatskikh"
   :license "GPLv3"
   :depends-on (#:stumpwm)

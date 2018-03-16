@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:maildir
   :serial t
-  :description "Describe maildir here"
+  :description "Display maildir information in the modeline (%M conflicts with mem). "
   :author "Morgan Veyret"
   :license "GPLv3"
   :depends-on (#:stumpwm)

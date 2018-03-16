@@ -4,7 +4,7 @@
 
 (asdf:defsystem #:kbd-layouts
   :serial t
-  :description "Describe kbd-layouts here"
+  :description "Keyboard layout switcher for StumpWM"
   :author "Wojciech Gac"
   :license "GPLv3"
   :depends-on (#:stumpwm)

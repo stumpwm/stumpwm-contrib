@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:cpu
   :serial t
-  :description "Describe cpu here"
+  :description "Add cpu info to the modeline."
   :author "Anonymous Coward, Jonathan Moore Liles"
   :license "GPLv3"
   :depends-on (#:stumpwm)

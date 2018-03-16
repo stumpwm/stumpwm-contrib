@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:productivity
   :serial t
-  :description "Describe productivity here"
+  :description "Lock StumpWM down so you have to get work done."
   :author "Ivy Foster"
   :license "GPLv3"
   :depends-on (#:stumpwm)

@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:passwd
   :serial t
-  :description "Describe passwd here"
+  :description "A simple password utility based on ironclad."
   :author "Anonymous"
   :license "GPLv3"
   :depends-on (#:stumpwm #:ironclad)

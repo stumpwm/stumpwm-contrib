@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:app-menu
   :serial t
-  :description "Describe app-menu here"
+  :description "A simple application menu for launching shell commands"
   :author "Anonymous"
   :license "GPLv3"
   :depends-on (#:stumpwm)

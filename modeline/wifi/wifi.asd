@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:wifi
   :serial t
-  :description "Describe wifi here"
+  :description "Display information about your wifi."
   :author "John Li"
   :license "GPLv3"
   :depends-on (#:stumpwm

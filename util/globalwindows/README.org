@@ -1,9 +1,8 @@
 ** Problem
 Out of the box StumpWM provides tools to navigate windows only within
 group bounds - "windowlist" function seems to be the main, and maybe
-only useful here.
-But sometimes the user wants to manage or even simply overview *all*
-application windows present in X session.
+only useful here. But sometimes the user wants to manage or even
+simply overview *all* application windows present in X session.
 
 So, this contrib extension was written with purpose of providing the
 way to manage global windows list in rather straightforward manner.
