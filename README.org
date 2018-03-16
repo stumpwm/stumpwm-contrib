@@ -1,5 +1,14 @@
 * A collection of StumpWM modules
 Documentation on modules can be found [[https://github.com/stumpwm/stumpwm/wiki/Modules][on our wiki]].  
+** Submitting a module
+Right now we have an open door policy for modules.  If you want it in,
+just submit a PR adding the module to this repo.  Follow the directory
+structure already laid out below.  Right before you're ready to make
+the final PR commit, run the script '=update-readme.sh=' to have your
+module (and its description) added to the appropriate category.  The
+script uses the "=:description=" tag in the =.asd= file.  The script
+is pretty dumb, so if your description spans multiple lines, it
+probably won't show up correctly.  Keep it short and sweet. 
 ** How to write a module
 *** General guidelines
 - Create your own package and optionally import the stumpwm
@@ -49,33 +58,52 @@ From here you can commence hacking.  When you're ready, advertise it
 to the world!
 
 [[http://www.xach.com/lisp/quickproject/][More docs here]].
+* Third Party Modules
+Advertise your module here, open a PR and include a org-mode link!
 * Current Modules 
 (click for its respective README/docs)
-** Media 
-- [[./media/amixer/README.org][amixer]]
-- [[./media/aumix/README.org][aumix]]
-** Minor Modes
-- [[./minor-mode/mpd/README.org][mpd]]
-- [[./minor-mode/notifications/README.org][notifications]]
+# Don't edit anything below this line, the script will blow it away
+# --
+** Utilities
+- [[./util/ttf-fonts/README.org][ttf-fonts]] :: Describe ttf-fonts here
+- [[./util/kbd-layouts/README.org][kbd-layouts]] :: Describe kbd-layouts here
+- [[./util/screenshot/README.org][screenshot]] :: Describe screenshot here
+- [[./util/alert-me/README.org][alert-me]] :: Alert me that an event is coming
+- [[./util/ft2-fonts/README.org][ft2-fonts]] :: An implementation of font rendering that allows users to select OTF/TTF fonts using FreeType rendering.
+- [[./util/winner-mode/README.org][winner-mode]] :: Emacs' winner-mode for StumpWM
+- [[./util/windowtags/README.org][windowtags]] :: Describe windowtags here
+- [[./util/notify/README.org][notify]] :: DBus-based notification server part
+- [[./util/qubes/README.org][qubes]] :: Integration to Qubes OS (https://www.qubes-os.org)
+- [[./util/stumptray/README.org][stumptray]] :: Describe stumptray here
+- [[./util/numpad-layouts/README.org][numpad-layouts]] :: A module for handling different keyboards numpad layouts
+- [[./util/clipboard-history/README.org][clipboard-history]] :: Simple clipboard history module for StumpWM
+- [[./util/globalwindows/README.org][globalwindows]] :: Describe globalwindows here
+- [[./util/urgentwindows/README.org][urgentwindows]] :: Allows focusing application windows that need user attention
+- [[./util/swm-gaps/README.org][swm-gaps]] :: Pretty (useless) gaps for StumpWM
+- [[./util/searchengines/README.org][searchengines]] :: Allows searching text using prompt or clipboard contents with various search engines
+- [[./util/command-history/README.org][command-history]] :: Save and load the stumpwm::*input-history* to a file
+- [[./util/logitech-g15-keysyms/README.org][logitech-g15-keysyms]] :: Describe logitech-g15-keysyms here
+- [[./util/pass/README.org][pass]] :: Integrate 'pass' with StumpWM
+- [[./util/surfraw/README.org][surfraw]] :: Describe surfraw here
+- [[./util/passwd/README.org][passwd]] :: Describe passwd here
+- [[./util/swm-emacs/README.org][swm-emacs]] :: Describe emacs here
+- [[./util/pinentry/README.org][pinentry]] :: Integrate GnuPG Agent with StumpWM
+- [[./util/app-menu/README.org][app-menu]] :: Describe app-menu here
+- [[./util/perwindowlayout/README.org][perwindowlayout]] :: Describe perwindowlayout here
+- [[./util/undocumented/README.org][undocumented]] :: Describe undocumented here
+- [[./util/productivity/README.org][productivity]] :: Describe productivity here
+** Media
+- [[./media/amixer/README.org][amixer]] :: Describe amixer here
+- [[./media/aumix/README.org][aumix]] :: Describe aumix here
 ** Modeline
-- [[./modeline/battery-portable/README.org][battery (portable)]]
-- [[./modeline/cpu/README.org][cpu]]
-- [[./modeline/disk/README.org][disk]]
-- [[file:modeline/hostname/README.org][hostname]]
-- [[./modeline/maildir/README.org][maildir]]
-- [[./modeline/mem/README.org][mem]]
-- [[./modeline/net/README.org][net]]
-- [[./modeline/wifi/README.org][wifi]]
-** Utilities 
-- [[./util/numpad-layouts/README.org][numpad-layouts]]
-- [[./util/app-menu/README.org][menu]]
-- [[./util/logitech-g15-keysyms/README.org][keysyms]]
-- [[./util/passwd/README.org][passwd]]
-- [[./util/productivity/README.org][productivity]]
-- [[./util/stumptray/README.org][stumptray]]
-- [[./util/surfraw/README.org][surfraw]]
-- [[./util/undocumented/README.org][undocumented]]
-- [[./util/windowtags/README.org][windowtags]]
-- [[./util/kbd-layouts/README.org][kbd-layouts]]
-- [[./util/pinentry/README.org][pinentry]]
-- [[./util/command-history/README.org][command-history]]
+- [[./modeline/hostname/README.org][hostname]] :: Put hostname in the StumpWM modeline
+- [[./modeline/cpu/README.org][cpu]] :: Describe cpu here
+- [[./modeline/battery-portable/README.org][battery-portable]] :: Describe battery-portable here
+- [[./modeline/disk/README.org][disk]] :: Describe disk here
+- [[./modeline/maildir/README.org][maildir]] :: Describe maildir here
+- [[./modeline/mem/README.org][mem]] :: Describe mem here
+- [[./modeline/wifi/README.org][wifi]] :: Describe wifi here
+- [[./modeline/net/README.org][net]] :: Describe net here
+** Minor Modes
+- [[./minor-mode/mpd/README.org][mpd]] :: Describe mpd here
+- [[./minor-mode/notifications/README.org][notifications]] :: Describe notifications here
