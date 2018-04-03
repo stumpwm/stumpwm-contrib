@@ -1,4 +1,3 @@
-;;;; notify.lisp
 (in-package #:notify)
 
 ;;;;
@@ -6,7 +5,7 @@
 ;;;;
 
 (defvar *notification-received-hook* 'show-notification
-  "Hook to execute when notification received")
+  "Function to execute when notification received")
 
 (defvar *notify-server-is-on* nil
   "Does notify-server listen to notifications?")
@@ -15,10 +14,10 @@
   "DBus listening thread")
 
 (defparameter *notify-server-start-message*
-  "Server will now listen for notifications")
+  "Notification Server listening for notifications.")
 
 (defparameter *notify-server-stop-message*
-  "Server will now stop listening for notifications")
+  "Notification Server will now stop listening for notifications.")
 
 (defun show-notification (app icon summary body)
   "Show the notification using standard STUMPWM::MESSAGE function"
@@ -60,10 +59,11 @@
 
 (defun notify-server-on ()
   "Turns on notify server."
-  (setf *notify-server-thread*
-	(make-thread #'notifications-listen :name "listener"))
-  (setf *notify-server-is-on* t)
-  (stumpwm:message *notify-server-start-message*))
+  (unless *notify-server-is-on*
+    (setf *notify-server-thread*
+          (make-thread #'notifications-listen :name "listener"))
+    (setf *notify-server-is-on* t)
+    (stumpwm:message *notify-server-start-message*)))
 
 (defun notify-server-off ()
   "Turns off notify server"
@@ -72,7 +72,7 @@
   (stumpwm:message *notify-server-stop-message*))
 
 (stumpwm:defcommand notify-server-toggle () ()
-		    "Toggles notify server."
-		    (if *notify-server-is-on*
-			(notify-server-off)
-			(notify-server-on)))
+  "Toggles notify server."
+  (if *notify-server-is-on*
+      (notify-server-off)
+      (notify-server-on)))
