@@ -4,7 +4,7 @@
 ;;;; Notify server to show standard notifications messages
 ;;;;
 
-(defvar *notification-received-hook* 'show-notification
+(defvar *notification-received-hook* '(show-notification)
   "Function to execute when notification received")
 
 (defvar *notify-server-is-on* nil
@@ -37,7 +37,7 @@
   (:interface "org.freedesktop.Notifications")
   (:name "Notify")
   (declare (ignore id actions hints timeout))
-  (funcall *notification-received-hook* appName icon summary body)
+  (stumpwm:run-hook-with-args *notification-received-hook* appName icon summary body)
   (values 1))
 
 (define-dbus-method (notify-dbus-service get-server-information) ()
