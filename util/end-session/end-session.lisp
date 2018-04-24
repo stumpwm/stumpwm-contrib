@@ -66,7 +66,7 @@ Returns true when yes is selected"
       (echo-string (current-screen) "Restarting...")
       (close-all-apps)
       (run-hook *quit-hook*)
-      (run-shell-command "systemctl restart"))))
+      (run-shell-command "systemctl reboot"))))
 
 (defcommand logout () ()
   (let ((choice (yes-no-diag "Close all programs and quit stumpwm?")))
