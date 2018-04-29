@@ -8,13 +8,16 @@
 (defvar *outer-gaps-size* 10)
 (defvar *gaps-on* nil)
 
+(defun apply-gaps-p (win)
+  "Tell if gaps should be applied to this window"
+  (and *gaps-on* (not (stumpwm::window-transient-p win))))
 ;; Redefined - with `if`s for *inner-gaps-on*
 (defun stumpwm::maximize-window (win)
   "Maximize the window."
   (multiple-value-bind (x y wx wy width height border stick)
       (stumpwm::geometry-hints win)
 
-    (if (and *gaps-on* (not (stumpwm::window-transient-p win)))
+    (if (apply-gaps-p win)
         (setf width (- width (* 2 *inner-gaps-size*))
               height (- height (* 2 *inner-gaps-size*))
               x (+ x *inner-gaps-size*)
@@ -40,10 +43,10 @@
           (let ((frame (stumpwm::window-frame win)))
             (setf (xlib:drawable-width (window-parent win)) (- (frame-width frame)
                                                                (* 2 (xlib:drawable-border-width (window-parent win)))
-                                                               (if (and *gaps-on* (not (stumpwm::window-transient-p win))) (* 2 *inner-gaps-size*) 0))
+                                                               (if (apply-gaps-p win) (* 2 *inner-gaps-size*) 0))
                   (xlib:drawable-height (window-parent win)) (- (stumpwm::frame-display-height (window-group win) frame)
                                                                 (* 2 (xlib:drawable-border-width (window-parent win)))
-                                                                (if (and *gaps-on* (not (stumpwm::window-transient-p win))) (* 2 *inner-gaps-size*) 0)))))
+                                                                (if (apply-gaps-p win) (* 2 *inner-gaps-size*) 0)))))
       ;; update the "extents"
       (xlib:change-property (window-xwin win) :_NET_FRAME_EXTENTS
                             (list wx wy
