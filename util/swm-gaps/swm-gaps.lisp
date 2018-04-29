@@ -53,6 +53,7 @@
                                   (- (xlib:drawable-width (window-parent win)) width wx)
                                   (- (xlib:drawable-height (window-parent win)) height wy))
                             :cardinal 32))))
+      (update-configuration win))))
 
 (defun reset-all-windows ()
   "Reset the size for all tiled windows"
