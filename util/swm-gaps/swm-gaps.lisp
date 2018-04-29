@@ -2,10 +2,11 @@
 
 (in-package #:swm-gaps)
 
-(export '(*inner-gaps-size* *outer-gaps-size* *gaps-on* toggle-gaps))
+(export '(*inner-gaps-size* *outer-gaps-size* *head-gaps-size* *gaps-on* toggle-gaps))
 
 (defvar *inner-gaps-size* 5)
 (defvar *outer-gaps-size* 10)
+(defvar *head-gaps-size* 0)
 (defvar *gaps-on* nil)
 
 (defun apply-gaps-p (win)
@@ -107,14 +108,14 @@
               (setf best-overlap overlap))))))
     best-frame))
 
-(defun add-outer-gaps ()
-  "Add extra gap to the outermost borders"
+(defun add-head-gaps ()
+  "Add extra gap to the head boundary"
   (mapcar (lambda (head)
             (let* ((height (stumpwm::head-height head))
                    (width (stumpwm::head-width head))
                    (x (stumpwm::head-x head))
                    (y (stumpwm::head-y head))
-                   (gap *outer-gaps-size*)
+                   (gap *head-gaps-size*)
                    (new-height (- height (* 2 gap)))
                    (new-width (- width (* 2 gap))))
               (stumpwm::resize-head
@@ -128,6 +129,6 @@
   (setf *gaps-on* (null *gaps-on*))
   (if *gaps-on*
       (progn
-        (add-outer-gaps)
+        (add-head-gaps)
         (reset-all-windows))
       (stumpwm::refresh-heads)))
