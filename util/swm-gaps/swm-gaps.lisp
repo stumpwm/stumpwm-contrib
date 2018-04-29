@@ -56,12 +56,8 @@
 
 (defun reset-all-windows ()
   "Reset the size for all tiled windows"
-  (let ((windows (mapcan (lambda (g)
-                           (mapcar (lambda (w) w) (stumpwm::sort-windows g)))
-                         (stumpwm::sort-groups (current-screen)))))
-    (mapcar (lambda (w)
-              (if (string= (class-name (class-of w)) "TILE-WINDOW")
-                  (stumpwm::maximize-window w))) windows)))
+  (mapcar #'stumpwm::maximize-window
+          (stumpwm::only-tile-windows (stumpwm:screen-windows (current-screen)))))
 
 ;; Redefined neighbour for working with outer gaps
 (defun stumpwm::neighbour (direction frame frameset)
