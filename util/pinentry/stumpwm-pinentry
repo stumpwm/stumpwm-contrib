@@ -5,8 +5,12 @@ echo OK Your orders please
 while IFS="\n" read -r command; do
     if [ "$command" == "GETINFO flavor" ]; then
         echo D stumpwm
+    elif [[ "$command" == SETDESC* ]]; then
+        description=${command:8}
+    elif [[ "$command" == SETPROMPT* ]]; then
+        prompt=${command:10}
     elif [ "$command" == GETPIN ]; then
-        password=$(echo -n "" | nc 127.0.0.1 22222)
+        password=$(printf "%s\n%s\n" "$description" "$prompt" | nc 127.0.0.1 22222)
         echo D "$password"
     elif [ "$command" == BYE ]; then
         exit 0

@@ -1,6 +1,37 @@
+** Application menu for StumpWM.
+
 ** Usage
 #+BEGIN_SRC lisp
 (load-module "app-menu")
 #+END_SRC
-** Tasks
-*** TODO Document this module
+
+Define =*app-menu*= in your =.stumpwmrc=. You can use strings
+to run shell commands or symbols to run Stumpwm commands
+(e.g. to popup existing application instead of start new one
+if applcation is already running).
+
+#+BEGIN_SRC lisp
+  (defcommand firefox () ()
+    "run firefox"
+    (run-or-raise "firefox" '(:class "Firefox")))
+
+  (setq *app-menu*
+        '(("INTERNET"
+           ;; submenu
+           ("Firefox" firefox)       ; call stumpwm command
+           ("Skype" "skypeforlinux") ; run shell script
+           )
+          ("WORK"
+           ("OpenOffice.org"  "openoffice"))
+          ("GRAPHICS"
+           ("GIMP" "gimp")
+           ("Inkscape" "inkscape"))
+          ("urxvt" urxvt)
+          ("K3B" "k3b")))
+#+END_SRC
+
+Add =show-menu= command to your keybindings, e.g.:
+
+#+BEGIN_SRC lisp
+(define-key *top-map* (kbd "M-`") "show-menu")
+#+END_SRC

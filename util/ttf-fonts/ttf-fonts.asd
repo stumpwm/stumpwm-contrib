@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:ttf-fonts
   :serial t
-  :description "Describe ttf-fonts here"
+  :description "A pure lisp implementation of TTF font rendering."
   :author "Michael Filonenko"
   :license "GPLv3"
   :depends-on (#:stumpwm #:clx-truetype)

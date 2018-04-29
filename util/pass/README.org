@@ -1,0 +1,20 @@
+** Usage
+
+Put the following in your =~/.stumpwmrc=:
+
+#+BEGIN_SRC lisp
+(load-module "pass")
+#+END_SRC
+
+The following commands will become available:
+
+- =pass-copy=: select an entry to put into the
+  clipboard. (Auto-completion is available.)
+- =pass-generate=: generate a password for a new given entry and put
+  it into the clipboard.
+
+There is no command to edit existing entries or to save a new entry
+because the UI would be awkward at best.
+
+The =pass:*password-store*= variable defines the home directory,
+=#P"~/.password-store/"= by default.

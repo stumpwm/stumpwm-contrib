@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:mem
   :serial t
-  :description "Describe mem here"
+  :description "Display memory in the modeline, %M conflicts with maildir."
   :author "Vitaly Mayatskikh"
   :license "GPLv3"
   :depends-on (#:stumpwm)

@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:undocumented
   :serial t
-  :description "Describe undocumented here"
+  :description " Look for stuff that should probably be in the manual that isn't"
   :author "Ben Spencer"
   :license "GPLv3"
   :depends-on (#:stumpwm)

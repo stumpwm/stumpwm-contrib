@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:perwindowlayout
   :serial t
-  :description "Describe perwindowlayout here"
+  :description "Change the keyboard layout per window."
   :author "Alex Ermolov"
   :license "GPLv3"
   :depends-on (#:stumpwm #:xkeyboard)

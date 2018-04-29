@@ -4,7 +4,7 @@
 
 (asdf:defsystem #:stumptray
   :serial t
-  :description "Describe stumptray here"
+  :description "System Tray for stumpwm."
   :author "Michael Filonenko"
   :license "GPLv3"
   :depends-on (#:stumpwm

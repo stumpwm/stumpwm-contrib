@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:surfraw
   :serial t
-  :description "Describe surfraw here"
+  :description "Integrates surfraw with stumpwm."
   :author "Ivy Foster"
   :license "GPLv3"
   :depends-on (#:stumpwm)

@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:disk
   :serial t
-  :description "Describe disk here"
+  :description "Display filesystem information in the modeline"
   :author "Morgan Veyret"
   :license "GPLv3"
   :depends-on (#:stumpwm)

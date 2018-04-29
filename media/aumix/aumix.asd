@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:aumix
   :serial t
-  :description "Describe aumix here"
+  :description "Manipulate your volume with aumix"
   :author "Fredrik Tolf"
   :license "GPLv3"
   :depends-on ("stumpwm")

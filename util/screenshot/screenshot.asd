@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:screenshot
   :serial t
-  :description "Describe screenshot here"
+  :description "Takes screenshots and stores them as png files"
   :author "Michael Filonenko"
   :license "GPLv3"
   :depends-on (#:zpng)

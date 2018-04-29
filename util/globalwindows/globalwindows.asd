@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:globalwindows
   :serial t
-  :description "Describe globalwindows here"
+  :description "Manipulate all windows in the current X session"
   :author "Alex Ermolov"
   :license "GPLv3"
   :depends-on (#:stumpwm)

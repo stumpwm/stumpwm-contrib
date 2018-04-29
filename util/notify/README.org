@@ -6,14 +6,15 @@ Shows notifications using =stumpwm:message= by default.
 ** Usage
 Add
 #+begin_src lisp
-(load-module "notify")
+  (load-module "notify")
+  (notify:notify-server-toggle)
 #+end_src
 to =.stumpwmrc=
 
 Now you can run default server using =notify-server-toggle=.
 In order to get your own notifications handler you can define on function
 #+begin_src lisp
-(defun notification-handler (app icon summary body)
-  "Does things with incoming notifications"
-  . . .)
+  (defun notification-handler (app icon summary body)
+    "Does things with incoming notifications"
+    ...)
 #+end_src

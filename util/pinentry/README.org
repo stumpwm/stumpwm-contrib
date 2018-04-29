@@ -1,3 +1,8 @@
+** Requirements
+
+- netcat
+- port 22222 available.
+
 ** Usage
 
 Put the following in your =~/.stumpwmrc=:
@@ -13,3 +18,9 @@ pinentry-program /absolute/path/to/stumpwm-contrib/util/pinentry/stumpwm-pinentr
 #+END_SRC
 
 GnuPG Agent will now use StumpWM to ask for your password.
+
+** Roadmap
+
+- Better error management (pinentry protocol has a SETERROR command,
+  cancelling the prompt has undefined behavior)
+- Randomized port (or configurable)
