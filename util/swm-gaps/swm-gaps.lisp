@@ -23,7 +23,6 @@
               x (+ x *inner-gaps-size*)
               y (+ y *inner-gaps-size*)))
 
-    (dformat 4 "maximize window ~a x: ~d y: ~d width: ~d height: ~d border: ~d stick: ~s~%" win x y width height border stick)
     ;; This is the only place a window's geometry should change
     (set-window-geometry win :x wx :y wy :width width :height height :border-width 0)
     (xlib:with-state ((window-parent win))
