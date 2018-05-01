@@ -10,19 +10,22 @@ Credit goes to the original author.
 #+BEGIN_QUOTE
 This modifies StumpWM's internal functions ~maximize-window~ and ~neighbour~, so
 might not work as expected if those definitions change in the core. Currently
-works with ~v1.0.0~.
+works with ~v1.0.1-rc~.
 #+END_QUOTE
 
 #+BEGIN_SRC common-lisp
-(load-module "swm-gaps")
+  (load-module "swm-gaps")
 
-;; Inner gaps run along all the 4 borders of a frame
-(setf swm-gaps:*inner-gaps-size* 10)
+  ;; Head gaps run along the 4 borders of the monitor(s)
+  (setf swm-gaps:*head-gaps-size* 20)
 
-;; Outer gaps add more padding to the outermost borders
-;; (touching the screen border)
-(setf swm-gaps:*outer-gaps-size* 20)
+  ;; Inner gaps run along all the 4 borders of a window
+  (setf swm-gaps:*inner-gaps-size* 5)
 
-;; Call command
-;; toggle-gaps
+  ;; Outer gaps add more padding to the outermost borders of a window (touching
+  ;; the screen border)
+  (setf swm-gaps:*outer-gaps-size* 30)
+
+  ;; Call command
+  ;; toggle-gaps
 #+END_SRC
