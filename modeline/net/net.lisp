@@ -12,7 +12,7 @@
 ;;;
 
 ;; Install formatters.
-(add-screen-mode-line-formatter #\l 'fmt-net-usage)
+(add-screen-mode-line-formatter #\l 'net-modeline)
 
 (defvar *net-device* nil) ; nil means auto. or specify explicitly, i.e. "wlan0"
 (defvar *net-last-rx* 0)
@@ -124,9 +124,8 @@ For the second case rescans route table every minute."
       (list (round (/ rx-s t-s))
 	    (round (/ tx-s t-s)))))
 
-(defun fmt-net-usage (ml)
+(defun fmt-net-usage ()
   "Returns a string representing the current network activity."
-  (declare (ignore ml))
   (let ((net (net-usage))
 	dn up)
     (defun kbmb (x y)
@@ -135,5 +134,27 @@ For the second case rescans route table every minute."
 	  (list (/ x 1e3) "k")))
     (setq dn (kbmb (car net) 0.1)
 	  up (kbmb (cadr net) 0.1))
-    (format nil "~A: ~5,2F~A/~5,2F~A " (net-device)
+    (format nil "~5,2F~A/~5,2F~A "
 	    (car dn) (cadr dn) (car up) (cadr up))))
+
+(defun net-modeline (ml)
+  (declare (ignore ml))
+  (format-expand *net-formatters-alist*
+                 *net-modeline-fmt*))
+
+(defvar *net-formatters-alist*
+  '((#\d net-device)
+    (#\u fmt-net-usage)))
+
+(defvar *net-modeline-fmt* "%d: %u"
+  "The default value for displaying net information on the modeline.
+
+@table @asis
+@item %%
+A literal '%'
+@item %d
+network device name
+@item %u
+network usage
+@end table
+")
