@@ -1,0 +1,26 @@
+Remap application keys based on X window class in StumpWM.
+
+Provides a simple way to remap keybindings in applications running under StumpWM.
+
+** Usage
+#+BEGIN_SRC lisp
+  (load-module "remap-keys")
+
+  (remap-keys:define-remapped-keys
+      '(("(Firefox|Chrome)"
+         ("C-n"   . "Down")
+         ("C-p"   . "Up")
+         ("C-f"   . "Right")
+         ("C-b"   . "Left")
+         ("C-v"   . "Next")
+         ("M-v"   . "Prior")
+         ("M-w"   . "C-c")
+         ("C-w"   . "C-x")
+         ("C-y"   . "C-v")
+         ("M-<"   . "Home")
+         ("M->"   . "End")
+         ("C-M-b" . "M-Left")
+         ("C-M-f" . "M-Right")
+         ("C-k"   . ("C-S-End" "C-x")))))
+#+END_SRC
+The above =define-remapped-keys= form adds Emacs like keybindings to windows whose =window-class= matches "Firefox" or "Chrome".
