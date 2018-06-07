@@ -152,14 +152,10 @@ For the second case rescans route table every minute."
 	    (car dn) (cadr dn) (car up) (cadr up))))
 
 (defun fmt-ipv4 ()
-   (if *net-ipv4*
-       *net-ipv4*
-       "noip"))
+  (or *net-ipv4* "noip"))
 
 (defun fmt-ipv6 ()
-  (if *net-ipv6*
-      *net-ipv6*
-      "noip"))
+  (or *net-ipv6* "noip"))
 
 (defun net-modeline (ml)
   (declare (ignore ml))
@@ -167,10 +163,10 @@ For the second case rescans route table every minute."
                  *net-modeline-fmt*))
 
 (defvar *net-formatters-alist*
-  '((#\d net-device)
-    (#\u fmt-net-usage)
-    (#\i fmt-ipv4)
-    (#\I fmt-ipv6)))
+  '((#\d . net-device)
+    (#\u . fmt-net-usage)
+    (#\i . fmt-ipv4)
+    (#\I . fmt-ipv6)))
 
 (defvar *net-modeline-fmt* "%d: %u"
   "The default value for displaying net information on the modeline.

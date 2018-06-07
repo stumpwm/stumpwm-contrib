@@ -48,13 +48,13 @@ total amount of memory, allocated memory, allocated/total ratio"
 
 (defun fmt-mem-percent (mem)
   "Returns a string representing the current percent of used memory."
-  (let* ((|%| (truncate (* 100 (nth 2 mem)))))
-    (format nil "^[~A~3D%^] " (bar-zone-color |%|) |%|)))
+  (let* ((% (truncate (* 100 (nth 2 mem)))))
+    (format nil "^[~A~3D%^] " (bar-zone-color %) %)))
 
 (defun fmt-mem-usage-bar (mem)
   "Returns a coloured bar-graph representing the current allocation of memory."
   (let ((cpu (truncate (* 100 (nth 2 mem)))))
-    (stumpwm::bar cpu *mem-usage-bar-width* *mem-usage-bar-full* *mem-usage-bar-empty*)))
+    (stumpwm:bar cpu *mem-usage-bar-width* *mem-usage-bar-full* *mem-usage-bar-empty*)))
 
 (defun mem-modeline (ml)
   (declare (ignore ml))
@@ -63,9 +63,9 @@ total amount of memory, allocated memory, allocated/total ratio"
                  (mem-usage)))
 
 (defvar *mem-formatters-alist*
-  '((#\a fmt-mem-allocated)
-    (#\p fmt-mem-percent)
-    (#\b fmt-mem-usage-bar)))
+  '((#\a . fmt-mem-allocated)
+    (#\p . fmt-mem-percent)
+    (#\b . fmt-mem-usage-bar)))
 
 (defvar *mem-modeline-fmt* "MEM: %a %p"
   "The default value for displaying mem usage information on the modeline.
