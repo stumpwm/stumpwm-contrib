@@ -93,9 +93,9 @@
 
 
 (defvar *maildir-formatters-alist*
-  '((#\n maildir-get-new)
-    (#\c maildir-get-cur)
-    (#\t maildir-get-tmp)))
+  '((#\n . maildir-get-new)
+    (#\c . maildir-get-cur)
+    (#\t . maildir-get-tmp)))
 
 (defvar *maildir-modeline-fmt* "%n %c"
   "The default value for displaying maildir information on the modeline.

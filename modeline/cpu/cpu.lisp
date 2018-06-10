@@ -132,10 +132,10 @@ utilization."
                  *cpu-modeline-fmt*))
 
 (defvar *cpu-formatters-alist*
-  '((#\c . fmt-cpu-usage)
-    (#\C . fmt-cpu-usage-bar)
-    (#\f . fmt-cpu-freq)
-    (#\t . fmt-cpu-temp)))
+  '((#\c  fmt-cpu-usage)
+    (#\C  fmt-cpu-usage-bar)
+    (#\f  fmt-cpu-freq)
+    (#\t  fmt-cpu-temp)))
 
 (defvar *cpu-modeline-fmt* "%c (%f) %t"
   "The default value for displaying cpu information on the modeline.

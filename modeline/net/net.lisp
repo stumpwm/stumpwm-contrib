@@ -163,10 +163,10 @@ For the second case rescans route table every minute."
                  *net-modeline-fmt*))
 
 (defvar *net-formatters-alist*
-  '((#\d . net-device)
-    (#\u . fmt-net-usage)
-    (#\i . fmt-ipv4)
-    (#\I . fmt-ipv6)))
+  '((#\d  net-device)
+    (#\u  fmt-net-usage)
+    (#\i  fmt-ipv4)
+    (#\I  fmt-ipv6)))
 
 (defvar *net-modeline-fmt* "%d: %u"
   "The default value for displaying net information on the modeline.
