@@ -33,7 +33,7 @@ Signal quality (without percentage sign)
 @end table
 ")
 
-(defvar *use-colors* nil
+(defvar *use-colors* t
   "Use colors to indicate signal quality.")
 
 (defun sig-quality-fmt (qual)
