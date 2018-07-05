@@ -18,3 +18,22 @@ In order to get your own notifications handler you can define on function
     "Does things with incoming notifications"
     ...)
 #+end_src
+
+** Dependencies
+
+On Debian/Ubuntu[fn:1] there's a dependency on =libfixposix-dev=. If you get an error
+such as the following:
+
+#+BEGIN_QUOTE
+~/quicklisp/dists/quicklisp/software/iolib-v0.8.3/src/syscalls/ffi-types-unix.c:14:10: fatal error: lfp.h: No such file or directory
+#+END_QUOTE
+
+Then you need to install the dev package:
+
+#+BEGIN_SRC sh
+  apt-get install -y libfixposix-dev
+#+END_SRC
+
+* Footnotes
+
+[fn:1] ...and possibly other distributions too
