@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=XTerm
+Exec=xterm
+Terminal=true
+Type=Application
+Path=/usr/local/bin
+Categories=System;TerminalEmulator;
+Keywords=shell;prompt;command;commandline;cmd;

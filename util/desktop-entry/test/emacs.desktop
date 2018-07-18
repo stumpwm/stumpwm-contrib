@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=GNU Emacs
+GenericName=Emacs
+Comment=Emacs is the extensible, customizable, self-documenting real-time display editor
+Comment[de]=Emacs ist der erweiterbare, anpassbare, selbst-dokumentierende Echtzeit-Editor
+Comment[es]=Emacs es un editor ampliable, adaptable, mismo documentado, de tiempo real
+Comment[fr]=Emacs est l'éditeur plein écran avancé, auto-documenté, personnalisable et extensible
+Icon=emacs
+TryExec=/usr/bin/emacs
+Exec=/usr/bin/emacs %F
+Terminal=false
+MimeType=text/css;text/english;text/html;text/plain;text/x-c;text/x-chdr;text/x-csrc;text/x-c++;text/x-c++hdr;text/x-c++src;text/x-java;text/x-makefile;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;
+Categories=Development;TextEditor;
+StartupWMClass=Emacs
