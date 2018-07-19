@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Preferred Applications
+Name[zh_CN]=优先使用的应用程序
+Comment=Select applications called on click on Web link or e-mail address
+Comment[zh_CN]=选择当点击网络链接或邮件地址时调用的应用程序
+Icon=preferences-desktop
+Exec=libfm-pref-apps
+StartupNotify=true
+Categories=Settings;DesktopSettings;X-LXDE-Settings;GTK;
+OnlyShowIn=LXDE;

@@ -1,0 +1,69 @@
+Load desktop entry files(*.desktop) and show them in an application menu for launching commands
+
+* Requirements
+- py-configparser: parsing desktop entry file
+- FiveAM: test framework (optional)
+if you are using Quicklisp, then in the REPL:
+#+BEGIN_SRC lisp
+(ql:quicklisp :py-configparser)
+(ql:quicklisp :FiveAM)
+#+END_SRC
+
+* Usage
+- Load module
+#+BEGIN_SRC lisp
+(load-module "desktop-entry")
+#+END_SRC
+
+- Initialize ~*entry-list*~ with the ~*entry-paths*~
+#+BEGIN_SRC lisp
+(desktop-entry:init-entry-list)
+#+END_SRC
+
+- Add show-desktop-menu command to your keybindings, e.g.:
+#+BEGIN_SRC lisp
+(define-key *root-map* (kbd "m") "show-desktop-menu")
+#+END_SRC
+
+* Customize
+- The ~*entry-paths*~ is defined as below,
+  you can change the value of it before initialization
+#+BEGIN_SRC lisp
+(defvar *entry-paths*
+  '(#P"/usr/share/applications"
+    #P"~/.local/share/applications"))
+#+END_SRC
+- Specify other entry-paths
+#+BEGIN_SRC lisp
+(desktop-entry:init-entry-list [entry paths])
+#+END_SRC
+
+- Add an entry to entry-list
+#+BEGIN_SRC lisp
+(desktop-entry:add-to-entry-list
+  desktop-entry:*entry-list*
+  #P"xxx.desktop")
+
+(desktop-entry:add-to-entry-list
+  desktop-entry:*entry-list*
+  (desktop-entry:make-desktop-entry #P"xxx.desktop"))
+
+(desktop-entry:add-to-entry-list
+  desktop-entry:*entry-list*
+  (desktop-entry:make-desktop-entry
+    '(:name "Google Chrome"
+      :entry-type "Application"
+      :exec "/usr/bin/google-chrome-stable %U"
+      :path nil
+      :categories ("Network" "WebBrowser")
+      :no-display nil
+      :only-show-in nil
+      :terminal nil)))
+#+END_SRC
+
+- Add favorite
+#+BEGIN_SRC lisp
+(desktop-entry:add-favorite-entry <instance of desktop-entry>)
+(desktop-entry:add-favorite-entry <name of an entry in *entry-list*>)
+(desktop-entry:add-favorite-entry <pathname of a desktop file>)
+#+END_SRC
