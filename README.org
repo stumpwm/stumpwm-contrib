@@ -95,7 +95,6 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/productivity/README.org][productivity]] :: Lock StumpWM down so you have to get work done.
 ** Media
 - [[./media/amixer/README.org][amixer]] :: Manipulate the volume using amixer
-- [[./media/aumix/README.org][aumix]] :: Manipulate your volume with aumix
 ** Modeline
 - [[./modeline/hostname/README.org][hostname]] :: Put hostname in the StumpWM modeline
 - [[./modeline/cpu/README.org][cpu]] :: Add cpu info to the modeline.
