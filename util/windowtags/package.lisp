@@ -8,6 +8,8 @@
 (import '(
   ; string wrappers for tag data storage
   stumpwm::utf8-to-string
+  ; groups
+  stumpwm::find-group
   ; switching windows
   stumpwm::really-raise-window
   ))
