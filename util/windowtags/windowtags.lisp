@@ -33,13 +33,14 @@
 
 (defun (setf window-tags) (newtags &optional (argwin nil))
   "Set the window tag set for a window"
-  	(let*
-	  ((win (or argwin (current-window)))
-	   (tagstring (format nil "~{~a ~}" (mapcar 'string-upcase newtags))))
-	  (xlib:change-property (window-xwin win)
-				:STUMPWM_TAGS
-				(string-to-utf8 tagstring)
-				:UTF8_STRING 8)))
+  (let* ((win (or argwin (current-window)))
+         (tagstring (format nil "~{~A ~}" (mapcar 'string-upcase newtags))))
+    (xlib:change-property (window-xwin win)
+                          :STUMPWM_TAGS
+                          (sb-ext:string-to-octets
+                           tagstring
+                           :external-format :utf-8)
+                          :UTF8_STRING 8)))
 
 (defun clear-tags-if (clearp &optional (argwin nil))
   "Remove tags matched by predicate"
