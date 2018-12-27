@@ -14,9 +14,8 @@
 ;;; CODE:
 
 (export '(*maildir-alist*
-          *maildir-modeline-fmt*
-
-          maildir-set-update-time))
+		  *maildir-modeline-fmt*
+		  *maildir-update-time*))
 
 
 
@@ -51,15 +50,6 @@ Temporary mails number
 
 
 
-(defun maildir-set-update-time (time-in-seconds)
-  "Set the maildir informations update interval."
-  (when *maildir-timer*
-    (cancel-timer *maildir-timer*))
-  (setf *maildir-update-time* time-in-seconds)
-  (setf *maildir-timer*
-        (run-with-timer *maildir-update-time* *maildir-update-time*
-                        'update-maildir-infos)))
-
 (defun maildir-mailboxes (maildir)
   "Returns a list of all mailboxes in *maildir-path*."
   (directory (merge-pathnames (make-pathname :directory '(:relative :wild))
@@ -68,8 +58,8 @@ Temporary mails number
 (defun maildir-mailbox-dir (mailbox dir-name)
   "Returns the specified sub-directory pathname for the provided mailbox."
   (merge-pathnames (make-pathname :directory (list :relative dir-name)
-                                  :name :wild :type :wild)
-                   mailbox))
+								  :name :wild :type :wild)
+				   mailbox))
 
 (defun update-maildir-infos ()
   "Update mail counts for *maildir-alist*."
@@ -90,10 +80,8 @@ Temporary mails number
   ;; disk access are slow and you obviously don't need to check
   ;; emails every time the modeline gets updated
   (unless *maildir-timer*
-    (update-maildir-infos)
-    (setf *maildir-timer*
-          (run-with-timer *maildir-update-time* *maildir-update-time*
-                          'update-maildir-infos)))
+	(setf *maildir-timer*
+		  (run-with-timer 0 *maildir-update-time* #'update-maildir-infos)))
   (loop for (label . info) in *maildir-info*
 		collect (stumpwm:format-expand `((#\l ,(constantly label))
 										 (#\n ,(lambda () (format nil "^[~A~D^]"
@@ -103,7 +91,7 @@ Temporary mails number
 										 (#\t ,(lambda () (format nil "~D" (getf info :tmp)))))
 									   *maildir-modeline-fmt*)
 		  into fmts
-		finally (return (format nil "~{~A~}" fmts))))
+		finally (return (apply #'concat fmts))))
 
 
 
