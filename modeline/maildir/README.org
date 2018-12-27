@@ -1,18 +1,26 @@
 ** Usage
+   Put:
+   #+BEGIN_SRC lisp
+     (load-module "maildir")
+   #+END_SRC
+   into your =~/.stumpwmrc=
+   
+   Then you can use =%D= in your mode line format. You can customize the
+   modeline format =*maildir-modeline-fmt*=. The relevant format options
+   are:
+   | Option | Description                               |
+   |--------+-------------------------------------------|
+   | =%l=     | maildir label                             |
+   | =%n=     | number of "new" messages (ie. unread)     |
+   | =%c=     | number of "current" messages (ie. seen)   |
+   | =%t=     | number of "temporary" messages (ie. misc) |
 
-Put:
-#+BEGIN_SRC lisp
-    (load-module "maildir")
-#+END_SRC
-into your =~/.stumpwmrc=
-
-Then you can use "%M" in your mode line format.
-You can customize the modeline format (*maildir-modeline-fmt*). See the
-documentation for *maildir-modeline-fmt* for more information.
-
-** Notes
-
-The %M mode line formatter is also used by the 'mem' module.
-
-** Tasks
-*** TODO Add per mailbox formatter
+   To add a Maildir, add it to the =*maildir-alist*= alist. The car or
+   each item is it's label and the cdr it's pathname. Here's an example
+   of how to add a custom directory.
+   #+BEGIN_SRC lisp
+	 (push (cons "Job" (realname "~/job-mail")) maildir:*maildir-alist*)
+   #+END_SRC
+   
+   By default, only =~/Mail= is indexed. All directories that cannot be
+   found, are ignored.
