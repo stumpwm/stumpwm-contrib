@@ -32,7 +32,7 @@
 									  (user-homedir-pathname))))
   "Alist of pathnames to the mail directories with names. Defaults to just ~/Mail.")
 
-(defvar *maildir-modeline-fmt* "[%l: %n] "
+(defvar *maildir-modeline-fmt* "%l: %n "
   "The Default Value For Displaying Maildir information on the modeline.
 
 @table @asis
@@ -52,8 +52,9 @@ Temporary mails number
 
 (defun maildir-mailboxes (maildir)
   "Returns a list of all mailboxes in *maildir-path*."
-  (directory (merge-pathnames (make-pathname :directory '(:relative :wild))
-							  maildir)))
+  (cons maildir (directory (merge-pathnames (make-pathname :directory
+														   '(:relative :wild))
+											maildir))))
 
 (defun maildir-mailbox-dir (mailbox dir-name)
   "Returns the specified sub-directory pathname for the provided mailbox."
@@ -84,8 +85,8 @@ Temporary mails number
 		  (run-with-timer 0 *maildir-update-time* #'update-maildir-infos)))
   (loop for (label . info) in *maildir-info*
 		collect (stumpwm:format-expand `((#\l ,(constantly label))
-										 (#\n ,(lambda () (format nil "^[~A~D^]"
-																  (if (plusp (getf info :new)) "^B" "")
+										 (#\n ,(lambda () (format nil "^[~@[^B~*~]~D^]"
+																  (plusp (getf info :new))
 																  (getf info :new))))
 										 (#\c ,(lambda () (format nil "~D" (getf info :cur))))
 										 (#\t ,(lambda () (format nil "~D" (getf info :tmp)))))
