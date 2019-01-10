@@ -75,12 +75,12 @@
     (format nil "~{~a ~}" fmts)))
 
 (defvar *disk-formatters-alist*
-  '((#\d disk-get-device)
-    (#\s disk-get-size)
-    (#\u disk-get-used)
-    (#\a disk-get-available)
-    (#\p disk-get-use-percent)
-    (#\m disk-get-mount-point)))
+  '((#\d  disk-get-device)
+    (#\s  disk-get-size)
+    (#\u  disk-get-used)
+    (#\a  disk-get-available)
+    (#\p  disk-get-use-percent)
+    (#\m  disk-get-mount-point)))
 
 (defvar *disk-modeline-fmt* "%m: %u/%s"
   "The default value for displaying disk usage information on the modeline.
