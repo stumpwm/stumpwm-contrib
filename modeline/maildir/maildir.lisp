@@ -13,57 +13,66 @@
 
 ;;; CODE:
 
-(add-screen-mode-line-formatter #\M 'maildir-modeline)
+(export '(*maildir-alist*
+		  *maildir-modeline-fmt*
+		  *maildir-update-time*))
+
+
 
 (defvar *maildir-timer* nil)
+
 (defvar *maildir-update-time* 900
   "Time between two updates of the maildir informations (in seconds).")
 
-(defun maildir-set-update-time (time-in-seconds)
-  "Set the maildir informations update interval."
-  (when *maildir-timer*
-    (cancel-timer *maildir-timer*))
-  (setf *maildir-update-time* time-in-seconds)
-  (setf *maildir-timer*
-        (run-with-timer *maildir-update-time* *maildir-update-time*
-                        'update-maildir-infos)))
+(defvar *maildir-info* '()
+  "List of plists for number of {new,cur,tmp} mail for each mailbox")
 
-(defvar *maildir-path*
-  (merge-pathnames (make-pathname :directory '(:relative "Mail"))
-                   (user-homedir-pathname))
-  "Pathname to the mail directory. Defaults to ~/Mail.")
+(defvar *maildir-alist*
+  (list (cons "Mail" (merge-pathnames (make-pathname :directory '(:relative "Mail"))
+									  (user-homedir-pathname))))
+  "Alist of pathnames to the mail directories with names. Defaults to just ~/Mail.")
+
+(defvar *maildir-modeline-fmt* "%l: %n "
+  "The Default Value For Displaying Maildir information on the modeline.
+
+@table @asis
+@item %%
+A literal '%'
+@item %l
+Label of the maildir
+@item %n
+New mails number
+@item %c
+Current mails number
+@item %t
+Temporary mails number
+@end table")
+
+
 
 (defun maildir-mailboxes (maildir)
   "Returns a list of all mailboxes in *maildir-path*."
-   (directory (merge-pathnames (make-pathname :directory '(:relative :wild))
-                               maildir)))
+  (cons maildir (directory (merge-pathnames (make-pathname :directory
+														   '(:relative :wild))
+											maildir))))
 
 (defun maildir-mailbox-dir (mailbox dir-name)
   "Returns the specified sub-directory pathname for the provided mailbox."
   (merge-pathnames (make-pathname :directory (list :relative dir-name)
-                                  :name :wild :type :wild)
-                   mailbox))
-
-
-(defvar *maildir-new* '()
-  "Number of new mails for each mailbox.")
-(defvar *maildir-cur* '()
-  "Number of mails for each mailbox.")
-(defvar *maildir-tmp* '()
-  "Number of tmp mails for each mailbox.")
+								  :name :wild :type :wild)
+				   mailbox))
 
 (defun update-maildir-infos ()
-  "Update mail counts for *maildir-path*."
-  (loop for m in (maildir-mailboxes *maildir-path*)
-     collect (length (directory (maildir-mailbox-dir m "new")))
-     into nb-new
-     collect (length (directory (maildir-mailbox-dir m "cur")))
-     into nb-cur
-     collect (length (directory (maildir-mailbox-dir m "tmp")))
-     into nb-tmp
-     finally (progn (setf *maildir-new* nb-new)
-                    (setf *maildir-cur* nb-cur)
-                    (setf *maildir-tmp* nb-tmp))))
+  "Update mail counts for *maildir-alist*."
+  (setf *maildir-info* '())
+  (loop for (label . dir) in *maildir-alist*
+		when (probe-file dir)
+		  do (loop for m in (maildir-mailboxes dir)
+				   sum (length (directory (maildir-mailbox-dir m "new"))) into nb-new
+				   sum (length (directory (maildir-mailbox-dir m "cur"))) into nb-cur
+				   sum (length (directory (maildir-mailbox-dir m "tmp"))) into nb-tmp
+				   finally (push (list label :new nb-new :cur nb-cur :tmp nb-tmp)
+								 *maildir-info*))))
 
 ;; modeline formatter
 (defun maildir-modeline (ml)
@@ -72,42 +81,19 @@
   ;; disk access are slow and you obviously don't need to check
   ;; emails every time the modeline gets updated
   (unless *maildir-timer*
-    (update-maildir-infos)
-    (setf *maildir-timer*
-          (run-with-timer *maildir-update-time* *maildir-update-time*
-                          'update-maildir-infos)))
-  (format-expand *maildir-formatters-alist*
-                 *maildir-modeline-fmt*))
+	(setf *maildir-timer*
+		  (run-with-timer 0 *maildir-update-time* #'update-maildir-infos)))
+  (loop for (label . info) in *maildir-info*
+		collect (stumpwm:format-expand `((#\l ,(constantly label))
+										 (#\n ,(lambda () (format nil "^[~@[^B~*~]~D^]"
+																  (plusp (getf info :new))
+																  (getf info :new))))
+										 (#\c ,(lambda () (format nil "~D" (getf info :cur))))
+										 (#\t ,(lambda () (format nil "~D" (getf info :tmp)))))
+									   *maildir-modeline-fmt*)
+		  into fmts
+		finally (return (apply #'concat fmts))))
 
-(defun maildir-get-new ()
-  (let ((total-new (reduce #'+ *maildir-new*)))
-    (format nil "^[~A~D^]" (if (plusp total-new) "^B" "") total-new)))
+
 
-(defun maildir-get-cur ()
-  (let ((total-cur (reduce #'+ *maildir-cur*)))
-    (format nil "~D" total-cur)))
-
-(defun maildir-get-tmp ()
-  (let ((total-tmp (reduce #'+ *maildir-tmp*)))
-    (format nil "~D" total-tmp)))
-
-
-(defvar *maildir-formatters-alist*
-  '((#\n . maildir-get-new)
-    (#\c . maildir-get-cur)
-    (#\t . maildir-get-tmp)))
-
-(defvar *maildir-modeline-fmt* "%n %c"
-  "The default value for displaying maildir information on the modeline.
-
-@table @asis
-@item %%
-A literal '%'
-@item %n
-New mails number
-@item %c
-Current mails number
-@item %t
-Temporary mails number
-@end table
-")
+(stumpwm:add-screen-mode-line-formatter #\D #'maildir-modeline)
