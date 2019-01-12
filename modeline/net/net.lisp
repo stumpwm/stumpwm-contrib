@@ -12,9 +12,11 @@
 ;;;
 
 ;; Install formatters.
-(add-screen-mode-line-formatter #\l 'fmt-net-usage)
+(add-screen-mode-line-formatter #\l 'net-modeline)
 
 (defvar *net-device* nil) ; nil means auto. or specify explicitly, i.e. "wlan0"
+(defvar *net-ipv4* nil)
+(defvar *net-ipv6* nil)
 (defvar *net-last-rx* 0)
 (defvar *net-last-tx* 0)
 (defvar *net-last-time* nil)
@@ -63,12 +65,24 @@ For the second case rescans route table every minute."
 	  *last-route-device*
 	  (let ((new-device (or (find-default) "lo")))
 	    (when (string/= new-device *last-route-device*)
-		(setq *net-last-tx* 0
-		      *net-last-rx* 0
-		      *net-last-time* nil
-		      *net-rx* nil
-		      *net-tx* nil
-		      *net-time* nil))
+              (setf *net-ipv4*
+                    (string-trim '(#\Newline)
+                     (run-shell-command
+                      (format nil
+                       "/sbin/ip -o -4 addr list ~A | awk '{print $4}' | cut -d/ -f1" new-device)
+                     t)))
+              (setf *net-ipv6*
+                    (string-trim '(#\Newline)
+                     (run-shell-command
+                      (format nil
+                       "/sbin/ip -o -6 addr list ~A | awk '{print $4}' | cut -d/ -f1" new-device)
+                     t)))
+	      (setq *net-last-tx* 0
+		    *net-last-rx* 0
+		    *net-last-time* nil
+		    *net-rx* nil
+		    *net-tx* nil
+		    *net-time* nil))
 	    (setq *last-route-rescan-time* (now)
 		  *last-route-device* new-device)))))
 
@@ -124,9 +138,8 @@ For the second case rescans route table every minute."
       (list (round (/ rx-s t-s))
 	    (round (/ tx-s t-s)))))
 
-(defun fmt-net-usage (ml)
+(defun fmt-net-usage ()
   "Returns a string representing the current network activity."
-  (declare (ignore ml))
   (let ((net (net-usage))
 	dn up)
     (defun kbmb (x y)
@@ -135,5 +148,35 @@ For the second case rescans route table every minute."
 	  (list (/ x 1e3) "k")))
     (setq dn (kbmb (car net) 0.1)
 	  up (kbmb (cadr net) 0.1))
-    (format nil "~A: ~5,2F~A/~5,2F~A " (net-device)
+    (format nil "~5,2F~A/~5,2F~A "
 	    (car dn) (cadr dn) (car up) (cadr up))))
+
+(defun fmt-ipv4 ()
+  (or *net-ipv4* "noip"))
+
+(defun fmt-ipv6 ()
+  (or *net-ipv6* "noip"))
+
+(defun net-modeline (ml)
+  (declare (ignore ml))
+  (format-expand *net-formatters-alist*
+                 *net-modeline-fmt*))
+
+(defvar *net-formatters-alist*
+  '((#\d  net-device)
+    (#\u  fmt-net-usage)
+    (#\i  fmt-ipv4)
+    (#\I  fmt-ipv6)))
+
+(defvar *net-modeline-fmt* "%d: %u"
+  "The default value for displaying net information on the modeline.
+
+@table @asis
+@item %%
+A literal '%'
+@item %d
+network device name
+@item %u
+network usage
+@end table
+")
