@@ -56,7 +56,7 @@ wait_result ()
 
     if echo "$RESULT" | grep -q '= $'
     then
-	return 1
+	return 0
     fi
 
     echo "$RESULT" |
