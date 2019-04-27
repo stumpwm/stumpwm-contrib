@@ -10,6 +10,8 @@ The following commands will become available:
 
 - =pass-copy=: select an entry to put into the
   clipboard. (Auto-completion is available.)
+- =pass-copy-menu=: select an entry from a menu to put into the
+  clipboard.
 - =pass-generate=: generate a password for a new given entry and put
   it into the clipboard.
 
