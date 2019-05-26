@@ -1,0 +1,32 @@
+* Cycle MRU
+
+Cycle windows in most recently used order.
+
+** Description
+
+Flip through a group's windows, in a fashion similar to Window's Alt-Tab or
+macOS' Command-Tab. A.K.A. Most Recently Used order.
+
+This code was lifted from [[http://nongnu.13855.n7.nabble.com/Alt-Tab-td127943.html][this thread]] on the stumpwm-devel mailing list from way
+back in 2012.
+
+I have made some minor aesthetic and semantic changes to it (ie - changing the
+name from alt-tab to cycle-mru), but full credit goes to Ruthard Baudach for the
+code.
+
+I am a complete noob when it comes to lisp, so any improvements would be greatly
+appreciated, as would any tips on how to implement the stuff on the todo list
+below.
+
+** Usage
+
+#+BEGIN_SRC common-lisp
+(load-module "cycle-mru")
+(define-key *top-map* (kbd "M-Tab") "cycle-mru")
+#+END_SRC
+
+** Todo
+
+- Use windowlist to choose, and only select on release.
+- Implement reverse cycle.
+- Preserve tab list during group change.
