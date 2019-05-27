@@ -42,16 +42,14 @@
      (setf *mru-index* (mod (1+ *mru-index*) (list-length *mru-cycle*)))
      (stumpwm:select-window-by-number (nth *mru-index* *mru-cycle*)))
     ;; else start anew
-    (
-     (setf *mru-index* 1)
+    ((setf *mru-index* 1)
      (setf *mru-cycle* (copy-list *mru-list*))
-     ;; if we've focussed a frame without window, current-window will return nil
-     ;; => select last used
+     ;; if we've focussed a frame without window, current-window will
+     ;; return nil => select last used
      (cond
        ((not (stumpwm:current-window))
 	(stumpwm:select-window-by-number (first *mru-cycle*)))
-       (
-	(push (stumpwm:window-number (stumpwm:current-window)) *mru-cycle*)
+       ((push (stumpwm:window-number (stumpwm:current-window)) *mru-cycle*)
 	(stumpwm:select-window-by-number (second *mru-cycle*))))))
 
   ;; update timestamp
