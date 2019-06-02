@@ -36,6 +36,9 @@ that made the package more dynamic and configurable in this respect...
 Also, I'm very new to Common Lisp, so the code is pretty hacky. I'd welcome any
 advice on how to make it better.
 
+Also credit must go to the author of [[https://github.com/tslight/stumpwm-contrib/tree/master/modeline/battery-portable][Battery Portable]] for the ~*refresh-time*~
+logic.
+
 ** EXTRA
 
 As an extra bonus this module contains the stumpwm command ~sensors~ for viewing
