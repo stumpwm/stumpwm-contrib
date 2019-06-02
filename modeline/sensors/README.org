@@ -4,13 +4,13 @@ View CPU temperature and fan RPM in the modeline.
 
 ** PRE-REQUISITES
 
-Running Linux with `lm-sensors` installed.
+Running Linux with ~lm-sensors~ installed.
 
 ** USAGE
 
-To load this module, place `(load-module sensors)` in your `.stumpwmrc`.
+To load this module, place ~(load-module sensors)~ in your ~.stumpwmrc~.
 
-Sensors information is then available to display in the modeline using `%S` in
+Sensors information is then available to display in the modeline using ~%S~ in
 your modeline config.
 
 As an example, here is my modeline config:
@@ -29,14 +29,14 @@ setting.
 
 ** CAVEATS
 
-This only displays the cpu of one core and the fan info. Much more is available
-with the sensors command. I'd welcome any patches that made the package more
-dynamic and configurable in this respect...
+This only displays the CPU temperature (~Package id 0~) and the fan RPM
+speed. Much more is available with the sensors command. I'd welcome any patches
+that made the package more dynamic and configurable in this respect...
 
 Also, I'm very new to Common Lisp, so the code is pretty hacky. I'd welcome any
 advice on how to make it better.
 
 ** EXTRA
 
-As an extra bonus this module contains the stumpwm command `sensors` for viewing
+As an extra bonus this module contains the stumpwm command ~sensors~ for viewing
 the same information in a message window.
