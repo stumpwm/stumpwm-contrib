@@ -1,27 +1,33 @@
-* A collection of StumpWM modules
-Documentation on modules can be found [[https://github.com/stumpwm/stumpwm/wiki/Modules][on our wiki]].  
+* StumpWM Contrib
+  *A collection of StumpWM modules*
+
+  You can  learn more about StumpWM modules consulting the documentation [[https://github.com/stumpwm/stumpwm/wiki/Modules][on our wiki]].
 ** Submitting a module
-Right now we have an open door policy for modules.  If you want it in,
-just submit a PR adding the module to this repo.  Follow the directory
-structure already laid out below.  Right before you're ready to make
-the final PR commit, run the script '=update-readme.sh=' to have your
-module (and its description) added to the appropriate category.  The
-script uses the "=:description=" tag in the =.asd= file.  The script
-is pretty dumb, so if your description spans multiple lines, it
-probably won't show up correctly.  Keep it short and sweet. 
+   StumpWM has an open door policy for modules.
+
+   If you want to submit a new module, just send a PR adding the module to this repository.
+
+   Please, follow the directory structure already laid out below.
+
+   Just before you sending the final PR commit, run the script '=update-readme.sh=' to have your
+   module (and its description) added to the appropriate category.
+
+   The script uses the "=:description=" tag in the =.asd= file.
+
+   The script is pretty dumb, so if your description spans multiple lines, it
+   probably won't show up correctly.
+
+   Keep it short and sweet.
 ** How to write a module
 *** General guidelines
-- Create your own package and optionally import the stumpwm
+    - Create your own package and optionally import the stumpwm
   package. Don't use the stumpwm package. If you need a symbol
   exported, [[https://github.com/stumpwm/stumpwm/issues][open an issue]].
-- Use =asdf=.
-- Document exported symbols and commands.
-- Stay organized!  Put things in neat little directories.  A distro
-  might want to package your module.
-
+    - Use =asdf=.
+    - Document exported symbols and commands.
+    - Stay organized!  Put things in neat little directories. A Distribution might want to package your module.
 *** A pseudo-tutorial
-The path of least resistance is to use `quickproject` and its helper
-functions.  Specifically (get [[http://www.quicklisp.org/beta/][quicklisp]]):
+    The path of least resistance is to use `quickproject` and its helper functions.  Specifically (get [[http://www.quicklisp.org/beta/][quicklisp]]):
 #+BEGIN_SRC lisp
   (ql:quickload "quickproject")
   (quickproject:make-project #p"~/path/to/new-module" :depends-on '(stumpwm) :name "swm-new-module")
@@ -59,9 +65,9 @@ to the world!
 
 [[http://www.xach.com/lisp/quickproject/][More docs here]].
 * Third Party Modules
-Advertise your module here, open a PR and include a org-mode link!
-* Current Modules 
-(click for its respective README/docs)
+  Advertise your module here, open a PR and include a org-mode link!
+* Current Modules
+  (click for its respective README/docs)
 # Don't edit anything below this line, the script will blow it away
 # --
 ** Utilities
