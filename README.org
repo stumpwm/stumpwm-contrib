@@ -70,46 +70,46 @@ to the world!
   (click for its respective README/docs)
 # Don't edit anything below this line, the script will blow it away
 # --
+** Modeline
+- [[./modeline/maildir/README.org][maildir]] :: Display maildir information in the modeline (%M conflicts with mem).
+- [[./modeline/cpu/README.org][cpu]] :: Add cpu info to the modeline.
+- [[./modeline/mem/README.org][mem]] :: Display memory in the modeline, %M conflicts with maildir.
+- [[./modeline/disk/README.org][disk]] :: Display filesystem information in the modeline
+- [[./modeline/net/README.org][net]] :: Displays information about the current network connection.
+- [[./modeline/wifi/README.org][wifi]] :: Display information about your wifi.
+- [[./modeline/battery-portable/README.org][battery-portable]] :: Add battery information to the modeline in a portable way.
+- [[./modeline/hostname/README.org][hostname]] :: Put hostname in the StumpWM modeline
 ** Utilities
-- [[./util/ttf-fonts/README.org][ttf-fonts]] :: A pure lisp implementation of TTF font rendering.
-- [[./util/kbd-layouts/README.org][kbd-layouts]] :: Keyboard layout switcher for StumpWM
-- [[./util/screenshot/README.org][screenshot]] :: Takes screenshots and stores them as png files
-- [[./util/alert-me/README.org][alert-me]] :: Alert me that an event is coming
-- [[./util/ft2-fonts/README.org][ft2-fonts]] :: An implementation of font rendering that allows users to select OTF/TTF fonts using FreeType rendering.
-- [[./util/winner-mode/README.org][winner-mode]] :: Emacs' winner-mode for StumpWM
-- [[./util/windowtags/README.org][windowtags]] :: Add metadata to windows to manipulate them en mass.
+- [[./util/searchengines/README.org][searchengines]] :: Allows searching text using prompt or clipboard contents with various search engines
 - [[./util/end-session/README.org][end-session]] :: Provides commands to stumpwm that allow the user to shutdown, restart, and logoff through the stumpwm UI
-- [[./util/notify/README.org][notify]] :: DBus-based notification server part
-- [[./util/qubes/README.org][qubes]] :: Integration to Qubes OS (https://www.qubes-os.org)
+- [[./util/perwindowlayout/README.org][perwindowlayout]] :: Change the keyboard layout per window.
+- [[./util/pass/README.org][pass]] :: Integrate 'pass' with StumpWM
+- [[./util/urgentwindows/README.org][urgentwindows]] :: Allows focusing application windows that need user attention
+- [[./util/screenshot/README.org][screenshot]] :: Takes screenshots and stores them as png files
+- [[./util/winner-mode/README.org][winner-mode]] :: Emacs' winner-mode for StumpWM
+- [[./util/kbd-layouts/README.org][kbd-layouts]] :: Keyboard layout switcher for StumpWM
+- [[./util/swm-gaps/README.org][swm-gaps]] :: Pretty (useless) gaps for StumpWM
+- [[./util/alert-me/README.org][alert-me]] :: Alert me that an event is coming
+- [[./util/windowtags/README.org][windowtags]] :: Add metadata to windows to manipulate them en mass.
+- [[./util/swm-emacs/README.org][swm-emacs]] :: A set of utilities for launching the beast.
+- [[./util/passwd/README.org][passwd]] :: A simple password utility based on ironclad.
 - [[./util/stumptray/README.org][stumptray]] :: System Tray for stumpwm.
+- [[./util/app-menu/README.org][app-menu]] :: A simple application menu for launching shell commands
+- [[./util/surfraw/README.org][surfraw]] :: Integrates surfraw with stumpwm.
+- [[./util/undocumented/README.org][undocumented]] :: Look for stuff that should probably be in the manual that isn't
+- [[./util/ttf-fonts/README.org][ttf-fonts]] :: A pure lisp implementation of TTF font rendering.
+- [[./util/desktop-entry/README.org][desktop-entry]] :: desktop-entry
 - [[./util/numpad-layouts/README.org][numpad-layouts]] :: A module for handling different keyboards numpad layouts
+- [[./util/command-history/README.org][command-history]] :: Save and load the stumpwm::*input-history* to a file
+- [[./util/productivity/README.org][productivity]] :: Lock StumpWM down so you have to get work done.
+- [[./util/pinentry/README.org][pinentry]] :: Integrate GnuPG Agent with StumpWM
+- [[./util/notify/README.org][notify]] :: DBus-based notification server part
 - [[./util/clipboard-history/README.org][clipboard-history]] :: Simple clipboard history module for StumpWM
 - [[./util/globalwindows/README.org][globalwindows]] :: Manipulate all windows in the current X session
-- [[./util/urgentwindows/README.org][urgentwindows]] :: Allows focusing application windows that need user attention
-- [[./util/swm-gaps/README.org][swm-gaps]] :: Pretty (useless) gaps for StumpWM
-- [[./util/searchengines/README.org][searchengines]] :: Allows searching text using prompt or clipboard contents with various search engines
-- [[./util/command-history/README.org][command-history]] :: Save and load the stumpwm::*input-history* to a file
 - [[./util/logitech-g15-keysyms/README.org][logitech-g15-keysyms]] :: Describe logitech-g15-keysyms here
-- [[./util/pass/README.org][pass]] :: Integrate 'pass' with StumpWM
-- [[./util/surfraw/README.org][surfraw]] :: Integrates surfraw with stumpwm.
-- [[./util/passwd/README.org][passwd]] :: A simple password utility based on ironclad.
-- [[./util/swm-emacs/README.org][swm-emacs]] :: A set of utilities for launching the beast.
-- [[./util/pinentry/README.org][pinentry]] :: Integrate GnuPG Agent with StumpWM
-- [[./util/app-menu/README.org][app-menu]] :: A simple application menu for launching shell commands
-- [[./util/perwindowlayout/README.org][perwindowlayout]] :: Change the keyboard layout per window.
-- [[./util/undocumented/README.org][undocumented]] :: Look for stuff that should probably be in the manual that isn't
-- [[./util/productivity/README.org][productivity]] :: Lock StumpWM down so you have to get work done.
+- [[./util/qubes/README.org][qubes]] :: Integration to Qubes OS (https://www.qubes-os.org)
+** Minor Modes
+- [[./minor-mode/notifications/README.org][notifications]] :: A notification library that sends notifications to the modeline via stumpish or from stumpwm itself.
+- [[./minor-mode/mpd/README.org][mpd]] :: Displays information about the music player daemon (MPD).
 ** Media
 - [[./media/amixer/README.org][amixer]] :: Manipulate the volume using amixer
-** Modeline
-- [[./modeline/hostname/README.org][hostname]] :: Put hostname in the StumpWM modeline
-- [[./modeline/cpu/README.org][cpu]] :: Add cpu info to the modeline.
-- [[./modeline/battery-portable/README.org][battery-portable]] :: Add battery information to the modeline in a portable way.
-- [[./modeline/disk/README.org][disk]] :: Display filesystem information in the modeline
-- [[./modeline/maildir/README.org][maildir]] :: Display maildir information in the modeline (%M conflicts with mem).
-- [[./modeline/mem/README.org][mem]] :: Display memory in the modeline, %M conflicts with maildir.
-- [[./modeline/wifi/README.org][wifi]] :: Display information about your wifi.
-- [[./modeline/net/README.org][net]] :: Displays information about the current network connection.
-** Minor Modes
-- [[./minor-mode/mpd/README.org][mpd]] :: Displays information about the music player daemon (MPD).
-- [[./minor-mode/notifications/README.org][notifications]] :: A notification library that sends notifications to the modeline via stumpish or from stumpwm itself.
