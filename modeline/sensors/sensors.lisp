@@ -5,29 +5,20 @@
 (defvar *refresh-time* 30
   "Time in seconds between updates of sensors information.")
 
-(defun get-cpu-temp (output)
-  "Rips out the the value of the Package id 0 row from the OUTPUT of the sensors
-   command. Adds color depending on it's value when converted to an int."
-  (let* ((start (search "Package id 0:" output))
-	 (end (search "(high" output))
-	 (cpu-temp (subseq output start end))
-	 (cpu-temp (string-trim "Package id 0: +" cpu-temp))
-	 (int (parse-integer (remove-if #'alpha-char-p cpu-temp) :junk-allowed t)))
-    (cond ((< 60 int) (concat "^1*" cpu-temp "^n"))
-	  ((< 50 int) (concat "^3*" cpu-temp "^n"))
-	  (t cpu-temp))))
-
-(defun get-fan-rpm (output)
-  "Rips out the value of the exhaust row from the OUTPUT of the sensors
-  command. Adds color depending on it's value when converted to an int."
-  (let* ((start (search "Exhaust" output))
-	 (end (search "(min" output))
-	 (fan-rpm (subseq output start end))
-	 (fan-rpm (string-trim "Exhaust :" fan-rpm))
-	 (int (parse-integer (remove-if #'alpha-char-p fan-rpm) :junk-allowed t)))
-    (cond ((< 3500 int) (concat "^1*" fan-rpm "^n"))
-	  ((< 2500 int) (concat "^3*" fan-rpm "^n"))
-	  (t fan-rpm))))
+(defun get-sensor (output start-string end-string upper-bound lower-bound)
+  "Rips out the the value of a sensors row from the OUTPUT from the sensors
+   command, using a START-STRING and END-STRING that mark the place of the
+   relevant sensor information. Adds color depending on it's value when
+   converted to an int, specified by the UPPER-BOUND and LOWER-BOUND."
+  (let* ((start (search start-string output))
+	 (end (search end-string output))
+	 (sensor (subseq output start end))
+	 ;; Get rid of the junk + and : characters from sensors' output
+	 (sensor (string-trim (concat start-string "+" " " ":" ) sensor))
+	 (int (parse-integer (remove-if #'alpha-char-p sensor) :junk-allowed t)))
+    (cond ((< upper-bound int) (concat "^1*" sensor "^n"))
+	  ((< lower-bound int) (concat "^3*" sensor "^n"))
+	  (t sensor))))
 
 (defun get-sensors (&optional as-string)
   "Gets a large string back from running sensors in the shell, and then parses
@@ -35,8 +26,8 @@
    Takes optional AS-STRING boolean which if true returns output as formatted
    string."
   (let* ((output (run-shell-command "sensors" t))
-	 (cpu-temp (get-cpu-temp output))
-	 (fan-rpm (get-fan-rpm output)))
+	 (cpu-temp (get-sensor output "Package id 0:" "(high" 60 50))
+	 (fan-rpm (get-sensor output "Exhaust" "(min" 3500 2500)))
     (if as-string
 	(concat cpu-temp " " fan-rpm)
 	(list cpu-temp fan-rpm))))
