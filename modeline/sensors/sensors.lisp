@@ -5,6 +5,12 @@
 (defvar *refresh-time* 30
   "Time in seconds between updates of sensors information.")
 
+(defvar *cpu-regex* "(?<=\\+).*[0-9]+.*C(?=.*\\()"
+  "A regex that captures all temperatures.")
+
+(defvar *fan-regex* "(?<=\\:).*[0-9]+.*RPM"
+  "A regex that captures all fans.")
+
 (defun get-sensor (output start-string end-string upper-bound lower-bound)
   "Rips out the the value of a sensors row from the OUTPUT from the sensors
    command, using a START-STRING and END-STRING that mark the place of the
