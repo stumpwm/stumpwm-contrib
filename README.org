@@ -75,6 +75,7 @@ to the world!
 - [[./modeline/cpu/README.org][cpu]] :: Add cpu info to the modeline.
 - [[./modeline/mem/README.org][mem]] :: Display memory in the modeline, %M conflicts with maildir.
 - [[./modeline/disk/README.org][disk]] :: Display filesystem information in the modeline
+- [[./modeline/stumptray/README.org][stumptray]] :: System Tray for stumpwm.
 - [[./modeline/net/README.org][net]] :: Displays information about the current network connection.
 - [[./modeline/wifi/README.org][wifi]] :: Display information about your wifi.
 - [[./modeline/battery-portable/README.org][battery-portable]] :: Add battery information to the modeline in a portable way.
@@ -93,7 +94,6 @@ to the world!
 - [[./util/windowtags/README.org][windowtags]] :: Add metadata to windows to manipulate them en mass.
 - [[./util/swm-emacs/README.org][swm-emacs]] :: A set of utilities for launching the beast.
 - [[./util/passwd/README.org][passwd]] :: A simple password utility based on ironclad.
-- [[./util/stumptray/README.org][stumptray]] :: System Tray for stumpwm.
 - [[./util/app-menu/README.org][app-menu]] :: A simple application menu for launching shell commands
 - [[./util/surfraw/README.org][surfraw]] :: Integrates surfraw with stumpwm.
 - [[./util/undocumented/README.org][undocumented]] :: Look for stuff that should probably be in the manual that isn't
