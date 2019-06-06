@@ -5,44 +5,46 @@
 (defvar *refresh-time* 30
   "Time in seconds between updates of sensors information.")
 
-(defvar *cpu-regex* "(?<=\\+).*[0-9]+.*C(?=.*\\()"
+(defvar *temp-regex* "(?<=\\+).*[0-9]+(?=\\..*)"
   "A regex that captures all temperatures.")
 
-(defvar *fan-regex* "(?<=\\:).*[0-9]+.*RPM"
+(defvar *fan-regex* "(?<=\\:).*?(?=RPM)"
   "A regex that captures all fans.")
 
-(defun get-sensor (output start-string end-string upper-bound lower-bound)
-  "Rips out the the value of a sensors row from the OUTPUT from the sensors
-   command, using a START-STRING and END-STRING that mark the place of the
-   relevant sensor information. Adds color depending on it's value when
-   converted to an int, specified by the UPPER-BOUND and LOWER-BOUND."
-  (let* ((start (search start-string output))
-	 (end (search end-string output))
-	 (sensor (subseq output start end))
-	 ;; Get rid of the junk + and : characters from sensors' output
-	 (sensor (string-trim (concat start-string "+" " " ":" ) sensor))
-	 (int (parse-integer (remove-if #'alpha-char-p sensor) :junk-allowed t)))
-    (cond ((< upper-bound int) (concat "^1*" sensor "^n"))
-	  ((< lower-bound int) (concat "^3*" sensor "^n"))
-	  (t sensor))))
+(defun sensors-as-ints (output regex)
+  (let ((strings (ppcre:all-matches-as-strings regex output)))
+    (mapcan ;; https://stackoverflow.com/a/13269952
+     (lambda (s)
+       (let ((i (parse-integer (remove-if #'alpha-char-p s) :junk-allowed t)))
+	 ;; low readings can skew the average too much
+	 (if (< 20 i)
+	     (list i))))
+     strings)))
 
 (defun get-sensors (&optional as-string)
-  "Gets a large string back from running sensors in the shell, and then parses
-   out a CPU temperature value and fan RPM using get-cpu-temp and get-fan-rpm.
-   Takes optional AS-STRING boolean which if true returns output as formatted
-   string."
   (let* ((output (run-shell-command "sensors" t))
-	 (cpu-temp (get-sensor output "Package id 0:" "(high" 60 50))
-	 (fan-rpm (get-sensor output "Exhaust" "(min" 3500 2500)))
+	 (temps (sensors-as-ints output *temp-regex*))
+	 (fans (sensors-as-ints output *fan-regex*))
+	 (max-temp (reduce #'max temps))
+	 (avg-temp (floor (apply #'+ temps) (length temps)))
+	 (avg-rpm (floor (apply #'+ fans) (length fans))))
     (if as-string
-	(concat cpu-temp " " fan-rpm)
-	(list cpu-temp fan-rpm))))
+	(concat
+	 (write-to-string max-temp) (string (code-char 176)) "C "
+	 (write-to-string avg-temp) (string (code-char 176)) "C "
+	 (write-to-string avg-rpm) " RPM")
+	(list max-temp avg-temp avg-rpm))))
 
 (defcommand sensors () ()
-	    (let* ((my-sensors (get-sensors))
-		   (cpu-temp (nth 0 my-sensors))
-		   (fan-rpm (nth 1 my-sensors)))
-	      (message "^B^5CPU: ^n~a~%^B^5FAN: ^n~a" cpu-temp fan-rpm)))
+  (let* ((s (get-sensors))
+	 (max-temp (nth 0 s))
+	 (avg-temp (nth 1 s))
+	 (avg-rpm (nth 2 s)))
+    (message (concat
+	      "^B^5MAXIMUM TEMPERATURE: ^n~a" (string (code-char 176)) "C~%"
+	      "^B^5AVERAGE TEMPERATURE: ^n~a" (string (code-char 176)) "C~%"
+	      "^B^5AVERAGE FAN SPEED: ^n~a RPM")
+	     max-temp avg-temp avg-rpm)))
 
 ;; pinched from battery portable code
 (let ((next 0)

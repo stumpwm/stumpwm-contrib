@@ -1,5 +1,5 @@
 ;;;; package.lisp
 
 (defpackage #:sensors
-  (:use #:cl #:stumpwm)
+  (:use #:cl #:stumpwm #:cl-ppcre)
   (:export #:*refresh-time*))
