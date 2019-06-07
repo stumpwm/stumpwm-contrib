@@ -4,8 +4,9 @@
 
 (defun get-milliseconds () ()
        "Get timestamp in milliseconds."
-       (floor (* 1000 (/ (get-internal-real-time)
-			 internal-time-units-per-second))))
+       (floor
+	(* 1000
+	   (/ (get-internal-real-time) internal-time-units-per-second))))
 
 (defvar *mru-last-call* (get-milliseconds))
 (defvar *mru-list* (make-list 0))
@@ -37,7 +38,7 @@
   "Focus next windows according to most recently used order."
   (cond
     ;; if we're still in timeout
-    ((< (- (get-milliseconds) *mru-last-call*) 400)
+    ((< (- (get-milliseconds) *mru-last-call*) *mru-timeout*)
      ;; cycle through windows
      (setf *mru-index* (mod (1+ *mru-index*) (list-length *mru-cycle*)))
      (stumpwm:select-window-by-number (nth *mru-index* *mru-cycle*)))
@@ -51,6 +52,5 @@
 	(stumpwm:select-window-by-number (first *mru-cycle*)))
        ((push (stumpwm:window-number (stumpwm:current-window)) *mru-cycle*)
 	(stumpwm:select-window-by-number (second *mru-cycle*))))))
-
   ;; update timestamp
   (setf *mru-last-call* (get-milliseconds)))
