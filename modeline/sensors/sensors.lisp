@@ -11,14 +11,23 @@
 (defvar *fan-regex* "(?<=\\:).*?(?=RPM)"
   "A regex that captures all fans.")
 
-(defvar *red-above* 60
+(defvar *red-above-temp* 60
   "Temperature to turn red at.")
 
-(defvar *yellow-above* 50
+(defvar *yellow-above-temp* 50
   "Temperature to turn yellow at.")
 
-(defvar *display-above* 40
+(defvar *display-above-temp* 40
   "Temperature to start displaying at.")
+
+(defvar *red-above-rpm* 4000
+  "Fan RPM to turn red at.")
+
+(defvar *yellow-above-rpm* 3000
+  "Fan RPM to turn yellow at.")
+
+(defvar *display-above-rpm* 2000
+  "Fan RPM to start displaying at.")
 
 (defvar *ignore-below* 20
   "Ignore temperatures below this temperature when calculating average.")
@@ -35,9 +44,9 @@
 
 (defun get-colors (value
 		   &optional
-		     (high *red-above*)
-		     (mid *yellow-above*)
-		     (low *display-above*))
+		     (high *red-above-temp*)
+		     (mid *yellow-above-temp*)
+		     (low *display-above-temp*))
   (cond ((< high value) (concat "^1*" (write-to-string value)))
 	((< mid value) (concat "^3*" (write-to-string value)))
 	((< low value) (write-to-string value))
@@ -56,7 +65,7 @@
 		   (handler-case
 		       (floor (apply #'+ fans) (length fans))
 		     (division-by-zero () 0))
-		   4000 3000 2000)))
+		   *red-above-rpm* *yellow-above-rpm* *display-above-rpm*)))
     (concat
      (if max-temp (concat max-temp (string (code-char 176)) "C^n"))
      (if avg-temp (concat " " avg-temp (string (code-char 176)) "C^n"))
