@@ -11,34 +11,45 @@
 (defvar *fan-regex* "(?<=\\:).*?(?=RPM)"
   "A regex that captures all fans.")
 
+(defvar *ignore-below* 20
+  "Ignore temperatures below this temperature when calculating average.")
+
 (defun sensors-as-ints (output regex)
   (let ((strings (ppcre:all-matches-as-strings regex output)))
     (mapcan ;; https://stackoverflow.com/a/13269952
      (lambda (s)
        (let ((i (parse-integer (remove-if #'alpha-char-p s) :junk-allowed t)))
 	 ;; low readings can skew the average too much
-	 (if (< 20 i)
+	 (if (< *ignore-below* i)
 	     (list i))))
      strings)))
+
+(defun get-colors (value high mid low)
+  (cond ((< high value) (concat "^1*" (write-to-string value)))
+	((< mid value) (concat "^3*" (write-to-string value)))
+	((< low value) (write-to-string value))
+	(t nil)))
 
 (defun get-sensors (&optional as-string)
   (let* ((output (run-shell-command "sensors" t))
 	 (temps (sensors-as-ints output *temp-regex*))
 	 (fans (sensors-as-ints output *fan-regex*))
-	 (max-temp (reduce #'max temps))
-	 (avg-temp
-	  (handler-case
-	      (floor (apply #'+ temps) (length temps))
-	    (division-by-zero () 0)))
-	 (avg-rpm
-	  (handler-case
-	      (floor (apply #'+ fans) (length fans))
-	    (division-by-zero () 0))))
+	 (max-temp (get-colors (reduce #'max temps) 60 50 40))
+	 (avg-temp (get-colors
+		    (handler-case
+			(floor (apply #'+ temps) (length temps))
+		      (division-by-zero () 0))
+		    60 50 40))
+	 (avg-rpm (get-colors
+		   (handler-case
+		       (floor (apply #'+ fans) (length fans))
+		     (division-by-zero () 0))
+		   4000 3000 2000)))
     (if as-string
 	(concat
-	 (write-to-string max-temp) (string (code-char 176)) "C "
-	 (write-to-string avg-temp) (string (code-char 176)) "C "
-	 (write-to-string avg-rpm) " RPM")
+	 (if max-temp (concat max-temp (string (code-char 176))) "C^n ")
+	 (if avg-temp (concat avg-temp (string (code-char 176))) "C^n ")
+	 (if avg-rpm (concat avg-temp "RPM^n")))
 	(list max-temp avg-temp avg-rpm))))
 
 (defcommand sensors () ()
