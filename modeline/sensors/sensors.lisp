@@ -5,12 +5,6 @@
 (defvar *refresh-time* 30
   "Time in seconds between updates of sensors information.")
 
-(defvar *temp-regex* "(?<=\\+).*[0-9]+(?=\\..*)"
-  "A regex that captures all temperatures.")
-
-(defvar *fan-regex* "(?<=\\:).*?(?=RPM)"
-  "A regex that captures all fans.")
-
 (defvar *red-above-temp* 60
   "Temperature to turn red at.")
 
@@ -32,6 +26,12 @@
 (defvar *ignore-below* 20
   "Ignore temperatures below this temperature when calculating average.")
 
+(defvar *temp-regex* "(?<=\\+).*[0-9]+(?=\\..*)"
+  "A regex that captures all temperatures.")
+
+(defvar *fan-regex* "(?<=\\:).*?(?=RPM)"
+  "A regex that captures all fans.")
+
 (defun sensors-as-ints (output regex)
   (let ((strings (ppcre:all-matches-as-strings regex output)))
     (mapcan ;; https://stackoverflow.com/a/13269952
@@ -42,7 +42,7 @@
 	     (list i))))
      strings)))
 
-(defun get-colors (value
+(defun fmt-sensor (value
 		   &optional
 		     (high *red-above-temp*)
 		     (mid *yellow-above-temp*)
@@ -52,16 +52,16 @@
 	((< low value) (write-to-string value))
 	(t nil)))
 
-(defun get-sensors ()
+(defun sensors ()
   (let* ((output (run-shell-command "sensors" t))
 	 (temps (sensors-as-ints output *temp-regex*))
 	 (fans (sensors-as-ints output *fan-regex*))
-	 (max-temp (get-colors (reduce #'max temps)))
-	 (avg-temp (get-colors
+	 (max-temp (fmt-sensor (reduce #'max temps)))
+	 (avg-temp (fmt-sensor
 		    (handler-case
 			(floor (apply #'+ temps) (length temps))
 		      (division-by-zero () 0))))
-	 (avg-rpm (get-colors
+	 (avg-rpm (fmt-sensor
 		   (handler-case
 		       (floor (apply #'+ fans) (length fans))
 		     (division-by-zero () 0))
@@ -71,18 +71,18 @@
      (if avg-temp (concat " " avg-temp (string (code-char 176)) "C^n"))
      (if avg-rpm (concat " " avg-temp "RPM^n")))))
 
-(defcommand sensors () ()
-  (message (get-sensors)))
+(defcommand sensors-message () ()
+  (message (sensors)))
 
 ;; pinched from battery portable code
 (let ((next 0)
       (last-value ""))
-  (defun fmt-sensors (ml)
+  (defun get-sensors (ml)
     (declare (ignore ml))
     (let ((now (get-universal-time)))
       (when (< now next)
-	(return-from fmt-sensors last-value))
+	(return-from get-sensors last-value))
       (setf next (+ now *refresh-time*)))
-    (setf last-value (get-sensors))))
+    (setf last-value (sensors))))
 
-(add-screen-mode-line-formatter #\S #'fmt-sensors)
+(add-screen-mode-line-formatter #\S #'get-sensors)
