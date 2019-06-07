@@ -33,6 +33,8 @@
   "A regex that captures all fans.")
 
 (defun sensors-as-ints (output regex)
+  "Use REGEX to extract sensor values from OUTPUT, and then cast them to a list
+   of integers if they are greater than *IGNORE-BELOW*."
   (let ((strings (ppcre:all-matches-as-strings regex output)))
     (mapcan ;; https://stackoverflow.com/a/13269952
      (lambda (s)
@@ -47,12 +49,20 @@
 		     (high *red-above-temp*)
 		     (mid *yellow-above-temp*)
 		     (low *display-above-temp*))
+  "If VALUE is greater than HIGH, MID or LOW, return it as a red, yellow or
+   normal coloured string, respectively. If value is lower than LOW, don't
+   return anything."
   (cond ((< high value) (concat "^1*" (write-to-string value)))
 	((< mid value) (concat "^3*" (write-to-string value)))
 	((< low value) (write-to-string value))
 	(t nil)))
 
 (defun sensors ()
+  "Transforms the output of the sensors command into two lists of integers. One
+   for temperatures and one for fan speeds. Calculate the average values of the
+   lists (and the maximum for temperatures), then cast those values back to
+   strings with appropriate color formatting. Finally concatenate those strings
+   into one line."
   (let* ((output (run-shell-command "sensors" t))
 	 (temps (sensors-as-ints output *temp-regex*))
 	 (fans (sensors-as-ints output *fan-regex*))
