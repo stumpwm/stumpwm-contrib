@@ -79,7 +79,7 @@
     (concat
      (if max-temp (concat max-temp (string (code-char 176)) "C^n"))
      (if avg-temp (concat " " avg-temp (string (code-char 176)) "C^n"))
-     (if avg-rpm (concat " " avg-temp "RPM^n")))))
+     (if avg-rpm (concat " " avg-rpm " RPM^n")))))
 
 (defcommand sensors-message () ()
   (message (sensors)))
