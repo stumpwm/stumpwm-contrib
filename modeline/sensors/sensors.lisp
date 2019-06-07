@@ -26,8 +26,14 @@
 	 (temps (sensors-as-ints output *temp-regex*))
 	 (fans (sensors-as-ints output *fan-regex*))
 	 (max-temp (reduce #'max temps))
-	 (avg-temp (floor (apply #'+ temps) (length temps)))
-	 (avg-rpm (floor (apply #'+ fans) (length fans))))
+	 (avg-temp
+	  (handler-case
+	      (floor (apply #'+ temps) (length temps))
+	    (division-by-zero () 0)))
+	 (avg-rpm
+	  (handler-case
+	      (floor (apply #'+ fans) (length fans))
+	    (division-by-zero () 0))))
     (if as-string
 	(concat
 	 (write-to-string max-temp) (string (code-char 176)) "C "
