@@ -22,7 +22,7 @@
 (defun show-notification (app icon summary body)
   "Show the notification using standard STUMPWM::MESSAGE function"
   (declare (ignore app icon))
-  (stumpwm:message "~A ~A" summary body))
+  (stumpwm:message "~A ~% ~A" summary body))
 
 (define-dbus-object notify-dbus-service
     (:path "/org/freedesktop/Notifications"))
