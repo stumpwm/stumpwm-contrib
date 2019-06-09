@@ -1,0 +1,22 @@
+* ttf-fonts
+  A LISP implementation of TTF font rendering.
+
+  All fonts installed on your OS default fonts folder will be loaded by TTF-fonts.
+
+  On Linux, *~/.local/share/fonts* are loaded too, by default.
+
+  Once new fonts are installed, you'll need to cache all fonts again.
+
+  More info on *clx-truetype* README file.
+* Usage
+  Add
+  #+BEGIN_SRC lisp
+  (ql:quickload '(:clx-truetype))
+
+  (xft:cache-fonts)
+
+  (load-module "ttf-fonts")
+
+  (set-font (make-instance 'xft:font :family "DejaVu Serif" :subfamily "Book" :size 11))
+  #+END_SRC
+  to =.stumpwmrc=
