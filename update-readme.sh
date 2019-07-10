@@ -2,7 +2,7 @@
 
 sed '/# --/q' README.org > tmpReadme
 
-for f in $(find . -name "*.asd");
+for f in $(find . -name "*.asd" | sort);
 do
     desc=$(grep description $f | grep -o \".*\" | sed 's,",,g');
     echo - [[$(dirname $f)/README.org][$(basename $f .asd)]] :: $desc >> tmpReadme
