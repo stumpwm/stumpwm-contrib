@@ -16,8 +16,6 @@
 
 (in-package #:gnu-pw-mgr)
 
-(ql:quickload :cl-ppcre)
-
 ;; All timer code is blatantly stolen^H^H^H^H^H^Hborrowed from the
 ;; passwd module.
 (defvar *password-id-remember-timeout* 0
@@ -28,24 +26,20 @@
 (defvar *password-id* nil)
 
 (defvar *password-id-timer*
-  #+sbcl (sb-ext:make-timer (lambda ()
-                              (setf *password-id* nil)))
-  #-sbcl (error 'not-implemented))
+  (sb-ext:make-timer (lambda ()
+                       (setf *password-id* nil))))
 
 (defvar *old-clipboard* nil)
 
 (defvar *clipboard-timer*
-  #+sbcl (sb-ext:make-timer (lambda ()
-                              (set-x-selection *old-clipboard*)
-                              (setf *old-clipboard* nil)))
-  #-sbcl (error 'not-implemented))
+  (sb-ext:make-timer (lambda ()
+                       (set-x-selection *old-clipboard*)
+                       (setf *old-clipboard* nil))))
 
 (defun reset-timer (timer timeout)
-  #+sbcl (progn
-           (when (sb-ext:timer-scheduled-p timer)
-             (sb-ext:unschedule-timer timer))
-           (sb-ext:schedule-timer timer timeout))
-  #-sbcl (error 'not-implemented))
+  (when (sb-ext:timer-scheduled-p timer)
+    (sb-ext:unschedule-timer timer))
+  (sb-ext:schedule-timer timer timeout))
 
 (stumpwm:define-stumpwm-type :gpw-password-id (input prompt)
   (or *password-id*
@@ -54,31 +48,26 @@
                 (read-one-line (current-screen) prompt :password t)))))
 
 (defun parse-id-lines (lines)
-  (mapcar (lambda (id-pair)
-            (format nil "~{~D) ~A~}" id-pair))
-          (loop for idx from 1
-             for id in
-               (loop for id-line in lines
-                  collect (first (cl-ppcre:split " +" id-line)))
-             collect (list idx id))))
+  (loop :for index :from 1
+        :for id-line :in lines
+        :for id := (first (cl-ppcre:split " +" id-line))
+        :collect (format nil "~D) ~A" index id)))
+
+(defun label-line-p (line)
+  (cl-ppcre:scan "^$|^seed-tag|^login id hint:" line))
 
 (stumpwm:defcommand password-to-selection (pwid)
   ((:gpw-password-id "Password ID: "))
   "Prompt for a password ID and a seed ID and set the X selection to
 the resulting password."
-  (let* ((cmd (format nil "exec gnu-pw-mgr '~a'" pwid))
+  (let* ((cmd (format nil "exec gnu-pw-mgr '~A'" pwid))
          (output (stumpwm:run-shell-command cmd t))
-         (lines (loop for line in (cl-ppcre:split "\\n" output)
-                   unless (or  (cl-ppcre:scan "^$" line)
-                               (cl-ppcre:scan "^seed-tag" line)
-                               (cl-ppcre:scan "^login id hint:" line))
-                   collect line))
+         (lines (remove-if 'label-line-p (cl-ppcre:split "\\n" output)))
          (seed (select-from-menu (stumpwm:current-screen)
                                  (parse-id-lines lines)
                                  "seed ID:"))
-         (seedno (if seed
-                     (parse-integer (first (cl-ppcre:split "\\) " seed)))
-                     nil)))
+         (seedno (when seed
+                     (parse-integer (first (cl-ppcre:split "\\) " seed))))))
     (unless *old-clipboard*
       (setf *old-clipboard* (get-x-selection)))
     (when (and *clipboard-clear-timeout*
@@ -91,7 +80,5 @@ the resulting password."
     (when seedno
       (stumpwm:set-x-selection
        (second (cl-ppcre:split " +" (nth (1- seedno) lines))))
-      (multiple-value-bind
-            (s hint)
-          (cl-ppcre:scan-to-strings "login id hint: .+\\n" output)
-        (if s (stumpwm:message s))))))
+      (alexandria:when-let ((string (cl-ppcre:scan-to-strings "login id hint: .+\\n" output)))
+        (stumpwm:message string)))))
