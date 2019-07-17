@@ -1,0 +1,29 @@
+** Description
+Sets the Bing daily wallpaper to your desktop using =feh=
+
+** Usage
+Add this to your =.stumpwmrc=:
+
+#+BEGIN_SRC lisp
+  (load-module "bingwallpaper")
+  (bingwallpaper:bingwallpaper 3) ; wait 3 seconds before loading
+#+END_SRC
+
+** Commands
+- =load-bing-wallpaper index= loads the wallpaper from a given number of days ago
+- =bing-wallpaper-info= shows a description of the current wallpaper
+
+** Customization
+- Customize the format of the wallpaper description by setting =*wpinfo-fmt*=
+- A newline is inserted by replacing the copyright string with "~%\\1", you
+  can set =*split-copyright*= to something else e.g. "\\1" to not do that
+
+** Misc
+The wallpaper is cached in the =stumpwm= folder in =$XDG_CACHE_HOME= or, if
+that doesn't exist then in =$HOME/.cache= along with a description of the
+cached wallpaper in =wallpaperinfo.txt=
+
+** Tasks
+- Maybe choose the most appropriate resolution to download depending on the
+  user's desktop resolution
+- Does this work on multiple monitors?

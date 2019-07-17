@@ -88,6 +88,7 @@ to the world!
 ** Utilities
 - [[./util/alert-me/README.org][alert-me]] :: Alert me that an event is coming
 - [[./util/app-menu/README.org][app-menu]] :: A simple application menu for launching shell commands
+- [[./util/bingwallpaper/README.org][bingwallpaper]] :: Sets the daily Bing wallpaper using feh
 - [[./util/clipboard-history/README.org][clipboard-history]] :: Simple clipboard history module for StumpWM
 - [[./util/command-history/README.org][command-history]] :: Save and load the stumpwm::*input-history* to a file
 - [[./util/desktop-entry/README.org][desktop-entry]] :: desktop-entry
