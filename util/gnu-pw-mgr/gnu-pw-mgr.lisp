@@ -52,7 +52,8 @@
 (defun parse-tags (lines)
   (loop :for index :from 1
         :for tag-line :in lines
-        :collect (first (cl-ppcre:split " +" tag-line))))
+        :collect (let ((passl (cl-ppcre:split " +" tag-line)))
+                   (cons (first passl) (second passl)))))
 
 ;; Normally we could run gnu-pw-mgr with the '-H/--no-header' option
 ;; to parse the output more easily, however we want to capture the
@@ -64,20 +65,18 @@
 
 (stumpwm:defcommand password-to-selection (pwid)
   ((:gpw-password-id "Password ID: "))
-  "Prompt for a password ID and a seed ID and set the X selection to
+  "Prompt for a password ID and a seed tag and set the X selection to
 the resulting password."
   (let* ((cmd (format nil "exec gnu-pw-mgr '~A'" pwid))
          (output (stumpwm:run-shell-command cmd t))
          (lines (remove-if 'header-line-p (cl-ppcre:split "\\n" output)))
-         (seed (select-from-menu (stumpwm:current-screen)
-                                 (parse-tags lines)
-                                 "seed ID:"))
-         (pass
-          (when seed
-            (second (cl-ppcre:split
-                     " +"
-                     (string (cl-ppcre:scan-to-strings
-                              (format nil "~A +\\S+" seed) output)))))))
+         (passes (parse-tags lines))
+         (tags (mapcar #'first passes))
+         (tag-sel (select-from-menu (stumpwm:current-screen)
+                                    tags
+                                    "seed tag:"))
+         (pass (when tag-sel
+                 (cdr (assoc tag-sel passes :test #'string=)))))
     (unless *old-clipboard*
       (setf *old-clipboard* (get-x-selection)))
     (when (and *clipboard-clear-timeout*
