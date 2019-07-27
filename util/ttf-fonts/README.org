@@ -1,0 +1,48 @@
+# Setup ttf-fonts Module
+
+The ttf-fonts module has only the default README.org file, which does not provide much help when setting up the module. These are just my notes from going through the process. I cannot guarantee they are correct or will work for everyone, but they did work for me.
+
+It is assumed you have your stumpwm envrionment setup to load modules i.e. (load-module "ttf-fonts") will find the module and load it. If not, see other pages on this Wiki for that.
+
+## Additional CL Packages
+
+You need to install the following additional CL packages to get ttf-fonts to work.
+
+* clx-truetype
+* xml-emitter
+* dbus
+
+You can do this using ql:quickload
+
+````
+(ql:quickload "clx-truetype")
+(ql:quickload "xml-emitter")
+(ql:quickload "dbus")
+````
+
+## Select TTF Font
+
+You need to select the truetype font you want to use. Note that it has to be a *.tff font. Other font formats, such as *.otf will not work. On Linux, you may find the various _fc_ utilities useful e.g. fc-query, fc-match, fc-list etc.
+
+At the vary least, you will need the font family, subfamily and size values. In some cases, you may also need the font registry name.
+
+## Code
+
+Once you have everything, you need to put something like the following in your .stumpwmrc file
+
+````
+(load-module "ttf-fonts")
+(xft:cache-fonts)
+(set-font (make-instance 'xft:font
+                         :family "DejaVu Sans Mono"
+                         :subfamily "Book"
+                         :size 16
+                         :antialiased t))
+````
+
+## Troubleshooting
+
+Everyone has there own way to do this. However, I found opening a _scratch.lisp_ file in Emacs and then using slime-connect to open a repl into the running stumpwm process the best way to go. I put the above code into the scratch file and then executed each line to ensure correctness and to experiment with different fonts. If you are an emacs user and you haven't yet setup slime and added the code to your .stumpwmrc to add swank, you really do need to!
+
+
+*Changes made by*: Tim Cross
