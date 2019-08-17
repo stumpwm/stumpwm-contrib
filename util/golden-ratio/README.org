@@ -13,7 +13,7 @@ Just add the following line to your .stumpwmrc file:
 #+END_SRC
 ...and then simply enable golden-ratio-mode with:
 #+BEGIN_SRC lisp
-(toggle-golden-ratio)
+(swm-golden-ratio:toggle-golden-ratio)
 #+END_SRC
 
 Turning the golden-ratio-module on will enable automatic resizing of the focused frame. Enjoy

@@ -28,13 +28,10 @@
                                               (stumpwm::frame-width to-frame))
                                    (resize-px target-y
                                               (stumpwm::frame-height to-frame)))
-                   (stumpwm:message "resized")
                    (setq *golden-ratio-on* T))))))
 
-  (stumpwm:defcommand toggle-golden-ratio () ()
-    "Toggle golden ratio"
-    (setf *golden-ratio-on* (null *golden-ratio-on*)))
-
-(stumpwm:message "reloaded")
+(stumpwm:defcommand toggle-golden-ratio () ()
+  "Toggle golden ratio"
+  (setf *golden-ratio-on* (null *golden-ratio-on*)))
 
 (stumpwm:add-hook stumpwm:*focus-frame-hook* 'resize-to-golden-ratio)
