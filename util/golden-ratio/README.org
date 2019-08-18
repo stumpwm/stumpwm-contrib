@@ -1,0 +1,23 @@
+** Commentary
+
+When working with multiple windows in a single frame, things can get small and, sometimes, a bit messy.
+This modules add automatic resizing of your focused frame according to the golden ratio, calculated using the head's height and width.
+
+This module was heavily inspired by emacs's [golden ratio](https://github.com/roman/golden-ratio.el) module.
+
+** Usage
+
+Just add the following line to your .stumpwmrc file:
+#+BEGIN_SRC lisp
+(load-module "swm-golden-ratio")
+#+END_SRC
+...and then simply enable golden-ratio-mode with:
+#+BEGIN_SRC lisp
+(swm-golden-ratio:toggle-golden-ratio)
+#+END_SRC
+
+Turning the golden-ratio-module on will enable automatic resizing of the focused frame. Enjoy
+
+** Tasks
+*** TODO Implement these features
+- [ ] Support for more than 2 inner-frames

@@ -94,6 +94,7 @@ to the world!
 - [[./util/end-session/README.org][end-session]] :: Provides commands to stumpwm that allow the user to shutdown, restart, and logoff through the stumpwm UI
 - [[./util/globalwindows/README.org][globalwindows]] :: Manipulate all windows in the current X session
 - [[./util/gnu-pw-mgr/README.org][gnu-pw-mgr]] :: Reconstruct passwords with gnu-pw-mgr
+- [[./util/golden-ratio/README.org][swm-golden-ratio]] :: Resize the currently focused frame to the golden ratio
 - [[./util/kbd-layouts/README.org][kbd-layouts]] :: Keyboard layout switcher for StumpWM
 - [[./util/logitech-g15-keysyms/README.org][logitech-g15-keysyms]] :: Describe logitech-g15-keysyms here
 - [[./util/notify/README.org][notify]] :: DBus-based notification server part
