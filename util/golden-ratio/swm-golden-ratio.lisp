@@ -18,17 +18,16 @@
                                            (stumpwm:current-head)))))
 
 (defun resize-to-golden-ratio (to-frame from-frame)
-  (if (not (stumpwm::single-frame-p))
-      (if *golden-ratio-on*
-          (let* ((target-x (target-px (stumpwm::head-width (stumpwm:current-head))))
-                 (target-y (target-px (stumpwm::head-height (stumpwm:current-head)))))
-            (progn (setq *golden-ratio-on* nil)
-                   (balance-current-group)
-                   (stumpwm:resize (resize-px target-x
-                                              (stumpwm::frame-width to-frame))
-                                   (resize-px target-y
-                                              (stumpwm::frame-height to-frame)))
-                   (setq *golden-ratio-on* T))))))
+  (when (and *golden-ratio-on* (not (stumpwm::single-frame-p))
+             (let* ((target-x (target-px (stumpwm::head-width (stumpwm:current-head))))
+                    (target-y (target-px (stumpwm::head-height (stumpwm:current-head)))))
+               (setq *golden-ratio-on* nil)
+               (balance-current-group)
+               (stumpwm:resize (resize-px target-x
+                                          (stumpwm::frame-width to-frame))
+                               (resize-px target-y
+                                          (stumpwm::frame-height to-frame)))
+               (setq *golden-ratio-on* T)))))
 
 (stumpwm:defcommand toggle-golden-ratio () ()
   "Toggle golden ratio"
