@@ -21,12 +21,6 @@ In order to get your own notifications handler you can define on function
 
 ** Dependencies
 
-To install dependencies (if you are using quicklisp):
-#+begin_src lisp
-(ql:quickload "xml-emitter")
-(ql:quickload "dbus")
-#+end_src
-
 On Debian/Ubuntu[fn:1] there's a dependency on =libfixposix-dev=. If you get an error
 such as the following:
 
