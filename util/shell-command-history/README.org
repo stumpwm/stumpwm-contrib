@@ -1,0 +1,27 @@
+* Problem
+
+After  quiting StumpWM,  your  shell command  history  is gone.   This
+simple plugin  saves the lisp ~stumpwm::*input-shell-history*~  to the
+contents of  special variable  ~*shell-command-history-file*~ (default
+to:  ~~/.stumpwm.d/shell-history~) and  loads it  again when  starting
+StumpWM.
+
+** Usage
+Add this to your ~.stumpwmrc~ (your main configuration file):
+
+Load contrib module:
+#+BEGIN_SRC lisp
+  (load-module "shell-command-history")
+#+END_SRC
+
+You can customize the shell history file's path:
+
+#+BEGIN_SRC lisp
+  (setf shell-command-history:*shell-command-history-file*
+        "/home/cage/.cache/stumpwm/shell-command-history")
+#+END_SRC
+
+* NOTE
+
+This code is derived from ~command-history~ © Arjen Dijkstra, released
+under GPLv3
