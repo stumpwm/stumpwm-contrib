@@ -106,6 +106,7 @@ Please see =README.org= files for each module for further details. Missing modul
 - [[./util/golden-ratio/README.org][swm-golden-ratio]] :: Resize the currently focused frame to the golden ratio
 - [[./util/kbd-layouts/README.org][kbd-layouts]] :: Keyboard layout switcher for StumpWM
 - [[./util/logitech-g15-keysyms/README.org][logitech-g15-keysyms]] :: Describe logitech-g15-keysyms here
+- [[./util/lookup/README.org][lookup]] :: Dictionary/search engine lookup module for StumpWM.
 - [[./util/notify/README.org][notify]] :: DBus-based notification server part
 - [[./util/numpad-layouts/README.org][numpad-layouts]] :: A module for handling different keyboards numpad layouts
 - [[./util/pass/README.org][pass]] :: Integrate 'pass' with StumpWM
@@ -116,6 +117,7 @@ Please see =README.org= files for each module for further details. Missing modul
 - [[./util/qubes/README.org][qubes]] :: Integration to Qubes OS (https://www.qubes-os.org)
 - [[./util/screenshot/README.org][screenshot]] :: Takes screenshots and stores them as png files
 - [[./util/searchengines/README.org][searchengines]] :: Allows searching text using prompt or clipboard contents with various search engines
+- [[./util/shell-command-history/README.org][shell-command-history]] :: Save and load the stumpwm::*input-shell-history* to a file
 - [[./util/surfraw/README.org][surfraw]] :: Integrates surfraw with stumpwm.
 - [[./util/swm-emacs/README.org][swm-emacs]] :: A set of utilities for launching the beast.
 - [[./util/swm-gaps/README.org][swm-gaps]] :: Pretty (useless) gaps for StumpWM
