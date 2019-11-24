@@ -39,7 +39,7 @@
     (#\p  disk-get-use-percent)
     (#\m  disk-get-mount-point)))
 
-(defparameter *disk-modeline-fmt* "dev %m mount %d av: %a per %p %u/%s"
+(defparameter *disk-modeline-fmt* "%m: %u/%s"
   "The default value for displaying disk usage information on the modeline.
 
 @table @asis
