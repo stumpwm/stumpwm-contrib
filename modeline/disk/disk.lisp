@@ -1,6 +1,6 @@
 ;;;; disk.lisp
 
-(in-package #:disk)
+(in-package :disk)
 
 ;;; "disk" goes here. Hacks and glory await!
 
@@ -29,52 +29,9 @@
 
 (add-screen-mode-line-formatter #\D 'disk-modeline)
 
-(defvar *disk-usage* nil)
+(defparameter *disk-usage* nil)
 
-(defun disk-usage-tokenize (usage-line-str)
-  (ppcre:split "(\\s+)" usage-line-str))
-
-(defun disk-update-usage (paths)
-  (setf *disk-usage*
-        (with-input-from-string
-            (usage-str (run-shell-command
-                        (format nil "df -h ~{~a ~} | grep -v 'Filesystem'" paths) t))
-          (loop for i = (read-line usage-str nil nil)
-             while i
-             collect (disk-usage-tokenize i)))))
-
-(defvar *disk-usage-paths* '("/")
-  "The list of mount points to report the disk usage of.")
-
-
-(defun disk-usage-get-field (path field-number)
-  (let ((usage-infos (find-if (lambda (item)
-                                (string= (car (last item)) path))
-                              *disk-usage*)))
-    (nth field-number usage-infos)))
-(defun disk-get-device (path)
-  (disk-usage-get-field path 0))
-(defun disk-get-size (path)
-  (disk-usage-get-field path 1))
-(defun disk-get-used (path)
-  (disk-usage-get-field path 2))
-(defun disk-get-available (path)
-  (disk-usage-get-field path 3))
-(defun disk-get-use-percent (path)
-  (disk-usage-get-field path 4))
-(defun disk-get-mount-point (path)
-  (disk-usage-get-field path 5))
-
-(defun disk-modeline (ml)
-  (declare (ignore ml))
-  (disk-update-usage *disk-usage-paths*)
-  (let ((fmts (loop for p in *disk-usage-paths*
-                   collect (format-expand *disk-formatters-alist*
-                                          *disk-modeline-fmt*
-                                          p))))
-    (format nil "~{~a ~}" fmts)))
-
-(defvar *disk-formatters-alist*
+(defparameter *disk-formatters-alist*
   '((#\d  disk-get-device)
     (#\s  disk-get-size)
     (#\u  disk-get-used)
@@ -82,7 +39,7 @@
     (#\p  disk-get-use-percent)
     (#\m  disk-get-mount-point)))
 
-(defvar *disk-modeline-fmt* "%m: %u/%s"
+(defparameter *disk-modeline-fmt* "dev %m mount %d av: %a per %p %u/%s"
   "The default value for displaying disk usage information on the modeline.
 
 @table @asis
@@ -103,3 +60,75 @@ Filesystem mount point
 @end table
 ")
 
+(defparameter *disk-usage-paths* '("/")
+  "The list of mount points to report the disk usage of.")
+
+(defun disk-usage-tokenize (usage-line-str)
+  (ppcre:split "(\\s+)" usage-line-str))
+
+(defun disk-update-usage (paths)
+  (setf *disk-usage*
+        (with-input-from-string
+            (usage-str (run-shell-command
+                        (format nil "df -h ~{~a ~} | grep -v 'File system'" paths) t))
+          (loop for i = (read-line usage-str nil nil)
+             while i
+             collect (disk-usage-tokenize i)))))
+
+(defun disk-usage-get-field (path field-number)
+  (let ((usage-infos (find-if (lambda (item)
+                                (string= (car (last item)) path))
+                              *disk-usage*)))
+    (nth field-number usage-infos)))
+
+(defun size-human-readable (size-as-number)
+  (diskspace:size-in-human-readable size-as-number))
+
+(defun disk-get-size-as-number (path)
+  (diskspace:disk-total-space path))
+
+(defun disk-get-size (path)
+  (diskspace:disk-total-space path t))
+
+(defun disk-get-used-as-number (path)
+   (- (disk-get-size-as-number path)
+      (disk-get-available-size-as-number path)))
+
+(defun disk-get-used (path)
+  (size-human-readable (disk-get-used-as-number path)))
+
+(defun disk-get-available-size-as-number (path)
+  (diskspace:disk-available-space path))
+
+(defun disk-get-available (path)
+  (diskspace:disk-available-space path t))
+
+(defun disk-get-use-percent (path)
+  (let ((value (truncate (* 100
+                            (/ (disk-get-used-as-number path)
+                               (disk-get-size-as-number path))))))
+
+    (format nil "~a%" value)))
+
+;;; whe should use fallback mode (i.e. shell + df) for this two :(
+;;; any idea how to improve this?
+
+(defun disk-get-device (path)
+  (disk-usage-get-field path 0))
+
+(defun disk-get-mount-point (path)
+  (disk-usage-get-field path 5))
+
+(defun use-fallback-method-p ()
+  (or (search "%m" *disk-modeline-fmt* :test #'string=)
+      (search "%d" *disk-modeline-fmt* :test #'string=)))
+
+(defun disk-modeline (ml)
+  (declare (ignore ml))
+  (when (use-fallback-method-p)
+    (disk-update-usage *disk-usage-paths*))
+  (let ((fmts (loop for p in *disk-usage-paths* collect
+                   (format-expand *disk-formatters-alist*
+                                  *disk-modeline-fmt*
+                                  p))))
+    (format nil "~{~a ~}" fmts)))

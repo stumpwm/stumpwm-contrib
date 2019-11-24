@@ -5,7 +5,7 @@
   :description "Display filesystem information in the modeline"
   :author "Morgan Veyret"
   :license "GPLv3"
-  :depends-on (#:stumpwm)
+  :depends-on (:stumpwm
+               :cl-diskspace)
   :components ((:file "package")
                (:file "disk")))
-
