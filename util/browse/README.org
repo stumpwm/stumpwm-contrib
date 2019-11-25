@@ -1,0 +1,29 @@
+#+title: browse -- open the default browser
+#+author: Spenser Truex
+#+email: web@spensertruex.com
+
+* Purpose
+- Open a web browser using the portable `xdg-open` (from xdg-utils) function. This
+- opens your "default browser", which must be set elsewhere.
+
+* Dependency
+~xdg-open~  must be installed.
+
+* Config
+- Use this in your StumpWM init file:
+#+begin_src common-lisp
+(load-module "browse")
+#+end_src
+
+- Bind `browse` to a key.
+#+begin_src lisp
+(define-key *root-map* (kbd "B") "browse")
+#+end_src
+
+- Set homepage (default: `about:blank`).
+#+begin_src lisp
+(setf *homepage* "https://spensertruex.com")
+#+end_src
+
+* License
+GNU GPL v3
