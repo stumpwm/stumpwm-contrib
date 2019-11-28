@@ -1,19 +1,32 @@
+* Intro
+
+This module prints some information about your disks on the modeline.
+
+* Dependency
+
+Put:
+#+BEGIN_SRC common-lisp
+    (ql:quickload "cl-diskspace")
+#+END_SRC
+
 ** Usage
 
 Put:
-#+BEGIN_SRC 
+#+BEGIN_SRC
     (load-module "disk")
 #+END_SRC
 
-into your =~/.stumpwmrc=
+into your ~~/.stumpwmrc~
 
 Then you can use "%D" in your mode line format.
 
-Filesystem(s) to be displayed can be customized by modifying the *disk-usage-paths* list.
+Filesystem(s)  to be  displayed  can be  customized  by modifying  the
+~*disk-usage-paths*~ list.
 
-You can customize the modeline format (*disk-modeline-fmt*). 
+You can customize the modeline format (~*disk-modeline-fmt*~).
 
-The default value for displaying disk usage information on the modeline.
+The  default  value  for  displaying disk  usage  information  on  the
+modeline.
 
 |------+----------------------------------|
 | Code | Result                           |
@@ -26,3 +39,8 @@ The default value for displaying disk usage information on the modeline.
 | %p   | Filesystem used space in percent |
 | %m   | Filesystem mount point           |
 |------+----------------------------------|
+
+** Known issues
+
+This module will  fallback on an external shell process  method to get
+informations if either ~%m~ or ~%d~ is used.
