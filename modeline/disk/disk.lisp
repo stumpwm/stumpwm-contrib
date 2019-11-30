@@ -37,7 +37,8 @@
     (#\u  disk-get-used)
     (#\a  disk-get-available)
     (#\p  disk-get-use-percent)
-    (#\m  disk-get-mount-point)))
+    (#\m  disk-get-mount-point)
+    (#\f  disk-get-fylesystem-type)))
 
 (defparameter *disk-modeline-fmt* "%m: %u/%s"
   "The default value for displaying disk usage information on the modeline.
@@ -57,6 +58,8 @@ Filesystem available space
 Filesystem used space in percent
 @item %m
 Filesystem mount point
+@item %f
+Filesystem type
 @end table
 ")
 
@@ -110,21 +113,23 @@ Filesystem mount point
 
     (format nil "~a%" value)))
 
-;;; whe should use fallback mode (i.e. shell + df) for this two :(
-;;; any idea how to improve this?
-
 (defun disk-get-device (path)
-  (disk-usage-get-field path 0))
+  #+linux (cl-mount-info:mountpoint->device path)
+  #-linux (disk-usage-get-field path 0))
 
 (defun disk-get-mount-point (path)
-  (disk-usage-get-field path 5))
+  path)
+
+(defun disk-get-fylesystem-type (path)
+  #+linux (cl-mount-info:mountpoint->fstype path)
+  #-linux "filesystem type supported only on GNU/Linux :-(")
 
 (defun use-fallback-method-p ()
-  (or (search "%m" *disk-modeline-fmt* :test #'string=)
-      (search "%d" *disk-modeline-fmt* :test #'string=)))
+  (search "%d" *disk-modeline-fmt* :test #'string=))
 
 (defun disk-modeline (ml)
   (declare (ignore ml))
+  #-linux
   (when (use-fallback-method-p)
     (disk-update-usage *disk-usage-paths*))
   (let ((fmts (loop for p in *disk-usage-paths* collect
