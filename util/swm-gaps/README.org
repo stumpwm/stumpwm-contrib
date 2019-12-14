@@ -10,7 +10,7 @@ Credit goes to the original author.
 #+BEGIN_QUOTE
 This modifies StumpWM's internal functions ~maximize-window~ and ~neighbour~, so
 might not work as expected if those definitions change in the core. Currently
-works with ~v1.0.1-rc~.
+works with ~v19.11~.
 #+END_QUOTE
 
 #+BEGIN_SRC common-lisp
