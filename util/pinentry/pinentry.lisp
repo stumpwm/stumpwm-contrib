@@ -8,7 +8,6 @@
         (prompt (read-line stream)))
     (format stream (or (stumpwm:read-one-line (stumpwm:current-screen)
                                               (format nil "~a~%~a " description prompt)
-                                              ""
                                               :password t)
                        ""))))
 

@@ -86,8 +86,9 @@ HEIGHT are subtracted."
                                                                   oh))))
         ;; update the "extents"
         (xlib:change-property (window-xwin win) :_NET_FRAME_EXTENTS
-                              (list wx wy
+                              (list wx
                                     (- (xlib:drawable-width (window-parent win)) width wx)
+                                    wy
                                     (- (xlib:drawable-height (window-parent win)) height wy))
                               :cardinal 32))
       (update-configuration win))))
