@@ -1,8 +1,8 @@
 ;;;; package.lisp
 
-(defpackage :disk
-  (:use :cl
-        :stumpwm)
+(defpackage #:disk
+  (:use #:cl
+        #:stumpwm)
   (:export
-   :*disk-modeline-fmt*
-   :*disk-usage-paths*))
+   #:*disk-modeline-fmt*
+   #:*disk-usage-paths*))
