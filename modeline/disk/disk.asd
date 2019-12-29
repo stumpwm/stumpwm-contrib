@@ -7,6 +7,6 @@
   :license "GPLv3"
   :depends-on (:stumpwm
                :cl-diskspace
-               #+linux :cl-mount-info)
+               (:feature :linux "cl-mount-info"))
   :components ((:file "package")
                (:file "disk")))
