@@ -38,7 +38,7 @@
     (#\a  disk-get-available)
     (#\p  disk-get-use-percent)
     (#\m  disk-get-mount-point)
-    (#\f  disk-get-fylesystem-type)))
+    (#\f  disk-get-filesystem-type)))
 
 (defparameter *disk-modeline-fmt* "%m: %u/%s"
   "The default value for displaying disk usage information on the modeline.
@@ -120,7 +120,7 @@ Filesystem type
 (defun disk-get-mount-point (path)
   path)
 
-(defun disk-get-fylesystem-type (path)
+(defun disk-get-filesystem-type (path)
   #+linux (cl-mount-info:mountpoint->fstype path)
   #-linux "filesystem type supported only on GNU/Linux :-(")
 
