@@ -6,14 +6,16 @@ This module prints some information about your disks on the modeline.
 
 Put:
 #+BEGIN_SRC common-lisp
-    (ql:quickload "cl-diskspace")
+  (ql:quickload "cl-diskspace")
+  ;; on GNU/linux only
+  (ql:quickload "cl-mount-info")
 #+END_SRC
 
 ** Usage
 
 Put:
-#+BEGIN_SRC
-    (load-module "disk")
+#+BEGIN_SRC common-lisp
+  (load-module "disk")
 #+END_SRC
 
 into your ~~/.stumpwmrc~
@@ -38,9 +40,10 @@ modeline.
 | %a   | Filesystem available space       |
 | %p   | Filesystem used space in percent |
 | %m   | Filesystem mount point           |
+| %f   | Filesystem type                  |
 |------+----------------------------------|
 
 ** Known issues
 
-This module will  fallback on an external shell process  method to get
-informations if either ~%m~ or ~%d~ is used.
+This  module  will  fallback  on  an external  shell  process  on  non
+GNU/Linux platform
