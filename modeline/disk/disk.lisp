@@ -114,14 +114,20 @@ Filesystem type
     (format nil "~a%" value)))
 
 (defun disk-get-device (path)
-  #+linux (cl-mount-info:mountpoint->device path)
+  #+linux
+  (handler-case
+      (cl-mount-info:mountpoint->device path)
+    (error () "ERR"))
   #-linux (disk-usage-get-field path 0))
 
 (defun disk-get-mount-point (path)
   path)
 
 (defun disk-get-filesystem-type (path)
-  #+linux (cl-mount-info:mountpoint->fstype path)
+  #+linux
+  (handler-case
+      (cl-mount-info:mountpoint->fstype path)
+    (error () "ERR"))
   #-linux "filesystem type supported only on GNU/Linux :-(")
 
 (defun use-fallback-method-p ()
