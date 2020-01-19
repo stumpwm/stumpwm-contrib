@@ -21,8 +21,11 @@
   "Put a password into the clipboard."
   (let ((entry (stumpwm:completing-read (stumpwm:current-screen)
                                         "entry: "
-                                        (pass-entries))))
-    (stumpwm:run-shell-command (format nil "pass -c ~a" entry))))
+                                        (pass-entries)
+                                        :initial-input ""
+                                        :require-match t)))
+    (when entry
+      (stumpwm:run-shell-command (format nil "pass -c ~a" entry)))))
 
 (stumpwm:defcommand pass-copy-menu () ()
   "Select a password entry from a menu and copy the password into the clipboard."
@@ -30,10 +33,12 @@
                 (stumpwm:current-screen)
                 (mapcar 'list (pass-entries))
                 "Copy password to clipboard: ")))
-    (stumpwm:run-shell-command (format nil "pass -c ~a" (car entry)))))
+    (when entry
+      (stumpwm:run-shell-command (format nil "pass -c ~a" (car entry))))))
 
 (stumpwm:defcommand pass-generate () ()
   "Generate a password and put it into the clipboard"
   (let ((entry-name (stumpwm:read-one-line (stumpwm:current-screen)
                                            "entry name: ")))
-    (stumpwm:run-shell-command (format nil "pass generate -c ~a" entry-name))))
+    (when entry-name
+      (stumpwm:run-shell-command (format nil "pass generate -c ~a" entry-name)))))
