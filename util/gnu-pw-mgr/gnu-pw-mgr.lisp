@@ -1,5 +1,5 @@
 ;;;; gnu-pw-mgr.lisp
-;; Copyright (C) 2019  Brandon Invergo <brandon@invergo.net>
+;; Copyright (C) 2019, 2020  Brandon Invergo <brandon@invergo.net>
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -71,10 +71,9 @@ the resulting password."
          (output (stumpwm:run-shell-command cmd t))
          (lines (remove-if 'header-line-p (cl-ppcre:split "\\n" output)))
          (passes (parse-tags lines))
-         (tags (mapcar #'first passes))
-         (tag-sel (select-from-menu (stumpwm:current-screen)
-                                    tags
-                                    "seed tag:"))
+         (tag-sel (first (select-from-menu (stumpwm:current-screen)
+                                           passes
+                                           "seed tag:")))
          (pass (when tag-sel
                  (cdr (assoc tag-sel passes :test #'string=)))))
     (unless *old-clipboard*
