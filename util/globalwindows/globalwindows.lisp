@@ -48,6 +48,9 @@ select the screen."
 (with-global-windowlist global-windowlist "Like windowlist, but for all groups not just the current one."
   (goto-window window))
 
-(with-global-windowlist global-pull-windowlist "Global windowlist for pulling windows to the current frame."
-  (move-window-to-group window (current-group))
+(with-global-windowlist global-pull-windowlist
+  "Global windowlist for pulling windows to the current frame."
+  (when (not (equalp (window-group window)
+                     (current-group)))
+    (move-window-to-group window (current-group)))
   (pull-window window))
