@@ -34,6 +34,12 @@ Then you need to install the dev package:
   apt-get install -y libfixposix-dev
 #+END_SRC
 
+** Testing
+You can test notifications (if you have notify-send installed) with:
+#+BEGIN_SRC sh
+notify-send 'Hello world!' 'This is an example notification.'
+#+END_SRC
+
 * Footnotes
 
 [fn:1] ...and possibly other distributions too

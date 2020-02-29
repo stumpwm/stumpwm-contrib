@@ -38,18 +38,26 @@
 (defvolcontrol amixer-PCM-1- "PCM" "1%-")
 (defvolcontrol amixer-PCM-1+ "PCM" "1%+")
 (defvolcontrol amixer-PCM-toggle "PCM" "toggle")
+(defvolcontrol amixer-PCM-mute "PCM" "mute")
+(defvolcontrol amixer-PCM-unmute "PCM" "unmute")
 
 (defvolcontrol amixer-Front-1- "Front" "1%-")
 (defvolcontrol amixer-Front-1+ "Front" "1%+")
 (defvolcontrol amixer-Front-toggle "Front" "toggle")
+(defvolcontrol amixer-Front-mute "Front" "mute")
+(defvolcontrol amixer-Front-unmute "Front" "unmute")
 
 (defvolcontrol amixer-Master-1- "Master" "1%-")
 (defvolcontrol amixer-Master-1+ "Master" "1%+")
 (defvolcontrol amixer-Master-toggle "Master" "toggle")
+(defvolcontrol amixer-Master-mute "Master" "mute")
+(defvolcontrol amixer-Master-unmute "Master" "unmute")
 
 (defvolcontrol amixer-Headphone-1- "Headphone" "1%-")
 (defvolcontrol amixer-Headphone-1+ "Headphone" "1%+")
 (defvolcontrol amixer-Headphone-toggle "Headphone" "toggle")
+(defvolcontrol amixer-Headphone-mute "Headphone" "mute")
+(defvolcontrol amixer-Headphone-unmute "Headphone" "unmute")
 
 (defcommand amixer-sense-toggle () ()
   (message

@@ -2,9 +2,6 @@
 
 (in-package #:command-history)
 
-(export '(*start-hook*
-          *quit-hook*))
-
 (defvar *home-dir* (getenv "HOME"))
 
 (defvar *command-history-file*

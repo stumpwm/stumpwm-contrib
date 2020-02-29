@@ -5,8 +5,8 @@ Load desktop entry files(*.desktop) and show them in an application menu for lau
 - FiveAM: test framework (optional)
 if you are using Quicklisp, then in the REPL:
 #+BEGIN_SRC lisp
-(ql:quicklisp :py-configparser)
-(ql:quicklisp :FiveAM)
+(ql:quickload :py-configparser)
+(ql:quickload :FiveAM)
 #+END_SRC
 
 * Usage

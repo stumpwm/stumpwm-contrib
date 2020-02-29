@@ -1,0 +1,59 @@
+** About
+   This is a tiny module for automating dictionary and search engine
+   lookups under StumpWM. It operates on user-provided query strings,
+   either typed on the keyboard or obtained from the X selection. The
+   user query, combined with the relevant URL, gets passed to the
+   browser via =xdg-open=.
+** Usage
+*** Installation
+    To enable the =lookup= module run the following (assuming your
+    Quicklisp can reach the =stumpwm-contrib= directory):
+    #+BEGIN_SRC lisp
+      (ql:quickload :lookup)
+    #+END_SRC
+*** Keybindings
+    The module defines two StumpWM commands for performing dictionary
+    and search engine lookups, =dictionary-lookup= and =search-lookup=,
+    respectively. By default, they are bound to =s-d= and =s-g=,
+    respectively. They can easily be rebound by running the following
+    code:
+    #+BEGIN_SRC lisp
+      (define-key *top-map* (kbd "<new-binding>") "<lookup-command>")
+    #+END_SRC
+** Configuration
+*** Adding/changing dictionaries
+    In order to add new or modify existing entries one needs to add
+    appropriate entries to the =lookup::*dictionaries*= plist. For
+    instance, to define a new entry for German (regardless of whether
+    there was one previously) one would run the following code:
+    #+BEGIN_SRC lisp
+      (setf (getf lookup::*dictionaries* :de)
+            "http://en.pons.com/translate?q=~a&l=deen#dict")
+    #+END_SRC
+    The query URL requires exactly one instance of =~a=, where the URL
+    would normally have the query string. The query string will be
+    subject to URL-encoding before opening.
+*** Changing search engine
+    Currently the =lookup= module only supports a single search engine
+    (Google by default). In order to change that one needs to
+    customize the variable =lookup::*search-engine*=. For instance, to
+    switch to DuckDuckGo, one would run the following code:
+    #+BEGIN_SRC lisp
+      (setf lookup::*search-engine* "https://duckduckgo.com/?q=~a")
+    #+END_SRC
+    Remember to put exactly one instance of =~a= in the URL, where the
+    query string is expected.
+*** Sticky language selection
+    The default behavior of dictionary lookup is to provide two-level
+    selection - first for the language, then for the search
+    phrase. With the sticky language selection enabled the =lookup=
+    module remembers the last language used and suggests it for the
+    user (requiring them to press Enter to accept). This saves some
+    typing when performing a sequence of lookups for the same
+    language. Last choice is remembered for the duration of the
+    current session. It is enabled by default. To disable it run the
+    following code:
+    #+BEGIN_SRC lisp
+      (setf lookup::*sticky-language-selection* nil)
+    #+END_SRC
+

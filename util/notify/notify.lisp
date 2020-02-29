@@ -1,5 +1,12 @@
 (in-package #:notify)
 
+(export
+ '(*notify-server-max-title-lines*
+   *notify-server-max-body-lines*
+   *notify-server-max-line-length*
+   *notify-server-title-color*
+   *notify-server-body-color*))
+
 ;;;;
 ;;;; Notify server to show standard notifications messages
 ;;;;
@@ -19,10 +26,47 @@
 (defparameter *notify-server-stop-message*
   "Notification Server will now stop listening for notifications.")
 
+(defparameter *notify-server-max-title-lines* 2)
+(defparameter *notify-server-max-body-lines* 20)
+(defparameter *notify-server-max-line-length* 100)
+
+(defparameter *notify-server-title-color* "^4")
+(defparameter *notify-server-body-color* "^0")
+
+(defun flatten-once (lstst)
+  (mapcan (lambda (x) x) lstst))
+
+(defun rewrap-line (line)
+  (if (> (length line) *notify-server-max-line-length*)
+      (cons (subseq line 0 *notify-server-max-line-length*)
+            (rewrap-line (subseq line *notify-server-max-line-length*)))
+      (list line)))
+
+(defun rewrap-body (body &key (max-lines 20) (show-ellipsis nil))
+  (let ((lines (split-sequence:split-sequence #\newline body)))
+    (format nil "~{~A~^~%~}"
+            (multiple-value-bind (fst rst)
+                (stumpwm:take max-lines
+                              (flatten-once
+                               (mapcar #'rewrap-line lines)))
+              (if (and rst show-ellipsis)
+                  (append fst (list "..."))
+                  fst)))))
+
 (defun show-notification (app icon summary body)
   "Show the notification using standard STUMPWM::MESSAGE function"
   (declare (ignore app icon))
-  (stumpwm:message "~A ~A" summary body))
+  (stumpwm:message "~A~A^0~% ~%~A~A^0"
+                   *notify-server-title-color*
+                   (rewrap-body
+                    summary
+                    :max-lines *notify-server-max-title-lines*
+                    :show-ellipsis t)
+                   *notify-server-body-color*
+                   (rewrap-body
+                    body
+                    :max-lines *notify-server-max-body-lines*
+                    :show-ellipsis t)))
 
 (define-dbus-object notify-dbus-service
     (:path "/org/freedesktop/Notifications"))

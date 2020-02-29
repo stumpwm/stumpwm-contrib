@@ -1,0 +1,17 @@
+* StumpTray
+  System Tray for StumpWM mode-line.
+* Dependencies
+  StumpTray depends on Xembed Commom Lisp package.
+
+  You can get it with QuickLisp: (ql:quickload "xembed")
+* Usage
+Add
+#+BEGIN_SRC lisp
+(load-module "stumptray")
+(stumptray::stumptray)
+#+END_SRC
+to =.stumpwmrc=
+* Tasks
+** TODO StumpTray disappears as user toggle StumpWM modeline back and forth.
+** TODO Start StumpTray with StumpWM mode-line by adding a wrapper that or modify the mode-line command.
+** TODO Fix errors that occurs once resuming from System Hibernation.
