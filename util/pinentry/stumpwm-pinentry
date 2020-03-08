@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+command -v nc >/dev/null || { echo >&2 "Netcat not installed. Aborting."; exit 1; }
+
 echo OK Your orders please
 
 while IFS="\n" read -r command; do
@@ -15,6 +17,5 @@ while IFS="\n" read -r command; do
     elif [ "$command" == BYE ]; then
         exit 0
     fi
-
     echo OK
 done < /dev/stdin
