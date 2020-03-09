@@ -1,3 +1,6 @@
+Provides a GPG pinentry client via the StumpWM interface.
+
+[[./pinentry.png]]
 * Requirements
 
 - netcat
