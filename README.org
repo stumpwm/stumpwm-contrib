@@ -1,23 +1,15 @@
-* StumpWM Contrib
-  *A collection of StumpWM modules*
-
-  You can  learn more about StumpWM modules consulting the documentation [[https://github.com/stumpwm/stumpwm/wiki/Modules][on our wiki]].
+* A collection of StumpWM modules
+Documentation on modules can be found [[https://github.com/stumpwm/stumpwm/wiki/Modules][on our wiki]].
 ** Submitting a module
-   StumpWM has an open door policy for modules.
+Right now we have an open door policy for modules.  If you want it in,
+just submit a PR adding the module to this repo.  Follow the directory
+structure already laid out below.  Right before you're ready to make
+the final PR commit, run the script '=update-readme.sh=' to have your
+module (and its description) added to the appropriate category.  The
+script uses the "=:description=" tag in the =.asd= file.  The script
+is pretty dumb, so if your description spans multiple lines, it
+probably won't show up correctly.  Keep it short and sweet.
 
-   If you want to submit a new module, just send a PR adding the module to this repository.
-
-   Please, follow the directory structure already laid out below.
-
-   Just before you sending the final PR commit, run the script '=update-readme.sh=' to have your
-   module (and its description) added to the appropriate category.
-
-   The script uses the "=:description=" tag in the =.asd= file.
-
-   The script is pretty dumb, so if your description spans multiple lines, it
-   probably won't show up correctly.
-
-   Keep it short and sweet.
 ** How to write a module
 *** General guidelines
     - Create your own package and optionally import the stumpwm
@@ -74,9 +66,11 @@ Please see =README.org= files for each module for further details. Missing modul
 (ql:quickload "notify")
 #+end_src
 * Third Party Modules
-  Advertise your module here, open a PR and include a org-mode link!
+Advertise your module here, open a PR and include a org-mode link!
+- [[https://github.com/njkli/stumpwm-weather/blob/master/readme.org][stumpwm-weather]] :: Displays weather in the modeline
 * Current Modules
-  (click for its respective README/docs)
+(click for its respective README/docs)
+
 # Don't edit anything below this line, the script will blow it away
 # --
 ** Media

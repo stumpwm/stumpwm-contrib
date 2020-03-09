@@ -1,5 +1,5 @@
 ;;;; package.lisp
 
 (defpackage #:undocumented
-  (:use #:cl :stumpwm))
-
+  (:use #:cl :stumpwm)
+  (:export :list-undocumented))

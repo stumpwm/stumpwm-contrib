@@ -141,15 +141,15 @@ For the second case rescans route table every minute."
 (defun fmt-net-usage ()
   "Returns a string representing the current network activity."
   (let ((net (net-usage))
-	dn up)
+	      dn up)
     (defun kbmb (x y)
       (if (>= (/ x 1e6) y)
-	  (list (/ x 1e6) "m")
-	  (list (/ x 1e3) "k")))
+	        (list (/ x 1e6) "m")
+	        (list (/ x 1e3) "k")))
     (setq dn (kbmb (car net) 0.1)
-	  up (kbmb (cadr net) 0.1))
-    (format nil "~5,2F~A/~5,2F~A "
-	    (car dn) (cadr dn) (car up) (cadr up))))
+	        up (kbmb (cadr net) 0.1))
+    (format nil "~5,2F~A/~5,2F~A"
+            (car dn) (cadr dn) (car up) (cadr up))))
 
 (defun fmt-ipv4 ()
   (or *net-ipv4* "noip"))
