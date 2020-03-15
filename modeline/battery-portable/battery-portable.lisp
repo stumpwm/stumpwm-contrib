@@ -164,22 +164,15 @@
     ((path :initarg :path :initform (error ":path missing")
            :reader path-of)))
 
-  (defun sysfs-field-exists? (path name)
-    (probe-file (merge-pathnames (make-pathname :name name)
-                                 path)))
-
   (defun sysfs-field (path name)
     (with-open-file (file (merge-pathnames (make-pathname :name name)
                                            path))
       (read-line-from-sysfs file)))
 
   (defun sysfs-int-field (path name)
-    (parse-integer (sysfs-field path name) :junk-allowed t))
-
-  (defun sysfs-int-field-or-nil (path name)
-    (if (sysfs-field-exists? path name)
-        (sysfs-int-field path name)
-        nil))
+    (handler-case (parse-integer (sysfs-field path name) :junk-allowed t)
+      (file-error () nil)
+      (simple-error () nil)))
 
   (defmethod all-batteries ((m sysfs-method))
     (remove nil
@@ -197,32 +190,34 @@
         (let ((path (path-of battery)))
           (if (string= (sysfs-field path "present") "0")
               :unknown
-              (let* ((state (sysfs-field path "status"))
-                     (consumption (or (sysfs-int-field-or-nil path "power_now")
-                                      (sysfs-int-field-or-nil path "current_now")
-                                      (return-from state-of :unknown)))
-                     (curr (or (sysfs-int-field-or-nil path "energy_now")
-                               ;; energy_* seems not to be there on
-                               ;; some boxes. Strange...
-                               (sysfs-int-field-or-nil path "charge_now")
-                               (return-from state-of :unknown)))
-                     (full (or (sysfs-int-field-or-nil path "energy_full")
-                               (sysfs-int-field-or-nil path "charge_full")
-                               (return-from state-of :unknown)))
-                     (percent (* 100 (/ curr full))))
-                (cond
-                  ((string= state "Full") (values :charged percent))
-                  ((string= state "Discharging")
-                   (values :discharging percent
-                           (if (zerop consumption)
-                               0
-                               (* 3600 (/ curr consumption)))))
-                  ((string= state "Charging")
-                   (values :charging percent
-                           (if (zerop consumption)
-                               0
-                               (* 3600 (/ (- full curr) consumption)))))
-                  (t :unknown)))))
+              (if (string= present "0")
+               :unknown
+               (let* ((state (sysfs-field path "status"))
+                      (consumption (or (sysfs-int-field path "power_now")
+                                       (sysfs-int-field path "current_now")
+                                       (return-from state-of :unknown)))
+                      (curr (or (sysfs-int-field path "energy_now")
+                                ;; energy_* seems not to be there on
+                                ;; some boxes. Strange...
+                                (sysfs-int-field path "charge_now")
+                                (return-from state-of :unknown)))
+                      (full (or (sysfs-int-field path "energy_full")
+                                (sysfs-int-field path "charge_full")
+                                (return-from state-of :unknown)))
+                      (percent (* 100 (/ curr full))))
+                 (cond
+                   ((string= state "Full") (values :charged percent))
+                   ((string= state "Discharging")
+                    (values :discharging percent
+                            (if (zerop consumption)
+                                0
+                                (* 3600 (/ curr consumption)))))
+                   ((string= state "Charging")
+                    (values :charging percent
+                            (if (zerop consumption)
+                                0
+                                (* 3600 (/ (- full curr) consumption)))))
+                   (t :unknown))))))
       (t () :unknown))))
 
 ;;; OpenBSD /usr/sbin/apm implementation
