@@ -299,13 +299,17 @@
                     (state-of bat)
                   (ecase state
                     (:unknown (format fmt "(no info)"))
-                    (:charged (format fmt "~~ ~D%" (round perc)))
+                    (:charged (etypecase perc
+                                (string (format fmt "~~ ~A" perc))
+                                (number (format fmt "~~ ~D%" (round perc)))))
                     ((:charging :discharging)
-                     (format fmt "~/battery-portable::fmt-time/~A ^[~A~D%^]"
+                     (format fmt "~/battery-portable::fmt-time/~A ^[~A~A%^]"
                              time
                              (if (eq state :charging) #\+ #\-)
                              (bar-zone-color perc 90 50 20 t)
-                             (round perc))))))))))
+                             (etypecase perc
+                               (string perc)
+                               (number (round perc))))))))))))
 
 ;;; The actual mode-line format function. A bit ugly...
 (let ((next 0)
