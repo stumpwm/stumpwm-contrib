@@ -42,8 +42,16 @@
   "Time in seconds between updates of battery information.")
 
 (defvar *prefer-sysfs* t
-  "Prefer sysfs over procfs for information gathering. This has effect
-  only on Linux.")
+  "This has no effect. Legacy purposes only.")
+
+(defvar *preferred-drivers-failed* nil
+  "T when the preferred battery method cannot find info.")
+
+(defvar *non-preferred-drivers-failed* nil
+  "T when the non-preferred battery method cannot find info.")
+
+(defvar *no-battery-info* "(no battery info)"
+  "Message to give when no battery info is found.")
 
 ;;; Method base class
 
@@ -54,11 +62,11 @@
 (defgeneric all-batteries (method)
   (:documentation "Returns all recognized batteries."))
 
-(defun preferred-battery-method ()
+(defun preferred-battery-method (&optional (sysfs t))
   #- (or linux openbsd)
   nil
   #+ linux
-  (if *prefer-sysfs*
+  (if sysfs
       (make-instance 'sysfs-method)
       (make-instance 'procfs-method))
   #+ openbsd
@@ -293,24 +301,33 @@
 (defun battery-info-string ()
   "Compiles a string suitable for StumpWM's mode-line."
   (with-output-to-string (fmt)
-    (let ((batteries (all-batteries (or (preferred-battery-method)
-                                        (return-from battery-info-string
-                                          "(not implemented)")))))
-      (if (endp batteries)
-          (format fmt "(no battery)")
-          (loop
+    (let ((current-fs (cond ((and *preferred-drivers-failed*
+                                  *non-preferred-drivers-failed*)
+                             (return-from battery-info-string
+                               "(not implemented)"))
+                            ((and *preferred-drivers-failed*
+                                  (not *non-preferred-drivers-failed*))
+                             nil)
+                            (t t))))
+      (let ((batteries (all-batteries (preferred-battery-method current-fs))))
+       (if (endp batteries)
+           (progn (format fmt "~A" *no-battery-info*)
+                  (if current-fs
+                      (setf *preferred-drivers-failed* t)
+                      (setf *non-preferred-drivers-failed* t)))
+           (loop
              for bat in batteries
              do (multiple-value-bind (state perc time)
                     (state-of bat)
                   (ecase state
-                    (:unknown (format fmt "(no info)"))
+                    (:unknown (format fmt "~A" *no-battery-info*))
                     (:charged (format fmt "~~ ~D%" (round perc)))
                     ((:charging :discharging)
                      (format fmt "~/battery-portable::fmt-time/~A ^[~A~D%^]"
                              time
                              (if (eq state :charging) #\+ #\-)
                              (bar-zone-color perc 90 50 20 t)
-                             (round perc))))))))))
+                             (round perc)))))))))))
 
 ;;; The actual mode-line format function. A bit ugly...
 (let ((next 0)
