@@ -297,13 +297,13 @@
                                         (return-from battery-info-string
                                           "(not implemented)")))))
       (if (endp batteries)
-          (format fmt "(no battery)")
+          (format fmt "(no procfs battery)")
           (loop
              for bat in batteries
              do (multiple-value-bind (state perc time)
                     (state-of bat)
                   (ecase state
-                    (:unknown (format fmt "(no info)"))
+                    (:unknown (format fmt "(no sysfs battery)"))
                     (:charged (format fmt "~~ ~D%" (round perc)))
                     ((:charging :discharging)
                      (format fmt "~/battery-portable::fmt-time/~A ^[~A~D%^]"
