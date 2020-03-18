@@ -46,9 +46,9 @@
   (let ((lines (split-sequence:split-sequence #\newline body)))
     (format nil "~{~A~^~%~}"
             (multiple-value-bind (fst rst)
-                (stumpwm:take max-lines
-                              (flatten-once
-                               (mapcar #'rewrap-line lines)))
+                (stumpwm::take max-lines
+                               (flatten-once
+                                (mapcar #'rewrap-line lines)))
               (if (and rst show-ellipsis)
                   (append fst (list "..."))
                   fst)))))
