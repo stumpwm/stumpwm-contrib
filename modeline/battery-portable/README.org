@@ -6,10 +6,3 @@ To load this module, place
 
 in your =.stumpwmrc=. Battery information is then available via %B
 in your mode-line config.
-
-If you have an older kernel and the above doesn't work, add
-#+BEGIN_SRC lisp
-    (setf stumpwm.contrib.battery-portable:*prefer-sysfs* nil)
-#+END_SRC
-below the above line.
-
