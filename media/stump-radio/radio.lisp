@@ -1,10 +1,11 @@
 (in-package :stump-radio)
 
-(defvar *radio* nil)
+;; radio stations
 
-(defparameter *stations* '((:|Le DJAM| . "http://www.djamradio.com/sound")
-			 (:|FluxFM| . "http://streams.fluxfm.de/live/mp3-320/Android/")
-			 (:|1Live| . "http://1liveuni-lh.akamaihd.net/i/1LIVE_HDS@179577/index_1_a-p.m3u8?sd=10"))
+(defparameter *stations*
+  '((:|Le DJAM| . "http://www.djamradio.com/sound")
+    (:|FluxFM| . "http://streams.fluxfm.de/live/mp3-320/Android/")
+    (:|1Live| . "http://1liveuni-lh.akamaihd.net/i/1LIVE_HDS@179577/index_1_a-p.m3u8?sd=10"))
   "association list of radio stations, key is a name, value is a playable URL of the radio station")
 
 (defun add-station (name url)
@@ -20,16 +21,22 @@
   (setf (cdr (last *stations*)) (list (car *stations*))
 	*stations* (cdr *stations*)))
 
-(defun radio-status-change (process)
-  (message (format nil "radio status changed to: ~a (PID: ~a)"
-						    (sb-ext:process-status process)
-						    (sb-ext:process-pid process))))
+;; radio playing and control
+
+(defvar *radio* nil
+  "holds the process structure of mplayer when a radio is running (or at least we think it is running),
+  NIL if not playing anything (as it was not yet ever playing or we properly shut it down)")
 
 (defun radio-running-p ()
   (and *radio*
        ;; don't test for :running, but for (not :exited),
        ;; as the process might also be in :stopped or :signaled
        (not (eq (sb-ext:process-status *radio*) :exited))))
+
+(defun radio-status-change (process)
+  (message (format nil "radio status changed to: ~a (PID: ~a)"
+						    (sb-ext:process-status process)
+						    (sb-ext:process-pid process))))
 
 (defcommand radio-start () ()
   "start radio if not running"
@@ -60,7 +67,7 @@
 
 (defcommand radio-force-restart () ()
   "stop current radio and start playing again
- (use for network problems or after suspend)"
+  (use for network problems or after suspend)"
   (radio-stop)
   (radio-start))
 
