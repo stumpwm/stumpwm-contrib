@@ -1,0 +1,46 @@
+a simple mplayer-based radio for the window manager StumpWM
+-----------------------------------------------------------
+
+Depends on mplayer which is started via SB-EXT:RUN-PROGRAM.
+
+Hacked by Max-Gerd Retzlaff.
+
+
+loading and configuration
+-------------------------
+
+You can automatically load the module by adding this to your ~/.stumpwm.d/init.lisp:
+
+  (load-module "stump-radio")
+
+It is suggested to make two commands globally available by some unused keys on
+your keyboard by adding this to your ~/.stumpwm.d/init.lisp as well:
+
+  (define-key *top-map* (kbd "XF86Launch6") "radio-toggle-playback")
+  (define-key *top-map* (kbd "XF86Launch5") "radio-next-station")
+
+There are more commands (see package.lisp) but usually just radio-toggle-playback
+and radio-next-station are all you really need.
+
+radio stations
+--------------
+
+The list of radio stations is stored in an internal association list.
+Currently added are Le DJAM radio (Paris, France), FluxFM (Berin, Germany),
+and 1 Live (Cologne, Germany).
+
+You can add a station with a call like like:
+
+  (stump-radio:add-station :|Le DJAM| "http://www.djamradio.com/sound")
+
+And remove it again with:
+
+  (stump-radio:remove-station :|Le DJAM|)
+
+This is how you can list the station in the REPL:
+
+  (stump-radio:list-stations)
+  ;; => (:|Le DJAM| :|1Live| :|FluxFM|)
+
+But you can also list the stations with the StumpWM command radio-list-stations
+which will show them in as a StumpWM message.
