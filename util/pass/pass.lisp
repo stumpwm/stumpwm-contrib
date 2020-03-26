@@ -1,10 +1,18 @@
 (defpackage #:pass
   (:use #:cl)
-  (:export *password-store*))
+  (:export *password-store*)
+  (:import-from :uiop :getenv-absolute-directory))
 
 (in-package #:pass)
 
-(defvar *password-store* (merge-pathnames #p".password-store/" (user-homedir-pathname)))
+(defvar *password-store*
+  ;; pass has partial support for XDG Base Dirs using export PASSWORD_STORE_DIR.
+  (or (getenv-absolute-directory "PASSWORD_STORE_DIR")
+      ;; Default is in the home directory.
+      (merge-pathnames #p".password-store/"
+                       (user-homedir-pathname)))
+  "Location to search for names in the password store, according to the XDG Base
+Directory Specification. Tries PASSWORD_STORE_DIR then $HOME/.password-store/.")
 
 (defun pass-entries ()
   (let ((home-ns-len (length (namestring *password-store*))))
