@@ -1,0 +1,28 @@
+very simple volume control for the window manager StumpWM
+---------------------------------------------------------
+
+Just support the three volume control keys on many keyboards.
+
+Depends on amixer which is started via RUN-SHELL-COMMAND.
+
+Hacked by Max-Gerd Retzlaff.
+
+
+loading and configuration
+-------------------------
+
+You can automatically load the module by adding this to your
+~/.stumpwm.d/init.lisp:
+
+  (load-module "stump-volume-control")
+
+Then assign the three commands volume-up, volume-down, volume-toggle-mute
+globally to some keys. If your keyboards has got them you can use the
+typical volume control keys:
+
+  (define-key *top-map* (kbd "XF86AudioRaiseVolume") "volume-up")
+  (define-key *top-map* (kbd "XF86AudioLowerVolume") "volume-down")
+  (define-key *top-map* (kbd "XF86AudioMute") "volume-toggle-mute")
+
+But you have to add it yourself to your ~/.stumpwm.d/init.lisp as I consider
+it bad manners to define global keys in a module.
