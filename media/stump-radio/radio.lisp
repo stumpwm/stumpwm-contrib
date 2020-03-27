@@ -19,7 +19,13 @@
 
 (defun next-radio-station ()
   (setf (cdr (last *stations*)) (list (car *stations*))
-	*stations* (cdr *stations*)))
+	*stations* (cdr *stations*))
+  (car *stations*))
+
+(defun previous-radio-station ()
+  (setf *stations* (cons (car (last *stations*))  *stations*)
+        (cdr (last *stations* 2)) nil)
+  (car *stations*))
 
 ;; radio playing and control
 
@@ -74,6 +80,11 @@
 (defcommand radio-next-station () ()
   "switch to next radio station and play that"
   (next-radio-station)
+  (radio-force-restart))
+
+(defcommand radio-previous-station () ()
+  "switch to previous radio station and play that"
+  (previous-radio-station)
   (radio-force-restart))
 
 (defcommand radio-list-stations () ()

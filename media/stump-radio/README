@@ -19,8 +19,15 @@ your keyboard by adding this to your ~/.stumpwm.d/init.lisp as well:
   (define-key *top-map* (kbd "XF86Launch6") "radio-toggle-playback")
   (define-key *top-map* (kbd "XF86Launch5") "radio-next-station")
 
+Or if you happen to have the keys, this is another option:
+
+  (define-key *top-map* (kbd "XF86AudioPlay") "radio-toggle-playback")
+  (define-key *top-map* (kbd "XF86AudioNext") "radio-next-station")
+  (define-key *top-map* (kbd "XF86AudioPrev") "radio-previous-station")
+
 There are more commands (see package.lisp) but usually just radio-toggle-playback
 and radio-next-station are all you really need.
+
 
 radio stations
 --------------
@@ -43,4 +50,4 @@ This is how you can list the station in the REPL:
   ;; => (:|Le DJAM| :|1Live| :|FluxFM|)
 
 But you can also list the stations with the StumpWM command radio-list-stations
-which will show them in as a StumpWM message.
+which will show them as a StumpWM message.
