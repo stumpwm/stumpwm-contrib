@@ -1,7 +1,7 @@
 (defpackage #:pass
   (:use #:cl)
-  (:export *password-store*)
-  (:import-from :uiop :getenv-absolute-directory))
+  (:export #:*password-store*)
+  (:import-from #:uiop #:getenv-absolute-directory))
 
 (in-package #:pass)
 
