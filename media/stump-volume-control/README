@@ -26,3 +26,11 @@ typical volume control keys:
 
 But you have to add it yourself to your ~/.stumpwm.d/init.lisp as I consider
 it bad manners to define global keys in a module.
+
+
+If you do not want to control the sound card that ALSA considers your
+first one (that is, sound card number 0, the default), just alter the
+value of the exported variable STUMP-VOLUME-CONTROL:*SOUND-CARD*. For
+example, by adding to your ~/.stumpwm.d/init.lisp:
+
+  (setf stump-volume-control:*sound-card* 1)
