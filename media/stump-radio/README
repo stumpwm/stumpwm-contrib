@@ -16,9 +16,9 @@ You can automatically load the module by adding this to your
 
   (load-module "stump-radio")
 
-It is suggested to make two commands globally available by some unused
-keys on your keyboard by adding this to your ~/.stumpwm.d/init.lisp as
-well:
+It is suggested to make two or three commands globally available
+by some unused keys on your keyboard by adding this to your
+~/.stumpwm.d/init.lisp as well:
 
   (define-key *top-map* (kbd "XF86Tools") "radio-previous-station")
   (define-key *top-map* (kbd "XF86Launch5") "radio-toggle-playback")

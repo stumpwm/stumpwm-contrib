@@ -19,7 +19,7 @@
 
 (defun next-radio-station ()
   (setf (cdr (last *stations*)) (list (car *stations*))
-	*stations* (cdr *stations*))
+        *stations* (cdr *stations*))
   (car *stations*))
 
 (defun previous-radio-station ()
@@ -41,29 +41,29 @@
 
 (defun radio-status-change (process)
   (message (format nil "radio status changed to: ~a (PID: ~a)"
-						    (sb-ext:process-status process)
-						    (sb-ext:process-pid process))))
+                                                    (sb-ext:process-status process)
+                                                    (sb-ext:process-pid process))))
 
 (defcommand radio-start () ()
   "start radio if not running"
   (if (radio-running-p)
       (message "Warning: radio already running, not starting.")
       (destructuring-bind (name . url)
-	  (car *stations*)
-	(message (format nil "Starting ~a radio..." name))
-	(setf *radio*
-	      (sb-ext:run-program "/usr/bin/mplayer" (list url)
-				  :wait nil
-				  :status-hook #'radio-status-change)))))
+          (car *stations*)
+        (message (format nil "Starting ~a radio..." name))
+        (setf *radio*
+              (sb-ext:run-program "/usr/bin/mplayer" (list url)
+                                  :wait nil
+                                  :status-hook #'radio-status-change)))))
 (defcommand radio-stop () ()
   "stop radio if running"
   (if (not (radio-running-p))
       (message "Warning: radio not running, not stopping.")
       (progn
-	(message "Stopping radio...")
-	(sb-ext:process-close *radio*) ;; close (to supress status changed hook)
-	(sb-ext:process-kill *radio* 15) ;; SIGTERM
-	(setf *radio* nil))))
+        (message "Stopping radio...")
+        (sb-ext:process-close *radio*) ;; close (to supress status changed hook)
+        (sb-ext:process-kill *radio* 15) ;; SIGTERM
+        (setf *radio* nil))))
 
 (defcommand radio-toggle-playback () ()
   "stop radio if running and start playing if not"
