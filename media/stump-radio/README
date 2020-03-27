@@ -56,3 +56,13 @@ This is how you can list the station in the REPL:
 
 But you can also list the stations with the StumpWM command
 radio-list-stations which will show them as a StumpWM message.
+
+
+Here are some more stations to add to your ~/.stumpwm.d/init.lisp:
+
+  (stump-radio:add-station :|FluxFM Klubradio|
+    "http://streams.fluxfm.de/klubradio/mp3-320/audio/")
+  (stump-radio:add-station :|1Live DJ Session|
+    "https://wdr-1live-djsession.icecastssl.wdr.de/wdr/1live/djsession/mp3/128/stream.mp3")
+  (stump-radio:add-station :|1Live Plan B|
+    "https://wdr-1live-planb.icecastssl.wdr.de/wdr/1live/planb/mp3/128/stream.mp3")

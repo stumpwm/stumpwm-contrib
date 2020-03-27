@@ -4,8 +4,8 @@
 
 (defparameter *stations*
   '((:|Le DJAM| . "http://www.djamradio.com/sound")
-    (:|FluxFM| . "http://streams.fluxfm.de/live/mp3-320/Android/")
-    (:|1Live| . "http://1liveuni-lh.akamaihd.net/i/1LIVE_HDS@179577/index_1_a-p.m3u8?sd=10"))
+    (:|FluxFM| . "http://streams.fluxfm.de/live/mp3-320/audio/")
+    (:|1Live| . "https://wdr-1live-live.icecastssl.wdr.de/wdr/1live/live/mp3/128/stream.mp3"))
   "association list of radio stations, key is a name, value is a playable URL of the radio station")
 
 (defun add-station (name url)
@@ -41,8 +41,8 @@
 
 (defun radio-status-change (process)
   (message (format nil "radio status changed to: ~a (PID: ~a)"
-                                                    (sb-ext:process-status process)
-                                                    (sb-ext:process-pid process))))
+                   (sb-ext:process-status process)
+                   (sb-ext:process-pid process))))
 
 (defcommand radio-start () ()
   "start radio if not running"
@@ -89,4 +89,4 @@
 
 (defcommand radio-list-stations () ()
   "list radio stations"
-  (message (format nil "radio stations: ~{~a~^, ~}" (list-stations))))
+  (message (format nil "radio stations: ~{~&  ~a~^,~}" (list-stations))))
