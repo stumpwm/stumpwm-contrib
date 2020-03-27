@@ -13,6 +13,6 @@
 
 (defcommand volume-toggle-mute () ()
   (let ((muted (search "[off]"
-		       (run-shell-command (format nil "amixer -c ~d sset Master playback toggle" *sound-card*)
+                       (run-shell-command (format nil "amixer -c ~d sset Master playback toggle" *sound-card*)
                                           t))))
     (message (concatenate 'string "Audio " (if muted "muted" "back on") "."))))
