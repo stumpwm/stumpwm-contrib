@@ -1,6 +1,8 @@
 a simple mplayer-based radio for the window manager StumpWM
 -----------------------------------------------------------
 
+I just want to be able to switch on some music by a press of a button.
+
 Depends on mplayer which is started via SB-EXT:RUN-PROGRAM.
 
 Hacked by Max-Gerd Retzlaff.
@@ -9,32 +11,35 @@ Hacked by Max-Gerd Retzlaff.
 loading and configuration
 -------------------------
 
-You can automatically load the module by adding this to your ~/.stumpwm.d/init.lisp:
+You can automatically load the module by adding this to your
+~/.stumpwm.d/init.lisp:
 
   (load-module "stump-radio")
 
-It is suggested to make two commands globally available by some unused keys on
-your keyboard by adding this to your ~/.stumpwm.d/init.lisp as well:
+It is suggested to make two commands globally available by some unused
+keys on your keyboard by adding this to your ~/.stumpwm.d/init.lisp as
+well:
 
-  (define-key *top-map* (kbd "XF86Launch6") "radio-toggle-playback")
-  (define-key *top-map* (kbd "XF86Launch5") "radio-next-station")
+  (define-key *top-map* (kbd "XF86Tools") "radio-previous-station")
+  (define-key *top-map* (kbd "XF86Launch5") "radio-toggle-playback")
+  (define-key *top-map* (kbd "XF86Launch6") "radio-next-station")
 
-Or if you happen to have the keys, this is another option:
+Or if you happen to have these keys, this is another option:
 
+  (define-key *top-map* (kbd "XF86AudioPrev") "radio-previous-station")
   (define-key *top-map* (kbd "XF86AudioPlay") "radio-toggle-playback")
   (define-key *top-map* (kbd "XF86AudioNext") "radio-next-station")
-  (define-key *top-map* (kbd "XF86AudioPrev") "radio-previous-station")
 
-There are more commands (see package.lisp) but usually just radio-toggle-playback
-and radio-next-station are all you really need.
+There are more commands (see package.lisp) but usually just
+radio-toggle-playback and radio-next-station are all you really need.
 
 
 radio stations
 --------------
 
 The list of radio stations is stored in an internal association list.
-Currently added are Le DJAM radio (Paris, France), FluxFM (Berin, Germany),
-and 1 Live (Cologne, Germany).
+Currently added are Le DJAM radio (Paris, France), FluxFM (Berin,
+Germany), and 1 Live (Cologne, Germany).
 
 You can add a station with a call like like:
 
@@ -49,5 +54,5 @@ This is how you can list the station in the REPL:
   (stump-radio:list-stations)
   ;; => (:|Le DJAM| :|1Live| :|FluxFM|)
 
-But you can also list the stations with the StumpWM command radio-list-stations
-which will show them as a StumpWM message.
+But you can also list the stations with the StumpWM command
+radio-list-stations which will show them as a StumpWM message.
