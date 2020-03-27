@@ -6,9 +6,7 @@
 (in-package #:pass)
 
 (defvar *password-store*
-  ;; pass has partial support for XDG Base Dirs using export PASSWORD_STORE_DIR.
   (or (getenv-absolute-directory "PASSWORD_STORE_DIR")
-      ;; Default is in the home directory.
       (merge-pathnames #p".password-store/"
                        (user-homedir-pathname)))
   "Location to search for names in the password store, according to the XDG Base
