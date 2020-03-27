@@ -12,7 +12,7 @@
       (merge-pathnames #p".password-store/"
                        (user-homedir-pathname)))
   "Location to search for names in the password store, according to the XDG Base
-Directory Specification. Tries PASSWORD_STORE_DIR then $HOME/.password-store/.")
+Directory Specification. Tries $PASSWORD_STORE_DIR then $HOME/.password-store/.")
 
 (defun pass-entries ()
   (let ((home-ns-len (length (namestring *password-store*))))
