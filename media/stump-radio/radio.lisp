@@ -2,7 +2,7 @@
 
 ;; radio stations
 
-(defparameter *stations*
+(defvar *stations*
   '((:|Le DJAM| . "http://www.djamradio.com/sound")
     (:|FluxFM| . "http://streams.fluxfm.de/live/mp3-320/audio/")
     (:|1Live| . "https://wdr-1live-live.icecastssl.wdr.de/wdr/1live/live/mp3/128/stream.mp3"))
