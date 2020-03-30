@@ -17,6 +17,10 @@
 (defun list-stations ()
   (mapcar #'car *stations*))
 
+(defun clear-stations ()
+  "clear all stations in case you want to get rid of the defaults"
+  (setf *stations* nil))
+
 (defun next-radio-station ()
   (setf (cdr (last *stations*)) (list (car *stations*))
         *stations* (cdr *stations*))
