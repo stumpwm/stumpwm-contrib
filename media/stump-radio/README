@@ -49,6 +49,11 @@ And remove it again with:
 
   (stump-radio:remove-station :|Le DJAM|)
 
+If you want to clear the beautiful default radio stations, call this
+before adding your own stations:
+
+  (stump-radio:clear-stations)
+
 This is how you can list the station in the REPL:
 
   (stump-radio:list-stations)
