@@ -293,7 +293,8 @@
 
 (defun fmt-time (stream arg colonp atp)
   (declare (ignore colonp atp))
-  (when (numberp arg)
+  (when (and (numberp arg)
+             (plusp arg))
     (multiple-value-bind (hours rest)
         (truncate arg 3600)
       (format stream "~D:~2,'0D" hours (floor rest 60)))))
