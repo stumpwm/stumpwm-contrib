@@ -21,12 +21,18 @@
   "clear all stations in case you want to get rid of the defaults"
   (setf *stations* nil))
 
+(defun assert-stations ()
+  "make sure *stations* is not empty; to be used in functions that try to access *stations*"
+  (assert (consp *stations*) (*stations*) "no radio stations in *stations*"))
+
 (defun next-radio-station ()
+  (assert-stations)
   (setf (cdr (last *stations*)) (list (car *stations*))
         *stations* (cdr *stations*))
   (car *stations*))
 
 (defun previous-radio-station ()
+  (assert-stations)
   (setf *stations* (cons (car (last *stations*))  *stations*)
         (cdr (last *stations* 2)) nil)
   (car *stations*))
@@ -50,6 +56,7 @@
 
 (defcommand radio-start () ()
   "start radio if not running"
+  (assert-stations)
   (if (radio-running-p)
       (message "Warning: radio already running, not starting.")
       (destructuring-bind (name . url)
