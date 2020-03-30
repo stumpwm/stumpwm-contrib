@@ -36,6 +36,12 @@ example, by adding to your ~/.stumpwm.d/init.lisp:
   (setf stump-volume-control:*sound-card* 1)
 
 
+This simple volume control module works mainly for ALSA as it uses
+amixer, the "command-line mixer for [the] ALSA soundcard driver".
+It might work also for PulseAudio as there are compatibility layers
+but there might be some shortcomings. Here is a workaround hack to
+address one problem that was observed:
+
 PulseAudio mutes more than it unmutes. There is a hack that will also
 unmute the outputs. See comment in VOLUME-TOGGLE-MUTE for more details.
 The hack is deactivated by default. You can activate it with:
