@@ -34,3 +34,10 @@ value of the exported variable STUMP-VOLUME-CONTROL:*SOUND-CARD*. For
 example, by adding to your ~/.stumpwm.d/init.lisp:
 
   (setf stump-volume-control:*sound-card* 1)
+
+
+PulseAudio mutes more than it unmutes. There is a hack that will also
+unmute the outputs. See comment in VOLUME-TOGGLE-MUTE for more details.
+The hack is deactivated by default. You can activate it with:
+
+  (setf stump-volume-control:*pulse-audio-unmute-hack* t)
