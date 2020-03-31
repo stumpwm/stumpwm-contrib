@@ -1,5 +1,5 @@
 (asdf:defsystem #:stump-radio
-  :description "mplayer-based radio for stumpvm"
+  :description "Minimalistic mplayer-based radio for StumpWM."
   :author "Max-Gerd Retzlaff"
   :depends-on (#:stumpwm)
   :components ((:file "package")
