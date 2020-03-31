@@ -34,4 +34,7 @@
         (run-shell-command (format nil "amixer -c ~d sset ~s playback on"
                                    *sound-card*
                                    output))))
-    (message (concatenate 'string "Audio " (if muted "muted" "back on") "."))))
+    (message (if muted
+                 "Audio muted."
+                 (format nil "Audio back on.~@[~%(Also switched on outputs: ~{~a~^, ~}.)~]"
+                         *pulse-audio-unmute-outputs*)))))
