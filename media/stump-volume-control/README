@@ -1,5 +1,5 @@
-very simple volume control for the window manager StumpWM
----------------------------------------------------------
+Minimalistic amixer-based volume control for the window manager StumpWM
+-----------------------------------------------------------------------
 
 Just support the three volume control keys on many keyboards.
 

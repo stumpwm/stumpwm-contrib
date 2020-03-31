@@ -1,5 +1,5 @@
 (asdf:defsystem #:stump-volume-control
-  :description "very simple volume control for stumpvm"
+  :description "Minimalistic amixer-based volume control for StumpWM."
   :author "Max-Gerd Retzlaff"
   :depends-on (#:stumpwm)
   :components ((:file "package")
