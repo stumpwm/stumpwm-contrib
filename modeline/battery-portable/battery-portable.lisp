@@ -357,7 +357,7 @@
                                        time
                                        (if (eq state :charging) #\+ #\-)
                                        (bar-zone-color perc 90 50 20 t)
-                                       (round perc))))))))))))
+                                       (round perc)))))))))))))
 
 ;;; The actual mode-line format function. A bit ugly...
 (let ((next 0)
