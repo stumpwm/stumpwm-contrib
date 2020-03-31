@@ -470,7 +470,7 @@ Volume
       (t (values choice selection)))))
 
 (defun mpd-selected-item (menu)
-  (nth (menu-state-selected menu) (menu-state-table menu)))
+  (nth (stumpwm::menu-selected menu) (stumpwm::menu-table menu)))
 
 (defun mpd-menu-action (action-type)
   (lambda (menu)
