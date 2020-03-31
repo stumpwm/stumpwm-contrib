@@ -38,6 +38,11 @@ example, by adding to your ~/.stumpwm.d/init.lisp:
 
   (setf stump-volume-control:*sound-card* 1)
 
+Set to NIL to not select any specific sound card explicitly by adding
+to your ~/.stumpwm.d/init.lisp instead:
+
+  (setf stump-volume-control:*sound-card* nil)
+
 
 PulseAudio compatibility
 ------------------------
