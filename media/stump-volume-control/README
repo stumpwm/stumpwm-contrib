@@ -39,17 +39,32 @@ example, by adding to your ~/.stumpwm.d/init.lisp:
   (setf stump-volume-control:*sound-card* 1)
 
 
-PulseAudio unmute hack
-----------------------
+PulseAudio compatibility
+------------------------
 
-This simple volume control module works mainly for ALSA as it uses
-amixer, the "command-line mixer for [the] ALSA soundcard driver".
+This minimalistic volume control module works mainly for ALSA as it uses
+amixer, the "command-line mixer for [the] ALSA sound card driver".
 It might work also for PulseAudio as there are compatibility layers
 but there might be some shortcomings.
 
-Here is a workaround hack to address one problem that was observed:
-PulseAudio mutes more than it unmutes. There is a hack that will also
-unmute the outputs. See comment in VOLUME-TOGGLE-MUTE for more details.
-The hack is deactivated by default. You can activate it with:
+Here is a little workaround to address one problem that was observed:
+PulseAudio mutes more than it unmutes. This module includes hack that
+will explicitly unmute the audio outputs when toggling audio back on.
+It can be controlled by altering the list stored in the exported
+variable STUMP-VOLUME-CONTROL:*PULSE-AUDIO-UNMUTE-OUTPUTS*. By default,
+it is set to '("Speaker" "Headphone") as "Speaker" and "Headphone" are
+the generic output names.
 
-  (setf stump-volume-control:*pulse-audio-unmute-hack* t)
+If your hardware uses special names, such as, for example, "Megaphone"
+and "Leslie speaker", add this to your ~/.stumpwm.d/init.lisp:
+
+  (setf stump-volume-control:*pulse-audio-unmute-outputs*
+        '("Megaphone" "Leslie speaker"))
+
+Change to NIL if you just use ALSA and do not want the extra calls to
+be executed (which will fail silently if you do not have the outputs),
+by adding to your  ~/.stumpwm.d/init.lisp instead:
+
+  (setf stump-volume-control:*pulse-audio-unmute-outputs* nil)
+
+(And now I have again spend more time on the dreaded PulseAudio...)
