@@ -9,12 +9,12 @@
 ;;; Maintainer: Ivy Foster
 ;;;
 ;;; Code:
-(defvar *default-device* "default")
+(defvar *default-device* 0)
 
 (defun volcontrol (device channel amount)
   (let* ((output (run-shell-command
-                  (concat "amixer -D "
-                          (or device *default-device*)
+                  (concat "amixer -c "
+                          (write-to-string (or device *default-device*))
                           " sset "
                           channel
                           " "

@@ -5,7 +5,7 @@
   :description "Manipulate the volume using amixer"
   :author "Amy Templeton, Jonathan Moore Liles, Ivy Foster"
   :license "GPL v3"
-  :depends-on (#:stumpwm)
+  :depends-on (#:stumpwm #:alexandria)
   :components ((:file "package")
                (:file "amixer")))
 
