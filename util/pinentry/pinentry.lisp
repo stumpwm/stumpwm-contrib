@@ -11,6 +11,9 @@
                                               :password t)
                        ""))))
 
-(usocket:socket-server "127.0.0.1" 22222 #'main nil
-                       :in-new-thread t
-                       :multi-threading t)
+(handler-case (usocket:socket-server "127.0.0.1" 22222 #'main nil
+                        :in-new-thread t
+                        :multi-threading t)
+  ;; Probably already running:
+  (usocket:address-in-use-error ())
+  (usocket:address-not-available-error ()))
