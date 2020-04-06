@@ -514,7 +514,7 @@ Volume
                       (if (equal (assoc-value :state status) "play")
                           (parse-integer (assoc-value :song status))
                           0)))
-      (let ((song-number (position choice options)))
+      (let ((song-number (position (car choice) options)))
         (case action
           (:mpd-playlist-move-up
            (if (= song-number 1)
@@ -523,9 +523,9 @@ Volume
                       (mpd-browse-playlist (1- song-number)))))
           (:mpd-playlist-move-down
            (if (= song-number (length options))
-             (mpd-browse-playlist song-number)
-             (progn (mpd-swap-tracks song-number (1+ song-number))
-                    (mpd-browse-playlist (1+ song-number)))))
+               (mpd-browse-playlist song-number)
+               (progn (mpd-swap-tracks song-number (1+ song-number))
+                      (mpd-browse-playlist (1+ song-number)))))
           (:mpd-playlist-delete
            (when song-number
              (mpd-remove-track song-number)
