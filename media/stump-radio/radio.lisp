@@ -49,7 +49,9 @@
        ;; as the process might also be in :stopped or :signaled
        (not (eq (sb-ext:process-status *radio*) :exited))))
 
-(defvar *sent-termination-signal* nil)
+(defvar *sent-termination-signal* nil
+  "used to detect that a status change to :exited was caused by
+  our own intentional process termination")
 
 (defun radio-status-change (process)
   (message (if (and (eq (sb-ext:process-status process) :exited)
