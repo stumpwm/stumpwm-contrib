@@ -49,10 +49,15 @@
        ;; as the process might also be in :stopped or :signaled
        (not (eq (sb-ext:process-status *radio*) :exited))))
 
+(defvar *sent-termination-signal* nil)
+
 (defun radio-status-change (process)
-  (message (format nil "radio status changed to: ~a (PID: ~a)"
-                   (sb-ext:process-status process)
-                   (sb-ext:process-pid process))))
+  (message (if (and (eq (sb-ext:process-status process) :exited)
+                    *sent-termination-signal*)
+               "Radio stopped."
+               (format nil "Radio status changed to ~a.~%(Process ID: ~a)"
+                       (sb-ext:process-status process)
+                       (sb-ext:process-pid process)))))
 
 (defcommand radio-start () ()
   "start radio if not running"
@@ -74,7 +79,7 @@
       (message "Warning: radio not running, not stopping.")
       (progn
         (message "Stopping radio...")
-        (sb-ext:process-close *radio*) ;; close (to supress status changed hook)
+        (setf *sent-termination-signal* t)
         (sb-ext:process-kill *radio* 15) ;; SIGTERM
         (setf *radio* nil))))
 
