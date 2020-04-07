@@ -62,8 +62,10 @@
       (destructuring-bind (name . url)
           (car *stations*)
         (message (format nil "Starting ~a radio..." name))
-        (setf *radio*
-              (sb-ext:run-program "/usr/bin/mplayer" (list url)
+        (setf *sent-termination-signal* nil
+              *radio*
+              (sb-ext:run-program "mplayer" (list url)
+                                  :search t
                                   :wait nil
                                   :status-hook #'radio-status-change)))))
 (defcommand radio-stop () ()
