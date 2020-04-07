@@ -5,7 +5,8 @@ Just support the three volume control keys on many keyboards.
 
 Depends on amixer which is started via RUN-SHELL-COMMAND.
 
-Hacked by Max-Gerd Retzlaff.
+Hacked by Max-Gerd Retzlaff. The primary source for this module
+is https://github.com/m-g-r/stumpwm-modules-mgr
 
 
 loading and configuration
