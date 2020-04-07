@@ -3,7 +3,7 @@ Minimalistic mplayer-based radio for the window manager StumpWM
 
 I just want to be able to switch on some music by a press of a button.
 
-Depends on mplayer which is started via SB-EXT:RUN-PROGRAM.
+Depends on mplayer (which is started via SB-EXT:RUN-PROGRAM).
 
 Hacked by Max-Gerd Retzlaff. The primary source for this module
 is https://github.com/m-g-r/stumpwm-modules-mgr
@@ -12,14 +12,14 @@ is https://github.com/m-g-r/stumpwm-modules-mgr
 loading and configuration
 -------------------------
 
-You can automatically load the module by adding this to your
-~/.stumpwm.d/init.lisp:
+You can automatically load the module by adding this to your StumpWM
+init file:
 
   (load-module "stump-radio")
 
 It is suggested to make two or three commands globally available
-by some unused keys on your keyboard by adding this to your
-~/.stumpwm.d/init.lisp as well:
+by some unused keys on your keyboard by adding this to your StumpWM
+init file as well:
 
   (define-key *top-map* (kbd "XF86Tools") "radio-previous-station")
   (define-key *top-map* (kbd "XF86Launch5") "radio-toggle-playback")
@@ -38,8 +38,8 @@ radio-toggle-playback and radio-next-station are all you really need.
 radio stations
 --------------
 
-The list of radio stations is stored in an internal association list.
-Currently added are Le DJAM radio (Paris, France), FluxFM (Berin,
+The list of radio stations is stored in an internal list of the module.
+The default stations are Le DJAM radio (Paris, France), FluxFM (Berin,
 Germany), and 1 Live (Cologne, Germany).
 
 You can add a station with a call like like:
@@ -50,7 +50,7 @@ And remove it again with:
 
   (stump-radio:remove-station :|Le DJAM|)
 
-If you want to clear the beautiful default radio stations, call this
+If you want to clear the recommended default radio stations, call this
 before adding your own stations:
 
   (stump-radio:clear-stations)
@@ -64,7 +64,7 @@ But you can also list the stations with the StumpWM command
 radio-list-stations which will show them as a StumpWM message.
 
 
-Here are some more stations to add to your ~/.stumpwm.d/init.lisp:
+Here are some more stations to add to your StumpWM init file:
 
   (stump-radio:add-station :|FluxFM Klubradio|
     "http://streams.fluxfm.de/klubradio/mp3-320/audio/")
