@@ -5,7 +5,8 @@ I just want to be able to switch on some music by a press of a button.
 
 Depends on mplayer which is started via SB-EXT:RUN-PROGRAM.
 
-Hacked by Max-Gerd Retzlaff.
+Hacked by Max-Gerd Retzlaff. The primary source for this module
+is https://github.com/m-g-r/stumpwm-modules-mgr
 
 
 loading and configuration
