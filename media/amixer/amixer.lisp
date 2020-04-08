@@ -9,12 +9,25 @@
 ;;; Maintainer: Ivy Foster
 ;;;
 ;;; Code:
-(defvar *default-device* "default")
+(defvar *default-device* "default"
+  "default audio device to control by amixer, string, number, or null.
+If it is a string, it will be used as a device name as it is,
+if it is a number it will be translated to the string \"hw:0\",
+if NIL don't send any device at all.")
+
+(defun translate-device-to-option (device)
+  "see docstring of *DEFAULT-DEVICE*"
+  (etypecase device
+    (string (format nil "-D ~a " device))
+    (number (format nil "-D hw:~d " device))
+    (null (if *default-device*
+              (translate-device-to-option *default-device*)
+              ""))))
 
 (defun volcontrol (device channel amount)
   (let* ((output (run-shell-command
-                  (concat "amixer -D "
-                          (or device *default-device*)
+                  (concat "amixer "
+                          (translate-device-to-option device)
                           " sset "
                           channel
                           " "
