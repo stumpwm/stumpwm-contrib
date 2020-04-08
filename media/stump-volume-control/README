@@ -52,7 +52,7 @@ Note, internally device numbers are translated to the device name
 of pattern "hw:<number>", so these two calls have the same effect:
 
   (setf stump-volume-control:*sound-card* 1)
-  (setf stump-volume-control:*sound-card* "hw:1)
+  (setf stump-volume-control:*sound-card* "hw:1")
 
 
 PulseAudio compatibility
