@@ -1,8 +1,10 @@
 (in-package :stump-volume-control)
 
 (defvar *sound-card* 0
-  "number of the sound card to control via amixer;
-  set to NIL to not select any specific sound card explicitly")
+  "audio device to control by amixer; string, number, or null.
+  If it is a string, it will be used as a device name as it is,
+  if it is a number it will be translated to the string \"hw:0\",
+  if NIL don't send any device at all.")
 
 (defvar *pulse-audio-unmute-outputs* '("Speaker" "Headphone")
   "PulseAudio mutes more than it unmutes; when this variable is set,
@@ -15,25 +17,35 @@
   Change to NIL if you just use ALSA and do not want the extra calls to
   be executed (which will fail silently if you do not have the outputs).")
 
+(defun translate-device-to-option (device)
+  "see docstring of *sound-card*"
+  (etypecase device
+    (string (format nil "-D ~a " device))
+    (number (format nil "-D hw:~d " device))
+    (null "")))
+
 (defcommand volume-up () ()
-  (run-shell-command (format nil "amixer ~@[-c ~d ~]sset Master playback 2db+" *sound-card*))
+  (run-shell-command (format nil "amixer ~asset Master playback 2db+"
+                             (translate-device-to-option *sound-card*)))
   (message "Audio bit lowder."))
 
 (defcommand volume-down () ()
-  (run-shell-command (format nil "amixer ~@[-c ~d ~]sset Master playback 2db-" *sound-card*))
+  (run-shell-command (format nil "amixer ~asset Master playback 2db-"
+                             (translate-device-to-option *sound-card*)))
   (message "Audio bit quieter."))
 
 (defcommand volume-toggle-mute () ()
   (let ((muted (search "[off]"
                        (run-shell-command
-                        (format nil "amixer ~@[-c ~d ~]sset Master playback toggle" *sound-card*)
+                        (format nil "amixer ~asset Master playback toggle"
+                                (translate-device-to-option *sound-card*))
                         t))))
     (when (not muted)
       (dolist (output *pulse-audio-unmute-outputs*)
         ;; Just unmute all listed outputs explicitly when going back on.
         ;; Of course, we cannot fix PulseAudio with a small hack here.
-        (run-shell-command (format nil "amixer ~@[-c ~d ~]sset ~s playback on"
-                                   *sound-card*
+        (run-shell-command (format nil "amixer ~asset ~s playback on"
+                                   (translate-device-to-option *sound-card*)
                                    output))))
     (message (if muted
                  "Audio muted."
