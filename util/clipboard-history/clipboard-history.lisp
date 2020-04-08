@@ -22,7 +22,7 @@
 
 ;; (poll-selection)
 
-(defun poll-selections ()
+(defun poll-clipboard-selection ()
   (poll-selection :clipboard))
 
 (defun basic-get-x-selection (&optional (selection :clipboard))
@@ -72,7 +72,7 @@
         (stumpwm:run-with-timer (- *clipboard-poll-timeout*
                                    (mod (get-decoded-time) *clipboard-poll-timeout*))
                                 *clipboard-poll-timeout*
-                                'poll-selections)))
+                                'poll-clipboard-selection)))
 
 ;; (start-clipboard-manager)
 
