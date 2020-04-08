@@ -1,0 +1,74 @@
+Minimalistic mplayer-based radio for the window manager StumpWM
+---------------------------------------------------------------
+
+I just want to be able to switch on some music by a press of a button.
+
+Depends on mplayer (which is started via SB-EXT:RUN-PROGRAM).
+
+Hacked by Max-Gerd Retzlaff. The primary source for this module
+is https://github.com/m-g-r/stumpwm-modules-mgr
+
+
+loading and configuration
+-------------------------
+
+You can automatically load the module by adding this to your StumpWM
+init file:
+
+  (load-module "stump-radio")
+
+It is suggested to make two or three commands globally available
+by some unused keys on your keyboard by adding this to your StumpWM
+init file as well:
+
+  (define-key *top-map* (kbd "XF86Tools") "radio-previous-station")
+  (define-key *top-map* (kbd "XF86Launch5") "radio-toggle-playback")
+  (define-key *top-map* (kbd "XF86Launch6") "radio-next-station")
+
+Or if you happen to have these keys, this is another option:
+
+  (define-key *top-map* (kbd "XF86AudioPrev") "radio-previous-station")
+  (define-key *top-map* (kbd "XF86AudioPlay") "radio-toggle-playback")
+  (define-key *top-map* (kbd "XF86AudioNext") "radio-next-station")
+
+There are more commands (see package.lisp) but usually just
+radio-toggle-playback and radio-next-station are all you really need.
+
+
+radio stations
+--------------
+
+The list of radio stations is stored in an internal list of the module.
+The default stations are Le DJAM radio (Paris, France), FluxFM (Berin,
+Germany), and 1 Live (Cologne, Germany).
+
+You can add a station with a call like like:
+
+  (stump-radio:add-station :|Le DJAM| "http://www.djamradio.com/sound")
+
+And remove it again with:
+
+  (stump-radio:remove-station :|Le DJAM|)
+
+If you want to clear the recommended default radio stations, call this
+before adding your own stations:
+
+  (stump-radio:clear-stations)
+
+This is how you can list the station in the REPL:
+
+  (stump-radio:list-stations)
+  ;; => (:|Le DJAM| :|1Live| :|FluxFM|)
+
+But you can also list the stations with the StumpWM command
+radio-list-stations which will show them as a StumpWM message.
+
+
+Here are some more stations to add to your StumpWM init file:
+
+  (stump-radio:add-station :|FluxFM Klubradio|
+    "http://streams.fluxfm.de/klubradio/mp3-320/audio/")
+  (stump-radio:add-station :|1Live DJ Session|
+    "https://wdr-1live-djsession.icecastssl.wdr.de/wdr/1live/djsession/mp3/128/stream.mp3")
+  (stump-radio:add-station :|1Live Plan B|
+    "https://wdr-1live-planb.icecastssl.wdr.de/wdr/1live/planb/mp3/128/stream.mp3")
