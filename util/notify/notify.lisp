@@ -90,6 +90,12 @@
   (:name "GetServerInformation")
   (values "StumpWM" "StumpWM" "localhost" "0.1"))
 
+(define-dbus-method (notify-dbus-service get-capabilities) ()
+    ((:array :string))
+  (:interface "org.freedesktop.Notifications")
+  (:name "GetCapabilities")
+  (values #("actions" "action-icons" "body" "body-markup")))
+
 (defun notifications-listen ()
   (handler-case
       (with-open-bus (bus (session-server-addresses))
