@@ -8,13 +8,13 @@
 
 (in-package #:swm-ssh)
 
-(defvar *config-path* #p"~/.ssh/config")
+(defvar *swm-ssh-config-path* #p"~/.ssh/config")
 
 (defvar *host-regex* "^Host[ \t]+")
 
 (defvar *swm-ssh-default-term* "urxvtc")
 
-(defun collect-hosts (&optional (ssh-config *config-path*))
+(defun collect-hosts (&optional (ssh-config *swm-ssh-config-path*))
   (with-open-file (stream ssh-config :direction :input)
     (loop for line = (read-line stream nil)
           while line
