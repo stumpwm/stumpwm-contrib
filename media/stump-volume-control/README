@@ -44,6 +44,16 @@ any specific sound card explicitly:
 
   (setf stump-volume-control:*sound-card* nil)
 
+Or you can set it to a device name, for example "default":
+
+  (setf stump-volume-control:*sound-card* "default")
+
+Note, internally device numbers are translated to the device name
+of pattern "hw:<number>", so these two calls have the same effect:
+
+  (setf stump-volume-control:*sound-card* 1)
+  (setf stump-volume-control:*sound-card* "hw:1)
+
 
 PulseAudio compatibility
 ------------------------
