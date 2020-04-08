@@ -1,0 +1,38 @@
+* Requirements
+
+- cl-ppcre
+
+  Install cl-ppcre from the REPL:
+  #+BEGIN_SRC lisp
+  (ql:quickload :cl-ppcre)
+  #+END_SRC
+
+* Usage
+
+This simple plugin parses your ssh config file and opens a connection using a
+teminal emulator.
+
+Put the following in your =~/.stumpwmrc=
+#+BEGIN_SRC lisp
+(load-module "swm-ssh")
+#+END_SRC
+
+And use it either by calling the appropriate function directly (~swm-ssh-menu~)
+or by defining a keybind (example =<prefix> C-a=) in your =~/.stumpwmrc=
+#+BEGIN_SRC lisp
+(define-key *root-map* (kbd "C-a") "swm-ssh-menu")
+#+END_SRC
+
+* Variables
+
+** *swm-ssh-default-term*
+Default terminal to open an ssh connection is ~urxvtc~. To change it, use
+#+BEGIN_SRC lisp
+(setq swm-ssh:*swm-ssh-default-term* "xterm")
+#+END_SRC
+
+** *swm-ssh-config-path*
+Ssh config file path. Defaults to =~/.ssh/config=. Change it with
+#+BEGIN_SRC lisp
+(setq swm-ssh:*swm-ssh-config-path* "/path/to/ssh/config")
+#+END_SRC
