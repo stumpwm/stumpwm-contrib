@@ -9,9 +9,10 @@
 (defvar *available-keyboard-layouts* nil)
 
 ;; Available options:
-;; :normal -> CapsLock
-;; :ctrl   -> Ctrl
-;; :swapped-> Swap Ctrl and CapsLock
+;; :normal      -> CapsLock
+;; :ctrl        -> Ctrl
+;; :swapped     -> Swap Ctrl and CapsLock
+;; :leave-alone -> do not change CapsLock
 (defvar *caps-lock-behavior* nil)
 
 ;; Custom option string appended to setxkbmap
@@ -52,8 +53,9 @@
                    *caps-lock-behavior*
                  (:normal "caps:capslock")
                  (:ctrl "ctrl:nocaps")
-                 (:swapped "ctrl:swapcaps")))
-         (cmd (format nil "setxkbmap ~a -option ~a~@[ ~a~]" layout caps *custom-setxkb-options*)))
+                 (:swapped "ctrl:swapcaps")
+                 (:leave-alone nil)))
+         (cmd (format nil "setxkbmap ~a~@[ -option ~a~]~@[ ~a~]" layout caps *custom-setxkb-options*)))
     (run-shell-command cmd nil)
     (when *run-xmodmap*
       (run-shell-command "xmodmap ~/.Xmodmap"))

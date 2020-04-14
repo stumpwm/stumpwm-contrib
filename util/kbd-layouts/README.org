@@ -18,6 +18,6 @@ variable =*CAPS-LOCK-BEHAVIOR*=. Available are the following values:
 - =:normal= - CapsLock serves as CapsLock
 - =:ctrl= - CapsLock serves as additional Ctrl
 - =:swapped= - CapsLock and Ctrl are swapped
+- =:leave-alone= - do not change CapsLock with setxkbmap
 By default the command =SWITCH-KEYBOARD-LAYOUT= is bound to the key
 combination =s-SPC= (=WinKey-Space=).
-
