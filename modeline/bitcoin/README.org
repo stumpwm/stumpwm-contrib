@@ -1,0 +1,48 @@
+** Usage
+
+Place the following in your =~/.stumpwmrc= file:
+
+#+BEGIN_SRC lisp
+  (load-module "bitcoin")
+#+END_SRC
+
+Then you can use "%b" in your mode line format.
+
+** Notes
+Get information through Coinbase API, so needs =dexador=, =babel=
+and =yason=.
+
+#+BEGIN_SRC lisp
+  (ql:quickload '("dexador" "babel" "yason"))
+#+END_SRC
+
+Price value, divided by 1000, is format as =~3$=, so a value
+of =9,123.78 USD= is shown as =9.124=.
+
+Price format is colorized or not depending on =*modeline-use-colors*=
+flag. You can customize setting =t= or =nil=:
+
+#+BEGIN_SRC lisp
+  (setf bitcoin:*modeline-use-colors* t)
+#+END_SRC
+
+Colors depends on last values average comparison:
+
+| Color         | Code    | Description                       |
+|---------------+---------+-----------------------------------|
+| Bright yellow | =^B^3*= | Price is higher than average      |
+| Red           | =^1*=   | Price is below average            |
+| White         | =^7*=   | Price is equal to average         |
+| Default color | =^**=   | When *modeline-use-colors* is nil |
+
+Last values average is calculated over a list of =*last-values-size*=
+where values are stored on every modeline refresh in a FIFO fashion. User can 
+customize the list size, but only increments have effect:
+
+#+BEGIN_SRC lisp
+  (setf bitcoin:*last-values-size* 42)
+#+END_SRC
+
+** Issues
+Uses =ignore-errors= to avoid the internet timeouts or the computer sleeping
+process to stuck the modeline.
