@@ -75,11 +75,14 @@ Advertise your module here, open a PR and include a org-mode link!
 # --
 ** Media
 - [[./media/amixer/README.org][amixer]] :: Manipulate the volume using amixer
+- [[./media/stump-radio/README.org][stump-radio]] :: Minimalistic mplayer-based radio for StumpWM.
+- [[./media/stump-volume-control/README.org][stump-volume-control]] :: Minimalistic amixer-based volume control for StumpWM.
 ** Minor Modes
 - [[./minor-mode/mpd/README.org][mpd]] :: Displays information about the music player daemon (MPD).
 - [[./minor-mode/notifications/README.org][notifications]] :: A notification library that sends notifications to the modeline via stumpish or from stumpwm itself.
 ** Modeline
 - [[./modeline/battery-portable/README.org][battery-portable]] :: Add battery information to the modeline in a portable way.
+- [[./modeline/bitcoin/README.org][bitcoin]] :: Display bitcoin price on StumpWM modeline.
 - [[./modeline/cpu/README.org][cpu]] :: Add cpu info to the modeline.
 - [[./modeline/disk/README.org][disk]] :: Display filesystem information in the modeline
 - [[./modeline/hostname/README.org][hostname]] :: Put hostname in the StumpWM modeline
@@ -116,6 +119,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/surfraw/README.org][surfraw]] :: Integrates surfraw with stumpwm.
 - [[./util/swm-emacs/README.org][swm-emacs]] :: A set of utilities for launching the beast.
 - [[./util/swm-gaps/README.org][swm-gaps]] :: Pretty (useless) gaps for StumpWM
+- [[./util/swm-ssh/README.org][swm-ssh]] :: A simple menu selector for ssh to a remote host for stumpwm that parses your ssh config to get available hosts
 - [[./util/ttf-fonts/README.org][ttf-fonts]] :: A pure lisp implementation of TTF font rendering.
 - [[./util/undocumented/README.org][undocumented]] :: Look for stuff that should probably be in the manual that isn't
 - [[./util/urgentwindows/README.org][urgentwindows]] :: Allows focusing application windows that need user attention
