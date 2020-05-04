@@ -52,15 +52,19 @@ HEIGHT are subtracted."
   (multiple-value-bind (x y wx wy width height border stick)
       (stumpwm::geometry-hints win)
 
-    (let ((ox 0) (oy 0) (ow 0) (oh 0))
+    (let ((ox 0) (oy 0) (ow 0) (oh 0)
+          (frame (stumpwm::window-frame win)))
       (if (apply-gaps-p win)
           (multiple-value-setq (ox oy ow oh) (gaps-offsets win)))
 
-      ;; only do width or height subtraction if result will be positive,
-      ;; otherwise stumpwm will crash
-      (when (< ow width)
+      ;; Only do width or height subtraction if result will be positive,
+      ;; otherwise stumpwm will crash. Also, only modify window dimensions
+      ;; if needed (i.e. window at least fills frame minus gap).
+      (when (and (< ow width)
+                 (>= width (- (frame-width frame) ow)))
         (setf width (- width ow)))
-      (when (< oh height)
+      (when (and (< oh height)
+                 (>= height (- (frame-height frame) oh)))
         (setf height (- height oh)))
 
       (setf x (+ x ox)
