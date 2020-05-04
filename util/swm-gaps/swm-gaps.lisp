@@ -56,9 +56,14 @@ HEIGHT are subtracted."
       (if (apply-gaps-p win)
           (multiple-value-setq (ox oy ow oh) (gaps-offsets win)))
 
-      (setf width (- width ow)
-            height (- height oh)
-            x (+ x ox)
+      ;; only do width or height subtraction if result will be positive,
+      ;; otherwise stumpwm will crash
+      (when (< ow width)
+        (setf width (- width ow)))
+      (when (< oh height)
+        (setf height (- height oh)))
+
+      (setf x (+ x ox)
             y (+ y oy))
 
       ;; This is the only place a window's geometry should change
