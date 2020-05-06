@@ -2,7 +2,7 @@
 
 (in-package #:swm-gaps)
 
-(export '(*inner-gaps-size* *outer-gaps-size* *head-gaps-size* *gaps-on* toggle-gaps))
+(export '(*inner-gaps-size* *outer-gaps-size* *head-gaps-size* *gaps-on* toggle-gaps toggle-gaps-on toggle-gaps-off))
 
 (defvar *inner-gaps-size* 5)
 (defvar *outer-gaps-size* 10)
@@ -162,9 +162,18 @@ HEIGHT are subtracted."
 
 (defcommand toggle-gaps () ()
   "Toggle gaps"
-  (setf *gaps-on* (null *gaps-on*))
-  (if *gaps-on*
-      (progn
-        (add-head-gaps)
-        (reset-all-windows))
-      (stumpwm:refresh-heads)))
+  (if (null *gaps-on*)
+      (toggle-gaps-on)
+      (toggle-gaps-off)))
+
+(defcommand toggle-gaps-on () ()
+  "Turn gaps on"
+  (setf *gaps-on* t)
+  (progn
+    (add-head-gaps)
+    (reset-all-windows)))
+
+(defcommand toggle-gaps-off () ()
+  "Turn gaps off"
+  (setf *gaps-on* nil)
+  (stumpwm:refresh-heads))
