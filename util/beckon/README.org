@@ -1,0 +1,29 @@
+#+title: beckon -- bring the mouse here
+#+author: Mark Dawson
+#+email: markgdawson@gmail.com
+
+* Purpose
+- Summon the mouse to the current window
+* Dependency
+None
+
+* Config
+- Use this in your StumpWM init file:
+#+begin_src common-lisp
+(load-module "beckon")
+#+end_src
+
+- Bind `beckon` to a key.
+#+begin_src lisp
+(define-key *root-map* (kbd "B") "beckon")
+#+end_src
+
+- Optionally set fractional position in current window
+  (default: 0.5 for both).
+#+begin_src lisp
+(setf *window-height-fraction* 0.5)
+(setf *window-width-fraction* 0.5)
+#+end_src
+
+* License
+GNU GPL v3
