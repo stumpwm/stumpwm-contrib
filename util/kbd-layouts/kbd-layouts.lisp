@@ -6,13 +6,14 @@
 ;; Variables ;;
 ;;;;;;;;;;;;;;;
 
-(defvar *available-keyboard-layouts* nil)
+(defvar *available-keyboard-layouts* '#1=("us" . #1#))
 
 ;; Available options:
-;; :normal -> CapsLock
-;; :ctrl   -> Ctrl
-;; :swapped-> Swap Ctrl and CapsLock
-(defvar *caps-lock-behavior* nil)
+;; :normal      -> CapsLock
+;; :ctrl        -> Ctrl
+;; :swapped     -> Swap Ctrl and CapsLock
+;; :leave-alone -> do not change CapsLock
+(defvar *caps-lock-behavior* :normal)
 
 ;; Custom option string appended to setxkbmap
 (defvar *custom-setxkb-options* nil)
@@ -52,8 +53,9 @@
                    *caps-lock-behavior*
                  (:normal "caps:capslock")
                  (:ctrl "ctrl:nocaps")
-                 (:swapped "ctrl:swapcaps")))
-         (cmd (format nil "setxkbmap ~a -option ~a~@[ ~a~]" layout caps *custom-setxkb-options*)))
+                 (:swapped "ctrl:swapcaps")
+                 (:leave-alone nil)))
+         (cmd (format nil "setxkbmap ~a~@[ -option ~a~]~@[ ~a~]" layout caps *custom-setxkb-options*)))
     (run-shell-command cmd nil)
     (when *run-xmodmap*
       (run-shell-command "xmodmap ~/.Xmodmap"))
@@ -62,9 +64,5 @@
 ;;;;;;;;;;;;;;
 ;; Defaults ;;
 ;;;;;;;;;;;;;;
-
-(setf *caps-lock-behavior* :normal)
-
-(keyboard-layout-list "us")
 
 (define-key *top-map* (kbd "s-SPC") "switch-keyboard-layout")

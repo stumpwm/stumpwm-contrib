@@ -13,11 +13,21 @@ those used by setxkbmap, e.g.:
 #+begin_src lisp
 (keyboard-layout-list "us" "pl" "ru -variant phonetic")
 #+end_src
+This will also immediately select first layout from the list.
+
 You can also specify the behavior of the CapsLock key using
 variable =*CAPS-LOCK-BEHAVIOR*=. Available are the following values:
 - =:normal= - CapsLock serves as CapsLock
 - =:ctrl= - CapsLock serves as additional Ctrl
 - =:swapped= - CapsLock and Ctrl are swapped
+- =:leave-alone= - do not change CapsLock with setxkbmap
+Add for example:
+#+begin_src lisp
+(setf kbd-layouts:*caps-lock-behavior* :leave-alone)
+#+end_src
+Note: If you do change =*CAPS-LOCK-BEHAVIOR*= add the call before
+the call to =KEYBOARD-LAYOUT-LIST= in your config file, to have it
+affect the initial configuration of your keyboard.
+
 By default the command =SWITCH-KEYBOARD-LAYOUT= is bound to the key
 combination =s-SPC= (=WinKey-Space=).
-
