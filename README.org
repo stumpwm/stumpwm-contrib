@@ -94,6 +94,7 @@ Advertise your module here, open a PR and include a org-mode link!
 ** Utilities
 - [[./util/alert-me/README.org][alert-me]] :: Alert me that an event is coming
 - [[./util/app-menu/README.org][app-menu]] :: A simple application menu for launching shell commands
+- [[./util/binwarp/README.org][binwarp]] :: Keyboard-driven divide-and-conquer mouse control mode.
 - [[./util/browse/README.org][browse]] :: Open the default web browser portably
 - [[./util/clipboard-history/README.org][clipboard-history]] :: Simple clipboard history module for StumpWM
 - [[./util/command-history/README.org][command-history]] :: Save and load the stumpwm::*input-history* to a file
