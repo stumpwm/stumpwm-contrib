@@ -1,0 +1,99 @@
+* Binwarp
+
+Binwarp (binary mouse warping) is a new keymap and mode that enables you to (almost) 
+get rid of mouse and go even more keyboard-driven! Moreover, with enough muscle memory, 
+you can be even more productive than with mouse, because Binwarp uses a divide-and-conquer 
+approach and splits the screen in two on every `binwarp` you make. Given that,
+you can reach any pixel on your screen in less than 12 keypresses (on 1920x1080 screen),
+but you would rarely need exact pixels, so it's even less keypresses!
+
+This mode is somewhat similar to the software called [[https://github.com/jordansissel/keynav][keynav]],
+with the notable advantage that Binwarp is written on top of StumpWM and all the
+configuration can be done in Common Lisp, which is much more comfortable than
+configuring some non-lispy external tool.
+
+** Getting Started
+
+To start using Binwarp, just load it into your StumpWM setup by adding either
+#+BEGIN_SRC lisp
+(load-module "binwarp)
+#+END_SRC
+or
+#+BEGIN_SRC lisp 
+(asdf:load-system :binwarp)
+#+END_SRC
+to your config file.
+
+Then you need to explicitly create a binding for Binwarp, using `define-binwarp-mode`.
+
+#+BEGIN_SRC lisp
+(binwarp:define-binwarp-mode your-binwarp-mode-name "X" (:map *root-map*)
+    ((kbd "RET") "ratclick 1")
+    ((kbd "SPC") "ratclick 3"))
+#+END_SRC
+
+This example snippet creates an interactive keymap named =your-binwarp-mode-name= and binds 
+it to =C-t X= (in case your =*root-map*= prefix key is =C-t=), while adding the left mouse-click
+to the default binwarp keymap as =RET= key, and right mouse-click as =SPC=.
+You can look at =define-binwarp-mode= documentation to learn its capabilities.
+
+** Configuration variables
+
+Binwarp exports a bunch of special variables that influence its behavior in a way
+that can suit your workflow. The list is:
+
+- =*reinitiate-ptr*=
+- =*init-ptr-position*=
+- =*preserve-history*=
+
+See the respective documentation for the ways they can be used to enhance your binwarping!
+
+Also, there is =*default-binwarp-keymap*= that  you can alter to enable different keys for binwarping,
+although using =define-binwarp-mode= seems more straightforward to me.
+
+** Interaction with remapped keys
+
+Due to Binwarp being an =interactive-keymap=, there are some problems with using it 
+together with the remapped keys, and some keypresses can never get to Binwarp,
+sometimes with the terrible consequence that you won't be able to disable Binwarp
+or accidentaly destroy some part of your setup (only the former happened to me 
+and I hope that latter is just a joke).
+
+To get around this, you can use =lambda=-s as the conditions for your 
+=define-remapped-keys= and include =binwarp*binwarp-mode-p*= as one of the
+conditions for these remapped keys to not work for.
+
+For example, if you remap keys for Firefox (as I do), then your configuration
+should look like this:
+
+#+BEGIN_SRC lisp
+(define-remapped-keys
+    `((,(lambda (win)
+          (and (member (window-class win)
+                       '("Firefox" "IceCat" "Nightly")
+                       :test #'string-equal)
+               (not binwarp:*binwarp-mode-p*)))
+        ... your bindings ...)))
+#+END_SRC
+
+** Mouse-related utils
+
+Binwarp have two general mouse-related utils:
+
+- =with-pointer=, macro that binds the mouse coordinates to the variables
+  you name, and runs the given macro body in the scope where these variables are accessible.
+- =randwarp=, command for random mouse warping in a given direction. I can't come up with a good 
+use-case for that, but it's fun and gives your mouse-related experience a bit of cool randomness :)
+
+If you have ideas on the mouse-related utils that you want to see in Binwarp, you're welcome to suggest or even add them!
+
+** Wishlist
+
+- [ ] Add per-window binwarping.
+- [ ] Make =*binwarp-history*= tree-like, instead of list, to never lose the track of where you've been.
+- [ ] Make documentation clearer (because documentation is never exhaustive).
+- [ ] Integrate Binwarp into StumpWM (?) or come up with a simple way to use both Binwarp
+  and =define-remapped-keys= without shooting your feet off.
+- [ ] Use different directions from the ones provided by StumpWM. =:top-left= and 
+  similar ones would be especially handy for fast navigation.
+- [ ] Add the mouse keybindings (e.g., =ratclick 1= and =ratclick 3=) to the =*default-binwarp-keymap*=.
