@@ -20,7 +20,7 @@
      (run-mode-line)
    #+END_SRC
    At this point the mode line should pop up. 
-   NB! If you kill the mode line process/thread, the built in stumpwm mode line wont return. To kill and restart the clim mode line interrupt the ~run-mode-line~ fuction we ran in our second repl (via =C-c C-c=) and abort the evaluation, then call ~restart-soft~. This should bring back the built in mode line, and you can follow the steps above to reopen the clim mode line. 
+   - NB! If you kill the mode line process/thread, the built in stumpwm mode line wont return. To kill and restart the clim mode line interrupt the ~run-mode-line~ fuction we ran in our second repl (via =C-c C-c=) and abort the evaluation, then call ~restart-soft~. This should bring back the built in mode line, and you can follow the steps above to reopen the clim mode line. 
 
 * Todo List
 ** TODO Fix drag and drop translator
