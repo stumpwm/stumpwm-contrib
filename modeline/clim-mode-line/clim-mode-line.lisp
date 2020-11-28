@@ -6,18 +6,26 @@
 (defvar *default-mode-line-function* 'format-mode-line)
 (defparameter *mode-line-active-formatters* '((format-nil format-groups format-windows)))
 
-;; (defun do-stumpwm-cmd (string)
-;;   )
-
 (define-application-frame clim-mode-line () ()
-  ;; (:top-level )
+  ;; (:top-level ) ; unsure if we want a custom toplevel or if our method will work fine
   (:panes (display :application
 		   :display-function 'clim-mode-line-display-function
 		   ;; :width 1920
 		   ;; :height 10
 		   :scroll-bars nil
-		   :borders nil))
-  (:layouts (default display)))
+		   :borders nil)
+	  ;; We should add an execute-extended-command, and switch to a layout containing that when
+	  ;; one calls colon. 
+	  (colon :modeline))
+  (:layouts
+   (default display)
+   (input colon)
+   (display+input (horizontally ()
+		    display colon))))
+
+(define-clim-mode-line-command (com-quit) ()
+  (frame-exit (or *application-frame*
+		  (find-application-frame 'clim-mode-line :create nil :activate nil))))
 
 (defun clim-mode-line-display-function (frame pane)
   "This just calls the function stored in *default-mode-line-function*"
