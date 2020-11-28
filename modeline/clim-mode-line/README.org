@@ -5,7 +5,22 @@
   This is a project to write a dock using CLIM inspired by the emacs and stumpwm mode lines. 
 
 ** Usage
-   Currently the (imo) best way to utilize this modeline is to launch StumpWM as normal and then start a swank/slynk server and connect to it. 
+   Currently the (imo) best way to utilize this modeline is to launch StumpWM as normal and then start a swank/slynk server and connect to it. From the repl evaluate 
+   #+BEGIN_SRC lisp
+     (in-package :stumpwm)
+     (load-module "clim-mode-line")
+   #+END_SRC
+   - NB! this can take a while if you havent loaded mcclim before, as it will need to be downloaded and compiled. 
+   Now that the module is loaded, we need to ensure that 
+   1. No other panel applications are running
+   2. The mode line is hidden. 
+   Now open up a new repl (with sly this is ~sly-mrepl-new~) and evaluate 
+   #+BEGIN_SRC lisp
+     (in-package :clim-mode-line)
+     (run-mode-line)
+   #+END_SRC
+   At this point the mode line should pop up. 
+   NB! If you kill the mode line process/thread, the built in stumpwm mode line wont return. To kill and restart the clim mode line interrupt the ~run-mode-line~ fuction we ran in our second repl (via =C-c C-c=) and abort the evaluation, then call ~restart-soft~. This should bring back the built in mode line, and you can follow the steps above to reopen the clim mode line. 
 
 * Todo List
 ** TODO Fix drag and drop translator
