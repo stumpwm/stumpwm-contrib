@@ -1,9 +1,9 @@
 ;;;; clim-mode-line.asd
 
 (asdf:defsystem #:clim-mode-line
-  :description "Describe clim-mode-line here"
-  :author "Your Name <your.name@example.com>"
-  :license  "Specify license here"
+  :description "A modeline inspired panel written with CLIM"
+  :author "Shozo <szos at posteo dot net>"
+  :license  "GPLv3"
   :version "0.0.1"
   :serial t
   :depends-on (#:clim #:clim-lisp #:mcclim #:slim #:stumpwm)
