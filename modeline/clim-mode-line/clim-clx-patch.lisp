@@ -17,7 +17,7 @@
                                        :_NET_WM_WINDOW_TYPE
                                        (list (xlib:intern-atom (xlib:window-display mirror) :_NET_WM_WINDOW_TYPE_DIALOG))
                                        :atom 32))
-	(:dock (xlib:change-property mirror
+	(:dock (xlib:change-property mirror ; this form is the only new thing here. 
 				     :_NET_WM_WINDOW_TYPE
 				     (list (xlib:intern-atom (xlib:window-display mirror)
 							     :_NET_WM_WINDOW_TYPE_DOCK))
