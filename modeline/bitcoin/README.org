@@ -6,43 +6,63 @@ Place the following in your =~/.stumpwmrc= file:
   (load-module "bitcoin")
 #+END_SRC
 
-Then you can use "%b" in your mode line format.
+Then you can use "%b" in your mode line format:
+
+#+BEGIN_SRC lisp
+(setf *screen-mode-line-format*
+      (list "[%n]"                      ; Groups
+            "%v"                        ; Windows
+            "^>"                        ; Push right
+            " | %b"                     ; Bitcoin
+            " | %d"))                   ; Clock
+#+END_SRC
 
 ** Notes
-Get information through Coinbase API, so needs =dexador=, =babel=
+
+Price format is colorized or not depending on =*modeline-use-colors*=
+flag. You can customize setting =t= or =nil= in =~/.stumpwmrc=:
+
+#+BEGIN_SRC lisp
+  (setf bitcoin:*modeline-use-colors* t)
+#+END_SRC
+
+Colors depends on a comparison between actual value and last values
+average:
+
+| Color         | Code    | Description                       |
+|---------------+---------+-----------------------------------|
+| Bright yellow | =^B^3*= | Price is higher than average      |
+| Red           | =^1*=   | Price is below average            |
+| White         | =^7*=   | Price is similar to average       |
+| Default color | =^**=   | When *modeline-use-colors* is nil |
+
+There is a threshold around average, so the increasing or decreasing
+color is only applied if threshold is passed, can be customized too:
+
+#+BEGIN_SRC lisp
+  (setf bitcoin:*threshold* 0.001) ; 0.001 is a 0.1% deviation from average
+#+END_SRC
+
+Last values average is calculated over a list of =*last-values-size*=
+where values are stored on every modeline refresh in a FIFO
+fashion.
+
+Get actual price through Coinbase(TM) API, so needs =dexador=, =babel=
 and =yason=.
 
 #+BEGIN_SRC lisp
   (ql:quickload '("dexador" "babel" "yason"))
 #+END_SRC
 
-Price value, divided by 1000, is format as =~3$=, so a value
-of =9,123.78 USD= is shown as =9.124=.
-
-Price format is colorized or not depending on =*modeline-use-colors*=
-flag. You can customize setting =t= or =nil=:
+Connection to price server is limited by a =*time-delay*= interval, in
+seconds.  So connection attempts between interval time are blocked,
+and last value is returned instead. Interval can be customized too:
 
 #+BEGIN_SRC lisp
-  (setf bitcoin:*modeline-use-colors* t)
-#+END_SRC
-
-Colors depends on last values average comparison:
-
-| Color         | Code    | Description                       |
-|---------------+---------+-----------------------------------|
-| Bright yellow | =^B^3*= | Price is higher than average      |
-| Red           | =^1*=   | Price is below average            |
-| White         | =^7*=   | Price is equal to average         |
-| Default color | =^**=   | When *modeline-use-colors* is nil |
-
-Last values average is calculated over a list of =*last-values-size*=
-where values are stored on every modeline refresh in a FIFO fashion. User can 
-customize the list size, but only increments have effect:
-
-#+BEGIN_SRC lisp
-  (setf bitcoin:*last-values-size* 42)
+  (setf bitcoin:*time-delay* 15) ; seconds
 #+END_SRC
 
 ** Issues
-Uses =ignore-errors= to avoid the internet timeouts or the computer sleeping
-process to stuck the modeline.
+
+Try to use conditions =restart= machinery to avoid the internet
+timeouts or the computer sleeping process to stuck the modeline.

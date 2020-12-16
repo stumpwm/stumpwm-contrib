@@ -1,6 +1,7 @@
 ;;;; package.lisp
 
 (defpackage :bitcoin
-  (:use :cl :stumpwm)   ; Using stumpwm:add-screen-mode-line-formatter
+  (:use :cl)
   (:export #:*modeline-use-colors*
-           #:*last-values-size*))
+           #:*threshold*
+           #:*time-delay*))
