@@ -18,25 +18,30 @@ probably won't show up correctly.  Keep it short and sweet.
     - Use =asdf=.
     - Document exported symbols and commands.
     - Stay organized!  Put things in neat little directories. A Distribution might want to package your module.
+
 *** A pseudo-tutorial
     The path of least resistance is to use `quickproject` and its helper functions.  Specifically (get [[http://www.quicklisp.org/beta/][quicklisp]]):
+
 #+BEGIN_SRC lisp
   (ql:quickload "quickproject")
   (quickproject:make-project #p"~/path/to/new-module" :depends-on '(stumpwm) :name "swm-new-module")
 #+END_SRC
+
 Then in =~/path/to/new-module/= you will have:
+
 #+BEGIN_EXAMPLE
   -rw-rw-r--  1 dave dave   68 Apr  6 19:38 package.lisp
   -rw-rw-r--  1 dave dave   53 Mar 16  2014 README.txt
   -rw-rw-r--  1 dave dave  271 Mar 16  2014 swm-new-module.asd
   -rw-rw-r--  1 dave dave 1.8K Apr  6 17:51 swm-new-module.lisp
 #+END_EXAMPLE
+
 The files that are important for you are =package.lisp= and
 =swm-new-module.asd=.  They contain the =asdf= metadata that describes
 your project.
 
 An example =asd= file looks like:
-#+BEGIN_EXAMPLE
+#+BEGIN_SRC lisp
 (asdf:defsystem #:swm-new-module
   :serial t
   :description "Describe swm-new-module here"
@@ -45,29 +50,35 @@ An example =asd= file looks like:
   :depends-on (#:stumpwm)
   :components ((:file "package")
                (:file "swm-emacs"))) ; any other files you make go here
-#+END_EXAMPLE
+#+END_SRC
+
 A =package.lisp= looks like:
-#+BEGIN_EXAMPLE
+#+BEGIN_SRC lisp
 (defpackage #:swm-new-module
   (:use #:cl :stumpwm))
-#+END_EXAMPLE
+#+END_SRC
 
 From here you can commence hacking.  When you're ready, advertise it
 to the world!
 
 [[http://www.xach.com/lisp/quickproject/][More docs here]].
+
 ** Loading a module
+
 Loading a module can usually be done in your =~/.stumpwmrc= for a module =module-name= using:
-#+begin_src lisp
+#+BEGIN_SRC lisp
 (load-module "module-name")
-#+end_src
+#+END_SRC
+
 Please see =README.org= files for each module for further details. Missing module dependencies, can be installed with:
-#+begin_src lisp
+#+BEGIN_SRC lisp
 (ql:quickload "notify")
-#+end_src
+#+END_SRC
+
 * Third Party Modules
 Advertise your module here, open a PR and include a org-mode link!
 - [[https://github.com/njkli/stumpwm-weather/blob/master/readme.org][stumpwm-weather]] :: Displays weather in the modeline
+
 * Current Modules
 (click for its respective README/docs)
 
@@ -77,9 +88,11 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./media/amixer/README.org][amixer]] :: Manipulate the volume using amixer
 - [[./media/stump-radio/README.org][stump-radio]] :: Minimalistic mplayer-based radio for StumpWM.
 - [[./media/stump-volume-control/README.org][stump-volume-control]] :: Minimalistic amixer-based volume control for StumpWM.
+
 ** Minor Modes
 - [[./minor-mode/mpd/README.org][mpd]] :: Displays information about the music player daemon (MPD).
 - [[./minor-mode/notifications/README.org][notifications]] :: A notification library that sends notifications to the modeline via stumpish or from stumpwm itself.
+
 ** Modeline
 - [[./modeline/battery-portable/README.org][battery-portable]] :: Add battery information to the modeline in a portable way.
 - [[./modeline/bitcoin/README.org][bitcoin]] :: Display bitcoin price on StumpWM modeline.
@@ -91,6 +104,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./modeline/net/README.org][net]] :: Displays information about the current network connection.
 - [[./modeline/stumptray/README.org][stumptray]] :: System Tray for stumpwm.
 - [[./modeline/wifi/README.org][wifi]] :: Display information about your wifi.
+
 ** Utilities
 - [[./util/alert-me/README.org][alert-me]] :: Alert me that an event is coming
 - [[./util/app-menu/README.org][app-menu]] :: A simple application menu for launching shell commands
