@@ -17,8 +17,12 @@
 (defparameter *threshold* 0.001
   "Magnitude that must be exceeded for a increasing or decreasing color.")
 
-(defparameter *time-delay* 15
+(defparameter *time-delay* 60
   "Time in seconds between calls to `*url*' to get price.")
+
+(defparameter *local-code* 2
+  "Localization code, `0' no thousand separator, `1' thousand separator
+is `,', `2' thousand separator is `.'.")
 
 ;;; Get price
 
@@ -31,24 +35,18 @@
 (defvar *prev-value* 0.0
   "Store previous price. ")
 
-(defun bitcoin-restart (c)
-  "Define a restart point to handle when *any* condition is signaled."
-  (declare (ignore c))
-  (invoke-restart 'bitcoin-restarter))
-
 (defun get-value-from-url ()
   "Get the actual USD-BTC value."
   ;; Just in case internet drops
-  (handler-bind ((t #'bitcoin-restart))
-    (restart-case
-        (gethash "rate_float"
-                 (gethash "USD"
-                          (gethash "bpi"
-                                   (yason:parse
-                                    (babel:octets-to-string
-                                     (dexador:get *url*)
-                                     :encoding :utf-8)))))
-      (bitcoin-restarter () 0.0))))
+  (handler-case
+      (gethash "rate_float"
+               (gethash "USD"
+                        (gethash "bpi"
+                                 (yason:parse
+                                  (babel:octets-to-string
+                                   (dexador:get *url* :keep-alive nil)
+                                   :encoding :utf-8)))))
+    (condition () 0.0)))
 
 (defun get-value-with-delay ()
   "Get price from `*url*' only once every `*time-delay'."
@@ -66,7 +64,7 @@
   "Size of last values stored list. The value is get from `*url*' on every
 modeline refresh, so depends on user's swapping windows behavior to set
 proprerly, with the `*time-delay*' time influencing too. Must be positive,
-is used in average price calculation.")
+because it is used in average price calculation.")
 
 (defvar *last-values*
   (make-list *last-values-size*
@@ -94,15 +92,29 @@ value vs average. This function is evaluated on every modeline refresh."
           (setf last-values-average (/ (reduce #'+ *last-values*)
                                        *last-values-size*))
           ;; Return with color if desired
-          (if *modeline-use-colors*
-              (let* ((diff (- value last-values-average))
-                     (pdiff (/ diff value)))
-                (cond ((> pdiff *threshold*)
-                       (format nil "^[^B^3*~1$^]" value))
-                      ((< pdiff (- *threshold*))
-                       (format nil "^[^1*~1$^]" value))
-                      (t (format nil "^[^7*~1$^]" value))))
-              (format nil "^[^**~1$^]" value)))
+          (let ((price (truncate value)))
+            (if *modeline-use-colors*
+                (let* ((diff (- value last-values-average))
+                       (pdiff (/ diff value)))
+                  (cond ((> pdiff *threshold*)
+                         (format nil
+                                 "^[^B^3*~[~D~;~:D~;~,,'.,:D~]^]"
+                                 *local-code*
+                                 price))
+                        ((< pdiff (- *threshold*))
+                         (format nil
+                                 "^[^1*~[~D~;~:D~;~,,'.,:D~]^]"
+                                 *local-code*
+                                 price))
+                        (t (format
+                            nil
+                            "^[^7*~[~D~;~:D~;~,,'.,:D~]^]"
+                            *local-code*
+                            price))))
+                (format nil
+                        "^[^**~[~D~;~:D~;~,,'.,:D~]^]"
+                        *local-code*
+                        price))))
         (format nil "-BTC-"))))
 
 (stumpwm:add-screen-mode-line-formatter #\b 'bitcoin-modeline)
@@ -110,7 +122,7 @@ value vs average. This function is evaluated on every modeline refresh."
 ;;; Debugging ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; (declaim (optimize (speed 0) (debug 3) (safety 0)))
 
-;;; CL-USER > (ql:quickload :bitcoin)
+;;; CL-USER > (asdf:load-system :bitcoin)
 ;;; CL-USER > (in-package "BITCOIN")
 ;;; BITCOIN > (do () (nil)
 ;;;             (let* ((price (get-value-with-delay))
@@ -150,4 +162,4 @@ value vs average. This function is evaluated on every modeline refresh."
 ;;;   (sleep 1))
 
 ;;; Wile executing, swap to code buffers, and any re-compile-load-ed
-;;; changes will be visible.
+;;; changes will be visible. Recall `C-c C-b' stops loop in Sly REPL.

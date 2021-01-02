@@ -4,4 +4,5 @@
   (:use :cl)
   (:export #:*modeline-use-colors*
            #:*threshold*
-           #:*time-delay*))
+           #:*time-delay*
+           #:*local-code*))
