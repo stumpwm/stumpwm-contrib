@@ -118,6 +118,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/screenshot/README.org][screenshot]] :: Takes screenshots and stores them as png files
 - [[./util/searchengines/README.org][searchengines]] :: Allows searching text using prompt or clipboard contents with various search engines
 - [[./util/shell-command-history/README.org][shell-command-history]] :: Save and load the stumpwm::*input-shell-history* to a file
+- [[./util/stump-nm/README.org][stump-nm]] :: StumpWM integration with NetworkManager
 - [[./util/surfraw/README.org][surfraw]] :: Integrates surfraw with stumpwm.
 - [[./util/swm-emacs/README.org][swm-emacs]] :: A set of utilities for launching the beast.
 - [[./util/swm-gaps/README.org][swm-gaps]] :: Pretty (useless) gaps for StumpWM
