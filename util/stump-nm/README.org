@@ -1,0 +1,64 @@
+* stump-nm
+
+Aka "StumpWM and NetworkManager integration".
+
+This module allows you to manage your Wi-Fi networks and VPN connections from
+within StumpWM itself. It is intentionally pretty bare-bones in features, in
+that it allows you to enable/disable connections, and no more. It is not a
+replacement for =nmtui= and/or =nmcli=.
+
+It offers 2 commands:
+
+- =nm-list-wireless-networks=
+- =nm-list-vpn-connections=
+
+Each command offers a menu where you can select a WiFi or VPN connection.
+
+An item in the menu may be prepended with a symbol to help readability.
+
+Those symbols are:
+
+- =*=: this network is active and connected.
+- =?=: this network is in the process of connecting.
+
+** Requirements
+
+NetworkManager must be installed. You can check if you have it by running this
+on a modern system:
+
+#+begin_src shell
+  systemctl status NetworkManager
+#+end_src
+
+It should show something akin to:
+
+#+begin_src shell
+  ● NetworkManager.service - Network Manager
+       Loaded: loaded (/usr/lib/systemd/system/NetworkManager.service; enabled; vendor preset: enabled)
+       Active: active (running) since Sat 2021-01-16 21:45:56 CET; 1 day 23h ago
+	 Docs: man:NetworkManager(8)
+     Main PID: 1375 (NetworkManager)
+	Tasks: 3 (limit: 38150)
+       Memory: 13.5M
+	  CPU: 52.206s
+       CGroup: /system.slice/NetworkManager.service
+	       └─1375 /usr/sbin/NetworkManager --no-daemon
+#+end_src
+
+If you don't have this, this module is not for you.
+
+** Usage
+
+Put the following in your =~/.stumpwmrc=:
+
+#+begin_src lisp
+  (load-module "stump-nm")
+#+end_src
+
+From this point on, 2 commands become available, and you can add keybindings for
+them, such as:
+
+#+begin_src lisp
+  ; This maps <prefix> C-w to list the wireless networks.
+  (define-key *root-map* (kbd "C-w") "nm-list-wireless-networks")
+#+end_src
