@@ -1,0 +1,39 @@
+* stump-backlight
+
+This module allows you to manage the backlight natively with StumpWM.
+
+** Requirements
+
+None. This is done natively.
+
+** Usage
+
+Put the following in your =~/.stumpwmrc=:
+
+#+begin_src lisp
+  (load-module "stump-backlight")
+#+end_src
+
+And enjoy the backlight buttons working.
+
+** Details
+
+stump-backlight exposes a few things:
+
+- The =*scale*= variable: defaults to 10. It defines the scale of the
+  backlight. If you want more granularity than 10 steps, increase this variable.
+- The =*current-percent*= variable: defaults to 50. It defines the current
+  percentage of the backlight. Due to underlying technology issues, the
+  percentage is managed separately from the real one, so this lets you set it at
+  startup.
+- The =update= function: it takes the values from the variables and applies the
+  backlight.
+- 2 commands: =backlight-increase= and =backlight-decrease=. They increase or
+  decrease based on the scale and apply the backlight.
+
+The 2 commands are bound to those keys:
+
+#+begin_src lisp
+  (define-key *root-map* (kbd "XF86MonBrightnessUp") "backlight-increase")
+  (define-key *root-map* (kbd "XF86MonBrightnessDown") "backlight-decrease")
+#+end_src
