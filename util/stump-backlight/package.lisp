@@ -1,7 +1,8 @@
 (defpackage #:stump-backlight
   (:use #:cl)
-  (:export #:*current-percent*
+  (:export #:*default-percent*
            #:*scale*
            #:backlight-increase
            #:backlight-decrease
+           #:current-output
            #:update))
