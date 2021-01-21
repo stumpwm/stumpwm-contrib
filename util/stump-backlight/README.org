@@ -22,12 +22,15 @@ stump-backlight exposes a few things:
 
 - The =*scale*= variable: defaults to 10. It defines the scale of the
   backlight. If you want more granularity than 10 steps, increase this variable.
-- The =*current-percent*= variable: defaults to 50. It defines the current
+- The =*default-percent*= variable: defaults to 50. It defines the default
   percentage of the backlight. Due to underlying technology issues, the
   percentage is managed separately from the real one, so this lets you set it at
   startup.
-- The =update= function: it takes the values from the variables and applies the
-  backlight.
+- The =(update output)= function: it takes the values from the variables and
+  applies the backlight. It takes one argument: the output (aka monitor) to
+  apply the update on.
+- The =(current-output)= function: it returns the output (aka monitor) of the
+  currently focused window. Useful to pass to the previous function.
 - 2 commands: =backlight-increase= and =backlight-decrease=. They increase or
   decrease based on the scale and apply the backlight.
 
