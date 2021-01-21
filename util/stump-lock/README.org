@@ -1,0 +1,34 @@
+* stump-lock
+
+This module allows you to lock your screen while away from your
+keyboard.
+
+Note: this is *not* a _secure_ screenlocker. It is a convenient
+one. The threat it is protecting against is your cat, not your hacker
+neighbor.
+
+** Requirements
+
+None. This is done natively.
+
+** Usage
+
+Put the following in your =~/.stumpwmrc=:
+
+#+begin_src lisp
+  (load-module "stump-lock")
+#+end_src
+
+And you need to define a password:
+
+#+begin_src lisp
+  (setf stump-lock:*password* "my super secret password")
+#+end_src
+
+You can now bind the =lock-screen= command to a key:
+
+#+begin_src lisp
+  (define-key *top-map* (kbd "s-l") "lock-screen")
+#+end_src
+
+That's it!
