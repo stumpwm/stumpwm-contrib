@@ -336,8 +336,9 @@
 (defun mpd-get-label ()
   (let* ((title (assoc-value :title *mpd-current-song*))
          (filename (assoc-value :file *mpd-current-song*))
-         (basename (subseq filename (1+ (or (position #\/ filename :from-end t) -1)) (position #\. filename :from-end t)))
-         (realname (if (null title) basename title)))
+         (basename (subseq filename (1+ (or (position #\/ filename :from-end t) -1))))
+         (noext (subseq basename 0 (position #\. basename :from-end t)))
+         (realname (if (null title) noext title)))
     realname))
 
 (defun mpd-get-track ()
@@ -806,8 +807,9 @@ Passed an argument of zero and if crossfade is on, toggles crossfade off."
 (defun mpd-create-label (infunc)
   (let* ((title (getf infunc :title))
          (filename (getf infunc :file))
-         (basename (subseq filename (1+ (position #\/ filename :from-end t)) (position #\. filename :from-end t)))
-         (realname (if (null title) basename title)))
+         (basename (subseq filename (1+ (or (position #\/ filename :from-end t) -1))))
+         (noext (subseq basename 0 (position #\. basename :from-end t)))
+         (realname (if (null title) noext title)))
     realname))
 
 (defcommand mpd-playlist () ()
