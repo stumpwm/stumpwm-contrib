@@ -96,6 +96,12 @@
   (:name "GetCapabilities")
   (values #("actions" "action-icons" "body" "body-markup")))
 
+(define-dbus-method (notify-dbus-service close-notification) ((returnId :uint32))
+    (:uint32 :uint32)
+  (:interface "org.freedesktop.Notifications")
+  (:name "CloseNotification")
+  (values returnId 3))
+
 (defun notifications-listen ()
   (handler-case
       (with-open-bus (bus (session-server-addresses))
