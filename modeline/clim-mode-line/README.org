@@ -1,0 +1,45 @@
+#+TITLE: CLIM-MODE-LINE
+#+AUTHOR: Shozo «szos at posteo dot net»
+
+* CLIM Mode Line
+  This is a project to write a dock using CLIM inspired by the emacs and stumpwm mode lines. 
+
+** Usage
+   Currently the (imo) best way to utilize this modeline is to launch StumpWM as normal and then start a swank/slynk server and connect to it. From the repl evaluate 
+   #+BEGIN_SRC lisp
+     (in-package :stumpwm)
+     (load-module "clim-mode-line")
+   #+END_SRC
+   - NB! this can take a while if you havent loaded mcclim before, as it will need to be downloaded and compiled. 
+   Now that the module is loaded, we need to ensure that 
+   1. No other panel applications are running
+   2. The mode line is hidden. 
+   Now open up a new repl (with sly this is ~sly-mrepl-new~) and evaluate 
+   #+BEGIN_SRC lisp
+     (in-package :clim-mode-line)
+     (run-mode-line)
+   #+END_SRC
+   At this point the mode line should pop up. 
+   - NB! If you kill the mode line process/thread, the built in stumpwm mode line wont return. To kill and restart the clim mode line interrupt the ~run-mode-line~ fuction we ran in our second repl (via =C-c C-c=) and abort the evaluation, then run the stumpwm command ~restart-soft~. This should bring back the built in mode line, and you can follow the steps above to reopen the clim mode line. If you dont have access to the second repl, you can evaluate the following in any repl connected to the image· ~(clim-mode-line::com-quit)~
+
+* Design Goals
+  The goal of this system is to suppland the built in stumpwm mode line and input line. To this end there are three general layouts/display items we need to make: 
+  1. we need a pane to display everything
+     - this is pretty easy, we already have it. its just an application pane we draw text to
+  2. We need an execute-extended-command pane
+     - this can be harder to implement. Its made easier by the fact that we wont have to wrap lines, but complicated by the fact that we need to accept arguments to some commands. Hopefully theres a built in modeline pane in drei or esa. 
+  3. We need to accept arguments and prompt the user. 
+     - This is probably the hardest part. What I think is the best course of action, is when accepting an extended command (think stumpwm colon commands) that takes arguments, we want to create a pop-up to accept them, and we want that pop up to not be managed by stumpwm and not relinquish focus to any other windows (aside from the mode line) until its finished getting the arguments. For example, we press =C-t ;= to open up the modeline execute-extended-command layout. we type in =Move Window To Group=, and a popup appears, asking us for the window and the group, while simultaneously the windows and groups in the mode line become active (through presentations) and clicking on them will satisfy that specific argument to the command we entered. Alternatively, we could type the window (name/number/class/title/etc) and the group (name/number/etc) in the popup, and then press meta-RET to submit it. 
+
+
+
+* Todo List
+** TODO Fix drag and drop translator
+   Drag and drop translator needs fixing, it is unclear why the second argument fails to be aquired.
+
+** TODO Update on window map/unmap
+   We want to update the frame whenever a map/unmap event occurs. This should probably be developed as a stumpwm mode line replacement and not a standalone dock/panel. Thus we can say with certainty that the mode line process will be within the same lisp image as stumpwm, and we can use stumpwm directly, and update the mode line directly from stumpwm. This also lets us get an idea of various other aspects, such as groups, heads, etc. 
+
+** TODO Fix Presentation Types
+   Presentation types need to be fleshed out. What we want to have happen is, for example, if 
+we define a command to move a window to a group, we want to be able to control-click on a window to select it, then click on a group and the window gets sent to that group. This is the same purpose as the drag and drop translator, but we want both working so we can define different behaviores for dragging vs clicking/keystrokes etc. 
