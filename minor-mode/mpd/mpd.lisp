@@ -249,28 +249,28 @@
 (defun mpd-minutes-seconds (time)
   (let ((minutes) (seconds) (hours))
     (if (< time 60)
-	(progn
-	  (setf hours 0)
-	  (setf minutes 0)
-	  (setf seconds time))
-      (multiple-value-bind (min sec) (floor time 60)
-			   (setf minutes min)
-			   (setf seconds sec)))
+        (progn
+          (setf hours 0)
+          (setf minutes 0)
+          (setf seconds time))
+        (multiple-value-bind (min sec) (floor time 60)
+          (setf minutes min)
+          (setf seconds sec)))
     (if (> minutes 59)
-	(multiple-value-bind (hr min) (floor minutes 60)
-			     (setf hours hr)
-			     (setf minutes min))
-      (setf hours 0))
+        (multiple-value-bind (hr min) (floor minutes 60)
+          (setf hours hr)
+          (setf minutes min))
+        (setf hours 0))
     (when (< seconds 10)
       (setf seconds (concat "0" (write-to-string seconds))))
     (if (> hours 0)
-	(format nil "~a:~2,,,'0@a:~a" hours minutes seconds)
-      (format nil "~a:~a" minutes seconds))))
+        (format nil "~a:~2,,,'0@a:~a" hours minutes seconds)
+        (format nil "~a:~a" minutes seconds))))
 
 (defun mpd-get-elapsed ()
   (let* ((time (assoc-value :time *mpd-status*))
-	 (pos (position #\: time))
-	 (elapsed (parse-integer (subseq time 0 pos))))
+ (pos (position #\: time))
+ (elapsed (parse-integer (subseq time 0 pos))))
     (mpd-minutes-seconds elapsed)))
 
 (defun mpd-get-length ()
@@ -282,10 +282,10 @@
         ((equal (assoc-value :state *mpd-status*) "pause") "Paused")
         ((equal (assoc-value :state *mpd-status*) "stop") "Stopped")))
 
-(defun mpd-get-shortstatus () 
+(defun mpd-get-shortstatus ()
   (cond ((equal (assoc-value :state *mpd-status*) "play") "->")
         ((equal (assoc-value :state *mpd-status*) "pause") "||")
-        ((equal (assoc-value :state *mpd-status*) "stop") "[]")))  
+        ((equal (assoc-value :state *mpd-status*) "stop") "[]")))
 
 (defun mpd-get-file ()
   (assoc-value :file *mpd-current-song*))
@@ -336,8 +336,9 @@
 (defun mpd-get-label ()
   (let* ((title (assoc-value :title *mpd-current-song*))
          (filename (assoc-value :file *mpd-current-song*))
-         (basename (subseq filename (1+ (or (position #\/ filename :from-end t) -1)) (position #\. filename :from-end t)))
-         (realname (if (null title) basename title)))
+         (basename (subseq filename (1+ (or (position #\/ filename :from-end t) -1))))
+         (noext (subseq basename 0 (position #\. basename :from-end t)))
+         (realname (if (null title) noext title)))
     realname))
 
 (defun mpd-get-track ()
@@ -488,8 +489,8 @@ Volume
 
           (define-key m (kbd "S-Up") (mpd-menu-action :mpd-playlist-move-up))
           (define-key m (kbd "S-Down") (mpd-menu-action :mpd-playlist-move-down))
-	  (define-key m (kbd "S-k") (mpd-menu-action :mpd-playlist-move-up))
-	  (define-key m (kbd "S-j") (mpd-menu-action :mpd-playlist-move-down))
+          (define-key m (kbd "S-k") (mpd-menu-action :mpd-playlist-move-up))
+          (define-key m (kbd "S-j") (mpd-menu-action :mpd-playlist-move-down))
           (define-key m (kbd "d") (mpd-menu-action :mpd-playlist-delete))
           (define-key m (kbd "RET") (mpd-menu-action :mpd-playlist-play))
           m)))
@@ -716,9 +717,9 @@ Volume
   (mpd-update-status)
   (if (mpd-single-p)
       (progn
-	(if *mpd-did-repeat*
-	    (mpd-send-command "repeat 1"))
-	(mpd-send-command "single 0"))
+        (if *mpd-did-repeat*
+            (mpd-send-command "repeat 1"))
+        (mpd-send-command "single 0"))
     (progn
       (setf *mpd-did-repeat* (mpd-repeating-p))
       (mpd-send-command "repeat 0")
@@ -782,62 +783,64 @@ Passed an argument of zero and if crossfade is on, toggles crossfade off."
   (mpd-update-current-song)
   (mpd-update-status)
   (message "~a"
-	   (format-expand *mpd-formatters-alist* *mpd-current-song-fmt*)))
+           (format-expand *mpd-formatters-alist* *mpd-current-song-fmt*)))
 
 (defcommand mpd-status () ()
   (mpd-update-status)
   (mpd-update-current-song)
   (message "~a"
-	   (format-expand *mpd-formatters-alist* *mpd-status-fmt*)))
+           (format-expand *mpd-formatters-alist* *mpd-status-fmt*)))
 
 (defun mpd-output-process (inlist)
   (let ((outlist ())
-	(celem ()))
+        (celem ()))
     (dolist (ie inlist)
       (if (equal (car ie) :file)
-	  (progn
-	    (if celem
-		(setf outlist (append outlist (list celem))))
-	    (setf celem ie))
-	(setf celem (append celem ie))))
+          (progn
+            (if celem
+                (setf outlist (append outlist (list celem))))
+            (setf celem ie))
+          (setf celem (append celem ie))))
     (setf outlist (append outlist (list celem)))
     outlist))
 
 (defun mpd-create-label (infunc)
   (let* ((title (getf infunc :title))
          (filename (getf infunc :file))
-         (basename (subseq filename (1+ (position #\/ filename :from-end t)) (position #\. filename :from-end t)))
-         (realname (if (null title) basename title)))
+         (basename (subseq filename (1+ (or (position #\/ filename :from-end t) -1))))
+         (noext (subseq basename 0 (position #\. basename :from-end t)))
+         (realname (if (null title) noext title)))
     realname))
 
 (defcommand mpd-playlist () ()
   (let* ((response (mpd-output-process (mpd-send-command "playlistinfo")))
          (result (mapcar (lambda (infunc) 
-   (list (mpd-create-label infunc)
- (read-from-string (let ((tv (getf infunc :time))) (if (null tv) "0" tv)))))
- response))
- ;; The field width which the song names should fill
- (mlen (max 50 (+ 10 (apply #'max (mapcar (lambda (istr) (length (car istr))) result)))))
- ;; Total playing length of the playlist
- (tplay (mpd-minutes-seconds (apply #'+ (mapcar #'cadr result)))))
-    (message "Current playlist (~a, ~a): ~%^7*~{~{~:[~;^B~]~3d. ~Va~a~:[~;^b~]~%~}~}" ;; This is now far less horrible than my first version, which had a format-to-string
-         (length result)                                                          ;; generating the format string for the format-to-output. *shudder*
-         tplay
-         (let* ((pn (1- (let ((n (mpd-get-number))) (if (null n) 0 (read-from-string n)))))
-                (outlist (let ((cn 0))
-                           (mapcar (lambda (in) 
-                                     (setf cn (1+ cn))
-                                     (list (= cn (+ 1 pn)) cn mlen (car in) (mpd-minutes-seconds (cadr in)) (= cn (+ 1 pn))))
-                                   result))))
-           (if (< (length outlist) 55)
-               outlist
-             (let* ((ii (max 0 (- pn 25)))
-                    (ai (min (length outlist) (+ pn 25))))
-               (if (< (- ai ii) 50)
-                   (progn
-                     (setf ii (max 0 (- ii (- 50 (- ai ii)))))
-                     (setf ai (min (length outlist) (+ ai (- 50 (- ai ii)))))))
-               (subseq outlist ii ai)))))))
+                           (list (mpd-create-label infunc)
+                                 (read-from-string (let ((tv (getf infunc :time))) (if (null tv) "0" tv)))))
+                         response))
+         ;; The field width which the song names should fill
+         (mlen (max 50 (+ 10 (apply #'max (mapcar (lambda (istr) (length (car istr))) result)))))
+         ;; Total playing length of the playlist
+         (tplay (mpd-minutes-seconds (apply #'+ (mapcar #'cadr result)))))
+    (message "Current playlist (~a, ~a): ~%^7*~{~{~:[~;^B~]~3d. ~Va~a~:[~;^b~]~%~}~}"
+             (length result)
+             tplay
+             (let* ((pn (1- (let ((n (mpd-get-number))) (if (null n) 0 (read-from-string n)))))
+                    (outlist (let ((cn 0))
+                               (mapcar (lambda (in)
+                                         (setf cn (1+ cn))
+                                         (list (= cn (+ 1 pn)) cn mlen (car in)
+                                               (mpd-minutes-seconds (cadr in)) (= cn (+ 1 pn))))
+                                       result))))
+               (if (< (length outlist) 55)
+                   outlist
+                 (let* ((ii (max 0 (- pn 25)))
+                        (ai (min (length outlist) (+ pn 25))))
+                   (if (< (- ai ii) 50)
+                       (progn
+                         (setf ii (max 0 (- ii (- 50 (- ai ii)))))
+                         (setf ai (min (length outlist) (+ ai (- 50 (- ai ii)))))))
+                   (subseq outlist ii ai)))))))
 
 (defcommand mpd-add-file (file) ((:rest "Add file to playlist: "))
   (mpd-format-command "add \"~a\"" file))
