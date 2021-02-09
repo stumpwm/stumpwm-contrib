@@ -2,27 +2,6 @@
 
 (in-package :bitcoin)
 
-;;; "bitcoin" goes here. Hacks and glory await!
-
-;;; Display bitcoin price on StumpWM modeline.
-;;;
-;;; Copyright 2020 Santiago Payà Miralta @santiagopim.
-;;;
-;;; This module is free software; you can redistribute it and/or modify
-;;; it under the terms of the GNU General Public License as published by
-;;; the Free Software Foundation; either version 2, or (at your option)
-;;; any later version.
-;;;
-;;; This module is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU General Public License for more details.
-;;;
-;;; You should have received a copy of the GNU General Public License
-;;; along with this software; see the file COPYING.  If not, see
-;;; <http://www.gnu.org/licenses/>.
-;;;
-
 ;;; CODE:
 
 ;;; Bitcoin formatter for the Stumpwm mode-line.
@@ -30,52 +9,157 @@
 ;;; values got from url and calculate its average. Comparing
 ;;; actual value with its average, set a color format.
 
-(add-screen-mode-line-formatter #\b 'bitcoin-modeline)
-
-(defparameter *url* "https://api.coindesk.com/v1/bpi/currentprice.json"
-  "Location of price provider.")
+;;; Exported
 
 (defparameter *modeline-use-colors* t
   "Flag use color or not in price value.")
 
-(defparameter *last-values* ()
-  "List of last values got from *url*.")
+(defparameter *threshold* 0.001
+  "Magnitude that must be exceeded for a increasing or decreasing color.")
 
-(defparameter *last-values-size* 42
-  "Size of last values stored list. The value is calculated on every
-modeline refresh, so depends on user's behavior to set proprerly.")
+(defparameter *time-delay* 60
+  "Time in seconds between calls to `*url*' to get price.")
+
+(defparameter *local-code* 2
+  "Localization code, `0' no thousand separator, `1' thousand separator
+is `,', `2' thousand separator is `.'.")
+
+;;; Get price
+
+(defparameter *url* "https://api.coindesk.com/v1/bpi/currentprice.json"
+  "Location of price provider.")
+
+(defvar *prev-time* 0
+  "Store previous time when got price.")
+
+(defvar *prev-value* 0.0
+  "Store previous price. ")
+
+(defun get-value-from-url ()
+  "Get the actual USD-BTC value."
+  ;; Just in case internet drops
+  (handler-case
+      (gethash "rate_float"
+               (gethash "USD"
+                        (gethash "bpi"
+                                 (yason:parse
+                                  (babel:octets-to-string
+                                   (dexador:get *url* :keep-alive nil)
+                                   :encoding :utf-8)))))
+    (condition () 0.0)))
+
+(defun get-value-with-delay ()
+  "Get price from `*url*' only once every `*time-delay'."
+  (let ((now (/ (get-internal-real-time) internal-time-units-per-second)))
+    ;; When `*time-delay*' time passed, ask for new price through internet
+    ;; and update `*prev-value*'.
+    (when (> (- now *prev-time*) *time-delay*)
+      (progn (setf *prev-time* now)
+             (setf *prev-value* (get-value-from-url))))
+    *prev-value*))
+
+;;; Store prices
+
+(defvar *last-values-size* 420
+  "Size of last values stored list. The value is get from `*url*' on every
+modeline refresh, so depends on user's swapping windows behavior to set
+proprerly, with the `*time-delay*' time influencing too. Must be positive,
+because it is used in average price calculation.")
+
+(defvar *last-values*
+  (make-list *last-values-size*
+             :initial-element (get-value-with-delay))
+  "List of last values got from `*url*'. Set size to `*last-values-size*'
+and initial element to actual value from url.")
+
+;;; Write on modeline
 
 (defun bitcoin-modeline (ml)
   "Get the actual USD-BTC value, store value in list, preserve list size
-popping last value, calculate average and set formatting depending on
+popping first value, calculate average and set formatting depending on
 value vs average. This function is evaluated on every modeline refresh."
   (declare (ignore ml))
-  (ignore-errors                        ; Just in case internet drops
-   (let ((value (/ (gethash "rate_float"
-                            (gethash "USD"
-                                     (gethash "bpi"
-                                              (yason:parse
-                                               (babel:octets-to-string
-                                                (dex:request *url*)
-                                                :encoding :utf-8)))))
-                   1000))
-         (last-values-length (length *last-values*))
-         (last-values-average 0))
-     ;; Add value to last values list
-     (push value *last-values*)
-     ;; Preserve last values list at size
-     (when (>= last-values-length *last-values-size*)
-       (setf *last-values* (nreverse *last-values*))
-       (pop *last-values*)
-       (setf *last-values* (nreverse *last-values*)))
-     ;; Calculate average of last values
-     (setf last-values-average (/ (reduce #'+ *last-values*)
-                                  last-values-length))
-     ;; Return with color if 
-     (if *modeline-use-colors*
-         (cond ((> value last-values-average)
-                (format nil "^[^B^3*~3$^]" value))
-               ((< value last-values-average)
-                (format nil "^[^1*~3$^]" value))
-               (t (format nil "^[^7*~3$^]" value)))
-         (format nil "^[^**~3$^]" value)))))
+  (let ((value (get-value-with-delay))
+        (last-values-average 0.0))
+    ;; Actual value must be positive number
+    (if (and (numberp value) (plusp value))
+        (progn
+          ;; Add value to last values list, appending to end
+          (setf *last-values* (append *last-values* (list value)))
+          ;; Preserve last values list at size, popping from front
+          (pop *last-values*)
+          ;; Calculate average of last values
+          (setf last-values-average (/ (reduce #'+ *last-values*)
+                                       *last-values-size*))
+          ;; Return with color if desired
+          (let ((price (truncate value)))
+            (if *modeline-use-colors*
+                (let* ((diff (- value last-values-average))
+                       (pdiff (/ diff value)))
+                  (cond ((> pdiff *threshold*)
+                         (format nil
+                                 "^[^B^3*~[~D~;~:D~;~,,'.,:D~]^]"
+                                 *local-code*
+                                 price))
+                        ((< pdiff (- *threshold*))
+                         (format nil
+                                 "^[^1*~[~D~;~:D~;~,,'.,:D~]^]"
+                                 *local-code*
+                                 price))
+                        (t (format
+                            nil
+                            "^[^7*~[~D~;~:D~;~,,'.,:D~]^]"
+                            *local-code*
+                            price))))
+                (format nil
+                        "^[^**~[~D~;~:D~;~,,'.,:D~]^]"
+                        *local-code*
+                        price))))
+        (format nil "-BTC-"))))
+
+(stumpwm:add-screen-mode-line-formatter #\b 'bitcoin-modeline)
+
+;;; Debugging ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; (declaim (optimize (speed 0) (debug 3) (safety 0)))
+
+;;; CL-USER > (asdf:load-system :bitcoin)
+;;; CL-USER > (in-package "BITCOIN")
+;;; BITCOIN > (do () (nil)
+;;;             (let* ((price (get-value-with-delay))
+;;;                    (average (/ (reduce #'+ *last-values*)
+;;;                                *last-values-size*))
+;;;                    (diff (- price average)))
+;;;               (format t "~&~2$ ~2$ ~2@$ ~4@$% ~a"
+;;;                       price
+;;;                       average
+;;;                       diff
+;;;                       (* 100 (/ diff price))
+;;;                       (bitcoin-modeline t)))
+;;;             (force-output)
+;;;             (sleep 1))
+
+;;; (do () (nil)
+;;;   (let ((price (get-value-with-delay))
+;;;         (average 0.0)
+;;;         (diff 0.0)
+;;;         (ratio 0.0))
+;;;     (when  (and (numberp price) (plusp price))
+;;;       (setf average (/ (reduce #'+ *last-values*)
+;;;                        *last-values-size*))
+;;;       (setf diff (- price average))
+;;;       (setf ratio (* 100 (/ diff price))))
+;;;     (format t "~&~2$ ~2$ ~2@$ ~4@$%"
+;;;             price
+;;;             average
+;;;             diff
+;;;             ratio))
+;;;   (force-output)
+;;;   (sleep 1))
+
+;;; (do () (nil)
+;;;   (format t "~&~a" (bitcoin-modeline t))
+;;;   (force-output)
+;;;   (sleep 1))
+
+;;; Wile executing, swap to code buffers, and any re-compile-load-ed
+;;; changes will be visible. Recall `C-c C-b' stops loop in Sly REPL.
