@@ -96,8 +96,6 @@
   (:name "GetCapabilities")
   (values #("actions" "action-icons" "body" "body-markup")))
 
-;;; based on dbus notifications spec
-;;; https://specifications.freedesktop.org/notification-spec/latest/ar01s09.html
 (defconstant +close-notification-reason-expired+ 1)
 (defconstant +close-notification-reason-dismissed-by-user+ 2)
 (defconstant +close-notification-reason-closed+ 3)
