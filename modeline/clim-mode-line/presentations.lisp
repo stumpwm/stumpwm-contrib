@@ -1,5 +1,8 @@
 (in-package :clim-mode-line)
 
+(defvar *current-group-color* +red+)
+(defvar *current-window-color* +red+)
+
 ;;; Presentation Methods
 
 (define-presentation-method present
@@ -7,12 +10,20 @@
   (let ((str (string-trim '(#\space) (stumpwm::format-expand
                                       stumpwm::*window-formatters*
                                       stumpwm::*window-format*
-                                      window))))
-    (format stream "~A" str)))
+                                      window)))
+        (curwin (stumpwm:current-window)))
+    (if (eq curwin window)
+        (with-drawing-options (stream :ink *current-window-color*)
+          (format stream "~A" str))
+        (format stream "~A" str))))
 
 (define-presentation-method present
     (group (type stumpwm::group) stream view &key)
-  (format stream "~A" (stumpwm:group-name group)))
+  (let ((curgrp (stumpwm:current-group)))
+    (if (eq curgrp group)
+        (with-drawing-options (stream :ink *current-group-color*)
+          (format stream "~A" (stumpwm:group-name group)))
+        (format stream "~A" (stumpwm:group-name group)))))
 
 ;;; Commands
 
@@ -54,9 +65,7 @@
 
 (define-clim-mode-line-command (com-delete-window)
     ((window stumpwm::window))
-  (stumpwm:delete-window window)
-  ;; (redisplay-clim-mode-line)
-  (window-refresh (find-pane-named *application-frame* 'display)))
+  (stumpwm:delete-window window))
 
 (define-clim-mode-line-command (com-kill-window)
     ((window stumpwm::window))

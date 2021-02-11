@@ -11,7 +11,7 @@
 		   :display-function 'clim-mode-line-display-function
 		   ;; :width 1920
 		   ;; :height 10
-                   :incremental-redisplay t
+                   ;; :incremental-redisplay t
 		   :scroll-bars nil
 		   :borders nil)
 	  ;; We should add an execute-extended-command, and switch to a layout containing that when
@@ -42,9 +42,15 @@
     (setf *mode-line-active* t)
     (run-frame-top-level frame)))
 
-(defun redisplay-clim-mode-line (&optional (ml (find-application-frame 'clim-mode-line :create nil :activate nil)))
-  (when ml
-    (redisplay-frame-panes ml :force-p t)))
+(defvar *redisplay-mode-line-lock* (bt:make-lock "cml-lock"))
+
+(defun redisplay-clim-mode-line (&optional (ml (find-application-frame
+                                                'clim-mode-line
+                                                :create nil
+                                                :activate nil)))
+  (bt:with-lock-held (*redisplay-mode-line-lock*)
+    (when ml
+      (redisplay-frame-panes ml :force-p t))))
 
 (defmethod clime:find-frame-type ((frame clim-mode-line)) 
   "this method sets the window type via clim-clx::adopt-frame as defined below."
