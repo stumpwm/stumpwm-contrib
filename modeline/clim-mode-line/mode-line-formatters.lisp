@@ -13,9 +13,14 @@
   (declare (ignore frame))
   (slim:cell (format pane "["))
   (loop for window in (stumpwm::sort-windows (stumpwm:current-group))
-        with current = (stumpwm:current-window)
-        do (slim:cell (present window 'stumpwm::window :stream pane
-                                                       :single-box t)))
+        ;; with current = (stumpwm:current-window)
+        ;; if (eq current window)
+        ;;   do (with-drawing-options (pane :ink +red+)
+        ;;        (slim:cell (present window 'stumpwm::window :stream pane
+        ;;                                                    :single-box t)))
+        ;; else
+          do (slim:cell (present window 'stumpwm::window :stream pane
+                                                         :single-box t)))
   (slim:cell (format pane "]"))
   ;; (slim:cell (format pane "Current Window: ~A" (stumpwm:current-window)))
   )

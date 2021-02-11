@@ -11,9 +11,10 @@
                                       stumpwm::*window-formatters*
                                       stumpwm::*window-format*
                                       window)))
-        (curwin (stumpwm:current-window)))
+        (curwin (stumpwm:current-window))
+        )
     (if (eq curwin window)
-        (with-drawing-options (stream :ink *current-window-color*)
+        (with-drawing-options (stream :ink +red+)
           (format stream "~A" str))
         (format stream "~A" str))))
 
@@ -21,7 +22,7 @@
     (group (type stumpwm::group) stream view &key)
   (let ((curgrp (stumpwm:current-group)))
     (if (eq curgrp group)
-        (with-drawing-options (stream :ink *current-group-color*)
+        (with-drawing-options (stream :ink +red+)
           (format stream "~A" (stumpwm:group-name group)))
         (format stream "~A" (stumpwm:group-name group)))))
 

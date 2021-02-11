@@ -28,7 +28,7 @@
   After that is completed, we can evaluate adding in a command reading system through the mode line. 
 
 * Todo List
-** TODO Fix Commands
-   Commands arent functioning currently.
+** TODO Fix Crashes
+   The mode line soft crashes when commands are executed. Sometimes it functions for a couple commands, other times a single command crashes it. A crash causes no condition to be signalled (they are possibly being caught in the refresh hook function) but rather causes the pane to go white - all output lost. 
 ** TODO Solve Threading Issues
    It is unclear whether crashes are caused by threading issues. This needs to be investigated and solved. 
