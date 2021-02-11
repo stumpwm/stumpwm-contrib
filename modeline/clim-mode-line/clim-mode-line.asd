@@ -10,5 +10,6 @@
   :components ((:file "package")
 	       (:file "clim-clx-patch")
                (:file "clim-mode-line")
-	       (:file "mode-line-formatters")
+               (:file "presentations")
+               (:file "mode-line-formatters")
 	       (:file "stumpwm-patch")))
