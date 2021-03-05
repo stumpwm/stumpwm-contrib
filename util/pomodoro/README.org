@@ -1,0 +1,39 @@
+* Simple Pomodoro-tracker for StumpWM
+
+I needed one because I'm desperate, short on time
+and hate ticking sounds and blinking notifications.
+
+It's just an example of how fast and furious is StumpWM scripting.
+
+** Installation
+
+In your =~/.stumpwmrc=:
+
+#+begin_src lisp
+(load-module "notifications")  ; optionally, goes before `swm-pomodoro`
+(load-module "swm-pomodoro")
+#+end_src
+
+This enables StumpWM commands:
+- ~pomodoro-start-timer~ starts pomodoro
+- ~pomodoro-cancel-timer~ cancels running pomodoro
+- ~pomodoro-reset~ erases all completed pomodoro's, resets the status.
+- ~pomodoro-status~ prints the status message. Either the pomodoro's running or the type of a break.
+  That's all, folks. Nothing else, not even the time passed/left - you don't need that information,
+  you need concentration! And, by the way, default SBCL timers that are used
+  don't seem to tell you how much time's left anyway...
+
+You may bind these to a *sparse-keymap* as you see fit.
+
+** Notificaitons
+When ~notifications~ stumpwm-contrib module is loaded, the status message
+will also be reflected in the notifications area of the mode-line.
+
+This is checked through ~(asdf:already-loaded-systems)~ so ~notifications~
+need to be loaded prior to ~swm-pomodoro~.
+
+** Sound Signal
+Optionally set ~swm-pomodoro:*bell-sound-file*~ (defaults to "~/Music/bell.wav").
+
+It will be played at each pomodoro's end.
+~swm-pomodoro:*sound-play-command*~ is setf-able too.
