@@ -113,6 +113,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/passwd/README.org][passwd]] :: A simple password utility based on ironclad.
 - [[./util/perwindowlayout/README.org][perwindowlayout]] :: Change the keyboard layout per window.
 - [[./util/pinentry/README.org][pinentry]] :: Integrate GnuPG Agent with StumpWM
+- [[./util/pomodoro/README.org][swm-pomodoro]] :: Pretty basic Pomodoro-tracker for StumpWM.
 - [[./util/productivity/README.org][productivity]] :: Lock StumpWM down so you have to get work done.
 - [[./util/qubes/README.org][qubes]] :: Integration to Qubes OS (https://www.qubes-os.org)
 - [[./util/screenshot/README.org][screenshot]] :: Takes screenshots and stores them as png files
