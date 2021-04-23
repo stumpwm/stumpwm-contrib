@@ -77,6 +77,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./media/amixer/README.org][amixer]] :: Manipulate the volume using amixer
 - [[./media/stump-radio/README.org][stump-radio]] :: Minimalistic mplayer-based radio for StumpWM.
 - [[./media/stump-volume-control/README.org][stump-volume-control]] :: Minimalistic amixer-based volume control for StumpWM.
+- [[./media/stumpwm-sndioctl/README.md][stumpwm-sndioctl]] :: Interface to OpenBSD's sndioctl for StumpWM.
 ** Minor Modes
 - [[./minor-mode/mpd/README.org][mpd]] :: Displays information about the music player daemon (MPD).
 - [[./minor-mode/notifications/README.org][notifications]] :: A notification library that sends notifications to the modeline via stumpish or from stumpwm itself.
