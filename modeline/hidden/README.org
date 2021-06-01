@@ -1,0 +1,10 @@
+** Usage
+Put:
+#+BEGIN_SRC lisp
+(load-module "hidden")
+#+END_SRC
+In your =~/.stumpwmrc=
+
+Then you can use:
+
+%H (Hidden window count)
