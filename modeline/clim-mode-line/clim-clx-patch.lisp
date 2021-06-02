@@ -10,17 +10,16 @@
 (defmethod adopt-frame :after ((fm clx-frame-manager) (frame application-frame))
   (let ((sheet (slot-value frame 'top-level-sheet)))
     (let* ((top-level-sheet (frame-top-level-sheet frame))
-           (mirror (sheet-direct-xmirror top-level-sheet)))
+           (mirror (sheet-direct-mirror top-level-sheet)))
       (case (clim-extensions:find-frame-type frame)
         (:override-redirect (setf (xlib:window-override-redirect mirror) :on))
         (:dialog (xlib:change-property mirror
                                        :_NET_WM_WINDOW_TYPE
                                        (list (xlib:intern-atom (xlib:window-display mirror) :_NET_WM_WINDOW_TYPE_DIALOG))
                                        :atom 32))
-	(:dock (xlib:change-property mirror ; this form is the only new thing here. 
+	(:dock (xlib:change-property mirror
 				     :_NET_WM_WINDOW_TYPE
-				     (list (xlib:intern-atom (xlib:window-display mirror)
-							     :_NET_WM_WINDOW_TYPE_DOCK))
+				     (list (xlib:intern-atom (xlib:window-display mirror) :_NET_WM_WINDOW_TYPE_DOCK))
 				     :atom 32)))
       (multiple-value-bind (w h x y) (climi::frame-geometry* frame)
         (declare (ignore w h))
@@ -37,7 +36,7 @@
       ;; Care for calling-frame, be careful not to trip on missing bits
       (let* ((calling-frame (frame-calling-frame frame))
              (tls (and calling-frame (frame-top-level-sheet calling-frame)))
-             (calling-mirror (and tls (sheet-xmirror tls))))
+             (calling-mirror (and tls (sheet-mirror tls))))
         (when calling-mirror
           (setf (xlib:transient-for mirror)
                 calling-mirror)))

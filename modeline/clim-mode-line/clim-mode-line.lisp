@@ -4,24 +4,26 @@
 
 (defvar *mode-line-active* nil)
 (defvar *default-mode-line-function* 'format-mode-line)
-(defparameter *mode-line-active-formatters* '((format-nil format-groups format-windows)))
+(defparameter *mode-line-active-formatters* '((format-groups format-windows)))
 
 (define-application-frame clim-mode-line () ()
-  ;; (:top-level ) ; unsure if we want a custom toplevel or if our method will work fine
   (:panes (display :application
 		   :display-function 'clim-mode-line-display-function
 		   ;; :width 1920
 		   ;; :height 10
+                   ;; :incremental-redisplay t
 		   :scroll-bars nil
 		   :borders nil)
 	  ;; We should add an execute-extended-command, and switch to a layout containing that when
 	  ;; one calls colon. 
-	  (colon :modeline))
+	  ;; (colon :modeline)
+          )
   (:layouts
    (default display)
-   (input colon)
-   (display+input (horizontally ()
-		    display colon))))
+   ;; (input colon)
+   ;; (display+input (horizontally ()
+   ;;      	    display colon))
+   ))
 
 (define-clim-mode-line-command (com-quit) ()
   (frame-exit (or *application-frame*
@@ -34,53 +36,22 @@
 (defun mode-line-active? ()
   *mode-line-active*)
 
-(defun run-mode-line ()
+(defun run-mode-line (&key (height 20))
   (let ((frame (make-application-frame 'clim-mode-line
-				       :height 20)))
+				       :height height)))
     (setf *mode-line-active* t)
     (run-frame-top-level frame)))
 
-(defun redisplay-clim-mode-line (&optional (ml (find-application-frame 'clim-mode-line :create nil :activate nil)))
-  (when ml
-    (redisplay-frame-panes ml :force-p t)))
+(defvar *redisplay-mode-line-lock* (bt:make-lock "cml-lock"))
+
+(defun redisplay-clim-mode-line (&optional (ml (find-application-frame
+                                                'clim-mode-line
+                                                :create nil
+                                                :activate nil)))
+  (bt:with-lock-held (*redisplay-mode-line-lock*)
+    (when ml
+      (redisplay-frame-panes ml :force-p t))))
 
 (defmethod clime:find-frame-type ((frame clim-mode-line)) 
   "this method sets the window type via clim-clx::adopt-frame as defined below."
   :dock)
-
-(defmethod default-frame-top-level
-    ((frame clim-mode-line)
-     &key (command-parser 'command-line-command-parser)
-       (command-unparser 'command-line-command-unparser)
-       (partial-command-parser
-	'command-line-read-remaining-arguments-for-partial-command)
-       (prompt "Command: "))
-  (declare (ignore prompt))
-  ;; Give each pane a fresh start first time through.
-  (loop
-      ;; The variables are rebound each time through the loop because the
-      ;; values of frame-standard-input et al. might be changed by a command.
-      ;;
-      ;; We rebind *QUERY-IO* ensuring variable is always a stream,
-      ;; but we use FRAME-QUERY-IO for our own actions and to decide
-      ;; whenever frame has the query IO stream associated with it..
-      (let* ((frame-query-io (frame-query-io frame))
-	     (*standard-input*  (or (frame-standard-input frame)  *standard-input*))
-	     (*standard-output* (or (frame-standard-output frame) *standard-output*))
-	     (*query-io* (or frame-query-io *query-io*))
-	     ;; during development, don't alter *error-output*
-	     ;; (*error-output* (frame-error-output frame))
-	     (*pointer-documentation-output* (frame-pointer-documentation-output frame))
-	     (*command-parser* command-parser)
-	     (*command-unparser* command-unparser)
-	     (*partial-command-parser* partial-command-parser))
-	(restart-case
-	    (flet ((execute-command ()
-		     (let ((command (read-frame-command frame :stream frame-query-io)))
-		       (when command
-			 (execute-frame-command frame command)))))
-	      (redisplay-frame-panes frame :force-p t)
-	      (execute-command))
-	  (abort ()
-	    :report "Return to application command loop."
-	    (beep))))))
