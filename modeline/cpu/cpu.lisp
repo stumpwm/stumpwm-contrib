@@ -11,8 +11,6 @@
 ;;; Maintainer: Julian Stecklina
 ;;;
 
-(export '(*acpi-thermal-zone*))
-
 ;; Install formatters.
 (add-screen-mode-line-formatter #\C 'cpu-modeline)
 
@@ -89,13 +87,39 @@ utilization."
             (when (string= (car split) field) (return (cadr split)))))
         "")))
 
+(defun get-proc-file-fields (fname field)
+  (let ((ret ()))
+    (with-open-file (s fname :if-does-not-exist nil) ;
+      (if s
+          (do ((line (read-line s nil nil) (read-line s nil nil)))
+              ((null line) nil)
+            (let ((split (cl-ppcre:split "\\s*:\\s*" line)))
+              (when (string= (car split) field) (setq ret (cons (cadr split) ret)))))
+          ""))
+    ret))
+
+(defun fmt-mhz (mhz)
+  (if (>= mhz 1000)
+        (format nil "~,2FGHz" (/ mhz 1000))
+        (format nil "~DMHz" mhz)))
+
 (defun fmt-cpu-freq ()
   "Returns a string representing the current CPU frequency (especially useful for laptop users.)"
   (let ((mhz (parse-integer (get-proc-file-field "/proc/cpuinfo" "cpu MHz")
                             :junk-allowed t)))
-    (if (>= mhz 1000)
-        (format nil "~,2FGHz" (/ mhz 1000))
-        (format nil "~DMHz" mhz))))
+    (fmt-mhz mhz)))
+
+(defun fmt-cpu-freq-range ()
+  (let ((freqs (get-proc-file-fields "/proc/cpuinfo" "cpu MHz")))
+    (if freqs
+	(let ((maxmhz (parse-integer (car freqs) :junk-allowed t))
+	      (minmhz (parse-integer (car freqs) :junk-allowed t)))
+	  (dolist (mhz freqs)
+	    (let ((m (parse-integer mhz :junk-allowed t)))
+	      (when (> m maxmhz) (setq maxmhz m))
+	      (when (< m minmhz) (setq minmhz m))))
+	  (format nil "~A-~A" (fmt-mhz minmhz) (fmt-mhz maxmhz)))
+	"")))
 
 (defvar *acpi-thermal-zone*
   (let ((proc-dir (list-directory #P"/proc/acpi/thermal_zone/"))
@@ -135,6 +159,7 @@ utilization."
   '((#\c  fmt-cpu-usage)
     (#\C  fmt-cpu-usage-bar)
     (#\f  fmt-cpu-freq)
+    (#\r  fmt-cpu-freq-range)
     (#\t  fmt-cpu-temp)))
 
 (defvar *cpu-modeline-fmt* "%c (%f) %t"
@@ -149,6 +174,8 @@ CPU usage
 CPU usage graph
 @item %f
 CPU frequency
+@item %r
+CPU frequency range
 @item %t
 CPU temperature
 @end table
