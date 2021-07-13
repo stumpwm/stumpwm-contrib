@@ -41,7 +41,7 @@
        (vector (scaled-current output (1+ min) (1- max))) ; max is non-inclusive
                                                           ; in X11 API, but
                                                           ; inclusive in ours.
-       backlight-type))))
+       :atom-type backlight-type))))
 
 (defun scaled-current (output min max)
   (truncate (/ (* (gethash output *current-percent*) (- max min)) 100)))
