@@ -43,9 +43,9 @@ color is only applied if =*threshold*= is passed, can be customized too:
   (setf bitcoin:*threshold* 0.001) ; 0.001 is a 0.1% deviation from average
 #+END_SRC
 
-Last values average is calculated over a list of =*last-values-size*=
-where values are stored on every modeline refresh in a FIFO
-fashion.
+Last values average is calculated over a 3 hours values list
+`*values*', where values are stored on every modeline refresh in a
+FIFO fashion.
 
 Get actual price through Coinbase(TM) API, so needs =dexador=, =babel=
 and =yason=.
@@ -56,16 +56,17 @@ and =yason=.
 
 Connection to =*url*= price server is limited by a =*time-delay*=
 interval, in seconds.  So connection attempts between interval time
-are blocked, and last value is returned instead. Interval can be
-customized too:
+are blocked. Interval can be customized too:
 
 #+BEGIN_SRC lisp
-  (setf bitcoin:*time-delay* 15) ; seconds
+  (setf bitcoin:*time-delay* 30) ; seconds
 #+END_SRC
 
 The localization format is set by =*local-code*=, when `0' there is no
-thousand separator, when `1' the thousand separator is `#\,' and when
-`2' the thousand separator is `#\.'. Can be customized too:
+thousand separator and gives 1234.56, when `1' the thousand separator
+is `#\,' and gives 1,234.56, when `2' the thousand separator is `#\.'
+and gives 1.234,56, and when `3' the thousang separator is `#\Space'
+and gives 1 234,56. Can be customized too:
 
 #+BEGIN_SRC lisp
   (setf bitcoin:*local-code* 2) ; formatting code to use
@@ -73,5 +74,5 @@ thousand separator, when `1' the thousand separator is `#\,' and when
 
 ** Issues
 
-Try to use conditions =handler-case= machinery to avoid the internet
-timeouts or the computer sleeping process to stuck the modeline.
+Try to use conditions' =handler-case= machinery to avoid the internet
+timeouts or the computer sleeping process, to stuck the modeline.
