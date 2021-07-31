@@ -65,7 +65,7 @@ are blocked. Interval can be customized too:
 The localization format is set by =*local-code*=, when `0' there is no
 thousand separator and gives 1234.56, when `1' the thousand separator
 is `#\,' and gives 1,234.56, when `2' the thousand separator is `#\.'
-and gives 1.234,56, and when `3' the thousang separator is `#\Space'
+and gives 1.234,56, and when `3' the thousand separator is `#\Space'
 and gives 1 234,56. Can be customized too:
 
 #+BEGIN_SRC lisp
