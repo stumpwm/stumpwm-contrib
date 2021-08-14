@@ -43,9 +43,10 @@ positive because `*values-size*'.")
                         (gethash "bpi"
                                  (yason:parse
                                   (babel:octets-to-string
-                                   (dexador:get *url* :keep-alive nil)
+                                   (dexador:get *url* :keep-alive t)
                                    :encoding :utf-8)))))
-    (condition () 0.0)))
+    ;; Return NIL in case some condition is triggered
+    (condition () nil)))
 
 ;;; Store prices
 
