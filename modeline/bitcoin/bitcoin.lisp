@@ -63,29 +63,27 @@ time-delay in seconds.")
 
 ;;; Write on modeline
 
+;;; Simple format positive numbers, using directive D for thousand
+;;; separator and direct value displacement in the decimal part.  Uses
+;;; truncate, so there is some precission loss, e.g. (truncate
+;;; 1231231.0999) gives 1231231 and 0.125. Does NOT work with negative
+;;; numbers.
+;;; More in https://stackoverflow.com/questions/35012859
+
 (defun comma-point (stream arg &rest args)
   (declare (ignore args))
-  (format stream
-          "~,,',,:D.~A"
-          (truncate arg)
-          (let ((float-string (format nil "~,2F" arg)))
-            (subseq float-string (1+ (position #\. float-string))))))
+  (multiple-value-bind (i r) (truncate arg)
+    (format stream "~,,',,:D.~2,'0D" i (truncate (* 100 r)))))
 
 (defun point-comma (stream arg &rest args)
   (declare (ignore args))
-  (format stream
-          "~,,'.,:D,~A"
-          (truncate arg)
-          (let ((float-string (format nil "~,2F" arg)))
-            (subseq float-string (1+ (position #\. float-string))))))
+  (multiple-value-bind (i r) (truncate arg)
+    (format stream "~,,'.,:D,~2,'0D" i (truncate (* 100 r)))))
 
 (defun space-comma (stream arg &rest args)
   (declare (ignore args))
-  (format stream
-          "~,,' ,:D,~A"
-          (truncate arg)
-          (let ((float-string (format nil "~,2F" arg)))
-            (subseq float-string (1+ (position #\. float-string))))))
+  (multiple-value-bind (i r) (truncate arg)
+    (format stream "~,,' ,:D,~2,'0D" i (truncate (* 100 r)))))
 
 (defun bitcoin-modeline (ml)
   "Get the actual USD-BTC value, store value in list, preserve list size
