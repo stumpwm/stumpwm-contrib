@@ -6,7 +6,8 @@
 
 ;;; CPU formatters for the mode-line
 ;;;
-;;; Copyright 2007 Anonymous Coward, Jonathan Moore Liles.
+;;; Copyright 2007 Anonymous Coward, Jonathan Moore Liles;
+;;;           2021 Benjamin Slade. 
 ;;;
 ;;; Maintainer: Julian Stecklina
 ;;;
@@ -21,13 +22,21 @@
 (defvar *cpu-usage-bar-full* #\#)
 (defvar *cpu-usage-bar-empty* #\:)
 
-
 (defvar *prev-user-cpu* 0)
 (defvar *prev-sys-cpu* 0)
 (defvar *prev-idle-cpu* 0)
 (defvar *prev-iowait* 0)
 (defvar *prev-result* '(0 0 0))
 (defvar *prev-time* 0)
+
+;; Defaults for medium, high, critical temperature colouring
+(defvar *cpu-temp-med* 65)
+(defvar *cpu-temp-hi* 75)
+(defvar *cpu-temp-crit* 90)
+
+
+(defvar *cpu-usage-modeline-fmt* "CPU: ^[~A~3D%^] "
+  "The default formatting for CPU usage")
 
 ;; More or less yanked from the wiki.
 (defun current-cpu-usage ()
@@ -71,7 +80,7 @@ not available). Don't make calculation more than once a second."
   "Returns a string representing current the percent of average CPU
   utilization."
   (let ((cpu (truncate (* 100 (current-cpu-usage)))))
-    (format nil "CPU: ^[~A~3D%^] " (bar-zone-color cpu) cpu)))
+    (format nil *cpu-usage-modeline-fmt* (bar-zone-color cpu) cpu)))
 
 (defun fmt-cpu-usage-bar (ml &optional (width *cpu-usage-bar-width*) (full *cpu-usage-bar-full*) (empty *cpu-usage-bar-empty*))
   "Returns a coloured bar-graph representing the current percent of average CPU
@@ -118,13 +127,15 @@ utilization."
 
 (defun fmt-cpu-temp ()
   "Returns a string representing the current CPU temperature."
-  (format nil "~,1F°C"
-          (case (car *acpi-thermal-zone*)
-            (:procfs (parse-integer
-                      (get-proc-file-field (cdr *acpi-thermal-zone*) "temperature")
-                      :junk-allowed t))
-            (:sysfs   (with-open-file (f (cdr *acpi-thermal-zone*))
-                        (/ (read f) 1000))))))
+  (let ((tempval (case (car *acpi-thermal-zone*)
+                   (:procfs (parse-integer
+                             (get-proc-file-field (cdr *acpi-thermal-zone*) "temperature")
+                             :junk-allowed t))
+                   (:sysfs   (with-open-file (f (cdr *acpi-thermal-zone*))
+                               (/ (read f) 1000))))))
+    (format nil "^[~A~,1F°C^]"
+            (bar-zone-color tempval *cpu-temp-med* *cpu-temp-hi* *cpu-temp-crit*)
+            tempval)))
 
 (defun cpu-modeline (ml)
   (declare (ignore ml))
