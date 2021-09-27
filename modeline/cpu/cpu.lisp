@@ -111,7 +111,8 @@ utilization."
         (sys-dir (sort
                   (remove-if-not
                    (lambda (x)
-                     (when (cl-ppcre:scan "^.*/thermal_zone\\d+/" (namestring x))
+                     (when (and (cl-ppcre:scan "^.*/thermal_zone\\d+/" (namestring x))
+                                (string-equal (alexandria:read-file-into-string (format nil "~A/type" x)) (format nil "x86_pkg_temp~%")))
                        x))
                    (list-directory #P"/sys/class/thermal/"))
                   #'string< :key #'namestring)))
