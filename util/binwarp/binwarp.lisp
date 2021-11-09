@@ -104,7 +104,7 @@ moves the pointer to the center of this area -- in the direction of the GRAVITY.
 (defvar *default-binwarp-keymap*
   '(((stumpwm:kbd "Down") "binwarp down")
     ((stumpwm:kbd "n") "binwarp down")
-    ((stumpwm:kbd "j") "binwarp-down")
+    ((stumpwm:kbd "j") "binwarp down")
 
     ((stumpwm:kbd "Up") "binwarp up")
     ((stumpwm:kbd "p") "binwarp up")
