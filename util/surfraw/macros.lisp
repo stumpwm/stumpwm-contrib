@@ -14,5 +14,3 @@
                  (surfraw ,key (get-x-selection)))
               commands)))
     (cons 'progn (reverse commands))))
-
-(auto-define-surfraw-commands-from-elvis-list)
