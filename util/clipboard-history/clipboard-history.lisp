@@ -49,7 +49,7 @@
                   (stumpwm:select-from-menu
                    (stumpwm:current-screen)
                    (mapcar (lambda (s)
-                             (list (string-maxlen s 32) s))
+                             (list (stumpwm::escape-caret (string-maxlen s 32)) s))
                            *clipboard-history*)
                    nil))))
         (when sel
