@@ -76,9 +76,9 @@ Advertise your module here, open a PR and include a org-mode link!
 # --
 ** Media
 - [[./media/amixer/README.org][amixer]] :: Manipulate the volume using amixer
-- [[./media/stump-radio/README.org][stump-radio]] :: Minimalistic mplayer-based radio for StumpWM.
-- [[./media/stump-volume-control/README.org][stump-volume-control]] :: Minimalistic amixer-based volume control for StumpWM.
-- [[./media/stumpwm-sndioctl/README.org][stumpwm-sndioctl]] :: Interface to OpenBSD's sndioctl from StumpWM.
+- [[./media/stump-radio/README][stump-radio]] :: Minimalistic mplayer-based radio for StumpWM.
+- [[./media/stump-volume-control/README][stump-volume-control]] :: Minimalistic amixer-based volume control for StumpWM.
+- [[./media/stumpwm-sndioctl/README.md][stumpwm-sndioctl]] :: Interface to OpenBSD's sndioctl from StumpWM.
 ** Minor Modes
 - [[./minor-mode/mpd/README.org][mpd]] :: Displays information about the music player daemon (MPD).
 - [[./minor-mode/notifications/README.org][notifications]] :: A notification library that sends notifications to the modeline via stumpish or from stumpwm itself.
@@ -106,7 +106,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/desktop-entry/README.org][desktop-entry]] :: desktop-entry
 - [[./util/end-session/README.org][end-session]] :: Provides commands to stumpwm that allow the user to shutdown, restart, and logoff through the stumpwm UI
 - [[./util/globalwindows/README.org][globalwindows]] :: Manipulate all windows in the current X session
-- [[./util/gnu-pw-mgr/README.org][gnu-pw-mgr]] :: Reconstruct passwords with gnu-pw-mgr
+- [[./util/gnu-pw-mgr/README.md][gnu-pw-mgr]] :: Reconstruct passwords with gnu-pw-mgr
 - [[./util/golden-ratio/README.org][swm-golden-ratio]] :: Resize the currently focused frame to the golden ratio
 - [[./util/kbd-layouts/README.org][kbd-layouts]] :: Keyboard layout switcher for StumpWM
 - [[./util/logitech-g15-keysyms/README.org][logitech-g15-keysyms]] :: Describe logitech-g15-keysyms here
@@ -127,11 +127,13 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/stump-lock/README.org][stump-lock]] :: Screen locker in StumpWM
 - [[./util/stump-nm/README.org][stump-nm]] :: StumpWM integration with NetworkManager
 - [[./util/surfraw/README.org][surfraw]] :: Integrates surfraw with stumpwm.
-- [[./util/swm-emacs/README.org][swm-emacs]] :: A set of utilities for launching the beast.
+- [[./util/swm-clim-message/README.org][swm-clim-message]] :: Display StumpWM messages and menus through CLIM
+- [[./util/swm-emacs/README.txt][swm-emacs]] :: A set of utilities for launching the beast.
 - [[./util/swm-gaps/README.org][swm-gaps]] :: Pretty (useless) gaps for StumpWM
 - [[./util/swm-ssh/README.org][swm-ssh]] :: A simple menu selector for ssh to a remote host for stumpwm that parses your ssh config to get available hosts
-- [[./util/ttf-fonts/README.org][ttf-fonts]] :: A pure lisp implementation of TTF font rendering.
+- [[./util/ttf-fonts/README.txt][ttf-fonts]] :: A pure lisp implementation of TTF font rendering.
 - [[./util/undocumented/README.org][undocumented]] :: Look for stuff that should probably be in the manual that isn't
 - [[./util/urgentwindows/README.org][urgentwindows]] :: Allows focusing application windows that need user attention
+- [[./util/wacom/README.org][wacom]] :: Map StumpWM frames to Wacom tablets using `xsetwacom`.
 - [[./util/windowtags/README.org][windowtags]] :: Add metadata to windows to manipulate them en mass.
 - [[./util/winner-mode/README.org][winner-mode]] :: Emacs' winner-mode for StumpWM
