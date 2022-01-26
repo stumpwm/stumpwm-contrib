@@ -119,12 +119,14 @@
    yet and /process/ is *NIL* /default/ and /freshness/ are returned.
 
    The value /freshness/ is a keyword of either ~:stale~, ~:fresh~, ~:default~,
-   or ~:timeout~. When /default/ has not been retrieved before, /freshness/ is
-   ~:fresh~. When /default/ has been retrieved before /freshness/ is
-   ~:stale~. If the attempt timed out due to not aquiring the mutex or the
-   thread not returning within /timeout/ seconds then /freshness/ is
-   ~:timeout~. If there is no message window frame or /process/ is not a process
-   (thread) object then /freshness/ is ~:default~.
+   or ~:timeout~. When /result/ has not been retrieved before, /freshness/ is
+   ~:fresh~. When /result/ has been retrieved before /freshness/ is ~:stale~. If
+   the attempt timed out due to not aquiring the mutex or the thread not
+   returning within /timeout/ seconds then /freshness/ is ~:timeout~. If there
+   is no message window frame or /process/ is not a process (thread) object then
+   /freshness/ is ~:default~. If /result/ isnt retrieved before the /process/
+   finishes, *message-window-final-value* will always return /freshness/ as
+   ~:fresh~.
       
 ** Generate Message Lists
    /Function/ *GENERATE-CLIM-MESSAGE* 
