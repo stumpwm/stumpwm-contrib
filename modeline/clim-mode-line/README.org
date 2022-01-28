@@ -150,53 +150,61 @@
    The macro ~define-drag-and-drop-translator~ functions similarly, but also
    takes a destination type, and must call the command in question explicitly.
 
+   Of note, if a gesture is used for both a presentation-to-command-translator
+   and a drag-and-drop-translator then whichever has the highest priority will
+   be active. It is unclear to me whether this is a limitation of clim or of my
+   own understanding. 
+
    See the file ~commands-and-translators.lisp~ for examples and more
    information. 
      
 ** Files
    Herin lies a walkthrough and explanation of the various files present in this
    module.
+
+*** macros.lisp
+    This file contains general macros that dont make sense to define
+    elsewhere. These include the clim-mode-line table formatting macros, ink
+    inversion macros, alignment macros, and looping macros.
    
 *** patch-clim-clx.lisp
-   This file contains a simple patch to a mcclim function in the clim-clx
-   package. This is needed to register the window created as a panel. Without
-   it, the mode line would be created as a regular window. 
+    This file contains a simple patch to a mcclim function in the clim-clx
+    package. This is needed to register the window created as a panel. Without
+    it, the mode line would be created as a regular window. 
 
 *** clim-mode-line.lisp
-   This file contains the application frame definition and all glue
-   functions. The display function lies here, alongside an update function, and
-   the function to run the frame. This also includes general drawing macros that
-   should be defined before other files are loaded. Currently these include:
-   - with-inverted-ink
+    This file contains the application frame definition and all glue
+    functions. The display function lies here, alongside an update function, and
+    the function to run the frame. 
 
 *** presentations.lisp
-   This file contains all presentation methods. Currently only group and window
-   presentation methods are present. The ~present~ presentation methods are only
-   in charge of writing the appropriate text to the stream given. These methods
-   should not call any of the ~slim~ table macros. 
+    This file contains all presentation methods. Currently only group and window
+    presentation methods are present. The ~present~ presentation methods are only
+    in charge of writing the appropriate text to the stream given. These methods
+    should not call any of the ~slim~ table macros. 
    
 *** formatters.lisp
-   This file contains all formatter functions. These functions correspond, at
-   least conceptually, to the mode line formatter functions of stumpwm, but take
-   different arguments and operate in a different manner.
+    This file contains all formatter functions. These functions correspond, at
+    least conceptually, to the mode line formatter functions of stumpwm, but take
+    different arguments and operate in a different manner.
 
-   The format of the mode line is represented by a list, where each element is
-   itself a list representing a row. Each of these row representing lists is a
-   list of formatter functions. These functions draw text to cells. 
+    The format of the mode line is represented by a list, where each element is
+    itself a list representing a row. Each of these row representing lists is a
+    list of formatter functions. These functions draw text to cells. 
 
-   When writing a formatter function, text is written to the mode line by
-   writing to the pane argument. All formats must occur within a ~slim:cell~.
+    When writing a formatter function, text is written to the mode line by
+    writing to the pane argument. All formats must occur within a ~slim:cell~.
 
-   Formatter functions may format plain text, or present an object. When
-   presenting an object the presentation method will format all text to the
-   pane, and the call to ~present~ must be within a ~slim:cell~.
+    Formatter functions may format plain text, or present an object. When
+    presenting an object the presentation method will format all text to the
+    pane, and the call to ~present~ must be within a ~slim:cell~.
 
 *** gestures.lisp
-   This file defines a set of gestures used to interact with the mode line. They
-   are all pointer gestures, and all combinations of control, meta, and super
-   are defined for both left and right pointer buttons. These gestures are used
-   for translators. Translators translate a gesture to a command. For example,
-   clicking on an object, or dragging an object onto another object.
+    This file defines a set of gestures used to interact with the mode line. They
+    are all pointer gestures, and all combinations of control, meta, and super
+    are defined for both left and right pointer buttons. These gestures are used
+    for translators. Translators translate a gesture to a command. For example,
+    clicking on an object, or dragging an object onto another object.
 
 * Limitations
   Currently, this module is developed on a machine with one screen and one head,
