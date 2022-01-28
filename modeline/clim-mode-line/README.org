@@ -1,0 +1,116 @@
+#+TITLE: CLIM Base Mode Line for StumpWM
+
+* Usage
+  This module depends on CLIM and SLIM, so please ensure they are somewhere that
+  they are somewhere that ASDF can find them. If you dont have a copy of CLIM
+  and SLIM, please evaluate ~(ql:quickload :clim)~ and ~(ql:quickload :slim)~ at
+  a repl before using this module.
+
+  It is highly recommended to run this module from a repl connected to the
+  StumpWM image, but if you want to play it risky, add the following to your
+  stumpwmrc. 
+
+  #+begin_src lisp
+    (load-module "clim-mode-line")
+    (clim-mode-line:app-main)
+  #+end_src
+
+  This must occur before any mode lines are created.
+
+  If loading through a repl, eval the following forms.
+
+  #+begin_src lisp
+    (ql:quickload :clim)
+    (ql:quickload :slim)
+    (ql:quickload :clim-mode-line)
+
+    (clim-mode-line:app-main)
+  #+end_src
+
+  This mode line is very much a work in progress. Currently it displays groups
+  and the windows of the current group, and allows you to move/focus windows and
+  groups through click and dragging them. This mode line doesnt interpret the
+  stumpwm mode line format list (although this would be a welcome addition).
+
+* Walkthrough
+  When writing a formatter for this mode line, you can use the whole gamut of
+  CLIM formatting and drawing functionality. In addition to this, the macro
+  ~with-inverted-ink~ is provided, which approximates the StumpWM highlight
+  method of swapping foreground and background. In addition to the keyword
+  arguments accepted by ~with-drawing-options~, it accepts the keyword arguments
+  ~:fg-ink~ and ~:bg-ink~, which specify the foreground and background inks to
+  use explicitly.
+  
+** Files
+   Herin lies a walkthrough and explanation of the various files present in this
+   module. 
+*** patch-clim-clx.lisp
+   This file contains a simple patch to a mcclim function in the clim-clx
+   package. This is needed to register the window created as a panel. Without
+   it, the mode line would be created as a regular window. 
+
+*** clim-mode-line.lisp
+   This file contains the application frame definition and all glue
+   functions. The display function lies here, alongside an update function, and
+   the function to run the frame. This also includes general drawing macros that
+   should be defined before other files are loaded. Currently these include:
+   - with-inverted-ink
+
+*** presentations.lisp
+   This file contains all presentation methods. Currently only group and window
+   presentation methods are present. The ~present~ presentation methods are only
+   in charge of writing the appropriate text to the stream given. These methods
+   should not call any of the ~slim~ table macros. 
+   
+*** formatters.lisp
+   This file contains all formatter functions. These functions correspond, at
+   least conceptually, to the mode line formatter functions of stumpwm, but take
+   different arguments and operate in a different manner.
+
+   The format of the mode line is represented by a list, where each element is
+   itself a list representing a row. Each of these row representing lists is a
+   list of formatter functions. These functions draw text to cells. 
+
+   When writing a formatter function, text is written to the mode line by
+   writing to the pane argument. All formats must occur within a ~slim:cell~.
+
+   Formatter functions may format plain text, or present an object. When
+   presenting an object the presentation method will format all text to the
+   pane, and the call to ~present~ must be within a ~slim:cell~.
+
+*** gestures.lisp
+   This file defines a set of gestures used to interact with the mode line. They
+   are all pointer gestures, and all combinations of control, meta, and super
+   are defined for both left and right pointer buttons. These gestures are used
+   for translators. Translators translate a gesture to a command. For example,
+   clicking on an object, or dragging an object onto another object.
+
+** Defining Formatters and Presentations
+      
+*** Formatters
+    Take, for example, the group formatter:
+    #+begin_src lisp
+      (defun format-groups (frame pane)
+        (declare (ignorable frame))
+        (slim:cell (format pane "["))
+        (let ((current-group (stumpwm:current-group)))
+          (dolist (group (stumpwm::sort-groups (stumpwm:current-screen)))
+            (if (eq current-group group)
+                (with-inverted-ink (pane)
+                  (slim:cell
+                    (present group 'stumpwm::group :stream pane :single-box t)))
+                (slim:cell
+                    (present group 'stumpwm::group :stream pane :single-box t)))))
+        (slim:cell (format pane "]")))
+    #+end_src
+    Within a formatter, everything gets drawin within a cell. We start by
+    drawing a delimiter. 
+
+* Limitations
+  Currently, this module is developed on a machine with one screen and one head,
+  and as such multi head or multi screen setups are not explicitly
+  supported. While supporting multi head setups is a goal, the main goal is
+  getting the clim mode line to be on rough feature parity with the existing
+  mode line.
+
+  Background colors are currently not supported very well. 
