@@ -22,7 +22,9 @@ formatted to the output stream in between each formatter when in text mode.")
   "Hold the single mode line")
 
 (define-application-frame mode-line ()
-  ((formatters :initform (list (list 'format-groups 'format-bar 'format-windows))
+  ((formatters :initform (list (list 'format-groups
+                                     'format-align-right
+                                     'format-windows))
                :initarg :formatters
                :accessor mode-line-formatters)
    (highlight-color :initform +red+

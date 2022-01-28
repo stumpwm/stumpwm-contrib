@@ -31,14 +31,20 @@
   and the windows of the current group, and allows you to move/focus windows and
   groups through click and dragging them.
 
-  While it would be a welcom addition, this mode line doesnt interpret the
+  While it would be a welcome addition, this mode line doesnt interpret the
   stumpwm mode line format list.
+
+  The equivalent of the mode line screen format from StumpWM is the mode line
+  format slot of the frame. This is interacted with via the functions
+  ~mode-line-format~ and ~set-mode-line-format~. It should be a list of lists of
+  functions. Every function should be a formatter function, as described
+  below. By default this is bound to ~'((format-groups format-align-right
+  format-windows))~. All symbols reside in the ~clim-mode-line~ package. 
 
 * Walkthrough
   When writing a formatter for this mode line, you can use the whole gamut of
   CLIM formatting and drawing functionality. In addition to this, a set of
   macros are provided to ease the process of writing a formatter. 
-
 
 ** Defining Formatters, Presentations, Commands, and Translators
    For defining a simple string formatter, the macro ~define-formatter~ is
