@@ -1,29 +1,11 @@
 (in-package #:clim-mode-line)
 
-(declaim (optimize (speed 0)
-                   (safety 3)
-                   (debug 3)))
-
-(defvar *align-x* :left)
-
-(defvar *highlight-drop* nil)
-
-(defvar *display-as-table* nil)
-
-(defvar *display-style* :text
-  "Should be one of either :table or :text.")
-
-(defvar *text-display-formatter-intermix* " "
-  "Spacing between each formatters output when in text mode. This string is 
-formatted to the output stream in between each formatter when in text mode.")
-
-(defmacro cell ((pane) &body body)
-  (declare (ignore pane))
-  `(formatting-cell (slim:*pane*
-                     ;; ,pane
-                     ;; :align-x *align-x*
-                     )
-     ,@body))
+(defmacro define-formatter (name string)
+  `(defun ,(intern (format nil "FORMAT-~A" name)) (frame pane other-formatters)
+     (if *display-as-table* 
+         (cell (pane) (format pane ,string))
+         (format pane ,string))
+     (call-next-formatter other-formatters frame pane)))
 
 (defun call-next-formatter (formatter-list frame pane)
   (when (eql *display-style* :text)
@@ -31,53 +13,16 @@ formatted to the output stream in between each formatter when in text mode.")
   (when formatter-list
     (funcall (car formatter-list) frame pane (cdr formatter-list))))
 
-(defmacro define-delimiter (name string)
-  `(defun ,(intern (format nil "FORMAT-~A" name)) (frame pane other-formatters)
-     (if *display-as-table* 
-         (cell (pane) (format pane ,string))
-         (format pane ,string))
-     (call-next-formatter other-formatters frame pane)))
-
-(define-delimiter space " ")
-(define-delimiter bar "|")
-(define-delimiter left-bracket "[")
-(define-delimiter right-bracket "]")
+(define-formatter space " ")
+(define-formatter bar "|")
+(define-formatter left-bracket "[")
+(define-formatter right-bracket "]")
+(define-formatter backslash "\\")
+(define-formatter slash "/")
 
 (defun format-align-right (frame pane other-formatters)
   (with-right-alignment (frame pane)
-    (call-next-formatter other-formatters frame pane))
-  ;; (let ((*align-x* :right))
-  ;;   (call-next-formatter other-formatters frame pane))
-  )
-
-(defun invoke-cell-with-stumpwm-highlighting (pane highlight-thunk continuation
-                                              &key (dropped *highlight-drop*))
-  (if (funcall highlight-thunk)
-      (if dropped
-          (cell (pane)
-            (with-inverted-ink (pane)
-              (funcall continuation pane)))
-          (with-inverted-ink (pane)
-            (cell (pane)
-              (funcall continuation pane))))
-      (cell (pane)
-        (funcall continuation pane))))
-
-(defmacro with-stumpwm-cell-highlighting ((pane highlight-when &key dropped)
-                                          &body body)
-  (alexandria:with-gensyms (continuation highlight-thunk contarg)
-    `(flet ((,continuation (,contarg)
-              (declare (ignore ,contarg))
-              ,@body)
-            (,highlight-thunk ()
-              ,highlight-when))
-       (declare (dynamic-extent (function ,continuation)
-                                (function ,highlight-thunk)))
-       (invoke-cell-with-stumpwm-highlighting ,pane
-                                              #',highlight-thunk
-                                              #',continuation
-                                              ,@(when dropped 
-                                                  `(:dropped ,dropped))))))
+    (call-next-formatter other-formatters frame pane)))
 
 (defun invoke-with-normal-stumpwm-highlighting (pane highlight-thunk continuation)
   "When HIGHLIGHT-THUNK is returns true, invoke CONTINUATION with the StumpWM
@@ -155,16 +100,16 @@ called within a table, invoke CONTINUATION within a cell."
                                          #',continuation
                                          ,style))))
 
-(defun invoke-with-formatting (pane continuation)
+(defun invoke-with-stumpwm-formatting (pane continuation)
   (with-cell (pane)
     (funcall continuation)))
 
-(defmacro with-formatting ((pane) &body body)
+(defmacro with-stumpwm-formatting ((pane) &body body)
   (alexandria:with-gensyms (cont)
     `(flet ((,cont ()
               ,@body))
        (declare (dynamic-extent (function ,cont)))
-       (invoke-with-formatting ,pane #',cont))))
+       (invoke-with-stumpwm-formatting ,pane #',cont))))
 
 (defun format-groups (frame pane other-formatters)
   (declare (ignorable frame))

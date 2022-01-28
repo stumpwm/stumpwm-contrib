@@ -8,6 +8,7 @@
   :depends-on (#:clim #:clim-lisp #:slim #:stumpwm)
   :components ((:file "package")
                (:file "patch-clim-clx")
+               (:file "macros")
                (:file "clim-mode-line")
                (:file "presentations")
                (:file "formatters")

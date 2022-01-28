@@ -29,21 +29,100 @@
 
   This mode line is very much a work in progress. Currently it displays groups
   and the windows of the current group, and allows you to move/focus windows and
-  groups through click and dragging them. This mode line doesnt interpret the
-  stumpwm mode line format list (although this would be a welcome addition).
+  groups through click and dragging them.
+
+  While it would be a welcom addition, this mode line doesnt interpret the
+  stumpwm mode line format list.
 
 * Walkthrough
   When writing a formatter for this mode line, you can use the whole gamut of
-  CLIM formatting and drawing functionality. In addition to this, the macro
-  ~with-inverted-ink~ is provided, which approximates the StumpWM highlight
-  method of swapping foreground and background. In addition to the keyword
-  arguments accepted by ~with-drawing-options~, it accepts the keyword arguments
-  ~:fg-ink~ and ~:bg-ink~, which specify the foreground and background inks to
-  use explicitly.
-  
+  CLIM formatting and drawing functionality. In addition to this, a set of
+  macros are provided to ease the process of writing a formatter. 
+
+
+** Defining Formatters, Presentations, and Commands
+   For defining a simple string formatter, the macro ~define-formatter~ is
+   provided.
+   
+   #+begin_src lisp
+     (define-formatter bar "|")
+   #+end_src
+   
+   The above defines a function called ~format-bar~ which formats ~|~ to the
+   mode line.
+
+   A formatter function is function which takes a frame, pane, and list of
+   formatters following it. The formatter should format some stuff to the pane,
+   and then call the function ~call-next-formatter~ with the list of following
+   formatters, the frame, and the pane. A simple example is the formatter
+   function ~format-align-right~. All of the logic of this formatter is wrapped
+   up in the macro ~with-right-alignment~, so the actual definition of this
+   function is:
+   
+   #+begin_src lisp
+     (defun format-align-right (frame pane other-formatters)
+       (with-right-alignment (frame pane)
+         (call-next-formatter other-formatters frame pane)))
+   #+end_src
+
+   Lets take a look at a slightly more complicated formatter, one which makes
+   use of the function ~present~.
+   
+   #+begin_src lisp
+     (defun format-groups (frame pane other-formatters)
+       (declare (ignorable frame))
+       (let ((current-group (stumpwm:current-group)))
+         (do-list-with-interspersed-element
+             (group (stumpwm::sort-groups (stumpwm:current-screen))
+               (format pane " "))
+           (with-stumpwm-highlighting (pane (eq current-group group))
+             (present group 'stumpwm::group :stream pane :single-box t))))
+       (call-next-formatter other-formatters frame pane))
+   #+end_src
+   
+   The ~format-groups~ function obtains the current group, and then uses the
+   macro ~do-list-with-interspersed-element~ to loop over the sorted groups,
+   binding each group to ~group~. This macro intersperses ~(format pane " ")~
+   with the body of the macro. This is important to avoid formatting ~" "~
+   before the first element. So, for each group we use
+   ~with-stumpwm-highlighting~ to, when the group is the current group, reverse
+   the background and foreground colors. The actual writing of the group to the
+   pane is handled by the ~present~ presentation method for the ~stumpwm::group~
+   type. Finally, we call ~call-next-formatter~ to advance to the next formatter
+   in the list.
+
+   All formatters which format something to the pane must do so within the macro
+   ~with-cell~. This macro handles formatting within a table when relevant. All
+   ~with-stumpwm-*~ macros eventually place all display within the ~with-cell~
+   macro.
+
+   The logic of how to display something is handled by defining a ~present~
+   method. These are needed in order to allow gestures to be active for the
+   presented object painlessly. For example, dragging a window onto a group with
+   the right pointer button moves the window to the group. In CLIM this is
+   called a translation, and it translates from a presentation to a command by
+   way of a gesture. The presentation method ~present~ is generally simple, just
+   formatting some text to a stream. For example, the ~present~ method for a
+   window is:
+
+   #+begin_src lisp
+     (define-presentation-method present
+         (window (type stumpwm::window) stream view &key)
+       (let ((str (string-trim '(#\space)
+                               (stumpwm::format-expand stumpwm::*window-formatters*
+                                                       stumpwm::*window-format*
+                                                       window))))
+         (format stream "~A" str)))
+   #+end_src
+
+   This defines a presentation method, specifically the ~present~ method, for a
+   window. The symbol ~window~ is the object being presented, and ~stream~ is
+   where it should be presented to. 
+     
 ** Files
    Herin lies a walkthrough and explanation of the various files present in this
-   module. 
+   module.
+   
 *** patch-clim-clx.lisp
    This file contains a simple patch to a mcclim function in the clim-clx
    package. This is needed to register the window created as a panel. Without
@@ -84,27 +163,6 @@
    are defined for both left and right pointer buttons. These gestures are used
    for translators. Translators translate a gesture to a command. For example,
    clicking on an object, or dragging an object onto another object.
-
-** Defining Formatters and Presentations
-      
-*** Formatters
-    Take, for example, the group formatter:
-    #+begin_src lisp
-      (defun format-groups (frame pane)
-        (declare (ignorable frame))
-        (slim:cell (format pane "["))
-        (let ((current-group (stumpwm:current-group)))
-          (dolist (group (stumpwm::sort-groups (stumpwm:current-screen)))
-            (if (eq current-group group)
-                (with-inverted-ink (pane)
-                  (slim:cell
-                    (present group 'stumpwm::group :stream pane :single-box t)))
-                (slim:cell
-                    (present group 'stumpwm::group :stream pane :single-box t)))))
-        (slim:cell (format pane "]")))
-    #+end_src
-    Within a formatter, everything gets drawin within a cell. We start by
-    drawing a delimiter. 
 
 * Limitations
   Currently, this module is developed on a machine with one screen and one head,

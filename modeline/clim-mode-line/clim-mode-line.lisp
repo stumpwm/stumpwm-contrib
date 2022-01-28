@@ -1,17 +1,22 @@
 (in-package #:clim-mode-line)
 
-(defmacro do-list-with-interspersed-element
-    ((var list &body interspersed-forms) &body body)
-  (alexandria:with-gensyms (initial rest hold cont tmp)
-    `(flet ((,cont (,var)
-              ,@body))
-       (let* ((,hold ,list)
-              (,initial (car ,hold))
-              (,rest (cdr ,hold)))
-         (,cont ,initial)
-         (dolist (,tmp ,rest)
-           ,@interspersed-forms
-           (,cont ,tmp))))))
+;; Uncomment for debugging
+;; (declaim (optimize (speed 0)
+;;                    (safety 3)
+;;                    (debug 3)))
+
+(defvar *align-x* :left)
+
+(defvar *highlight-drop* nil)
+
+(defvar *display-as-table* nil)
+
+(defvar *display-style* :text
+  "Should be one of either :table or :text.")
+
+(defvar *text-display-formatter-intermix* " "
+  "Spacing between each formatters output when in text mode. This string is 
+formatted to the output stream in between each formatter when in text mode.")
 
 (defvar *stumpwm-modeline-frame* nil
   "Hold the single mode line")
@@ -69,18 +74,6 @@
   "this method sets the window type via clim-clx::adopt-frame as defined below."
   :dock)
 
-(defmacro with-inverted-ink ((pane &rest drawing-options
-                              &key (ink '+flipping-ink+) fg-ink bg-ink
-                              &allow-other-keys)
-                             &body body)
-  (let ((p (gensym "PANE")))
-    `(let ((,p ,pane))
-       (surrounding-output-with-border (,p :ink ,(or bg-ink ink)
-                                           :filled t
-                                           :move-cursor nil)
-         (with-drawing-options (,p :ink ,(or fg-ink ink) ,@drawing-options)
-           ,@body)))))
-
 (defvar *mode-line-display-function* 'display-mode-line-as-table)
 
 (defun display-mode-line (frame pane)
@@ -91,70 +84,11 @@
                     )
     (funcall *mode-line-display-function* frame pane)))
 
-(defmacro with-table ((pane &rest options) &body body)
-  ;; Set up a table, and make sure we can communicate it to functions further down
-  ;; the call stack.
-  `(slim:with-table (,pane ,@options)
-     (let ((*display-as-table* t)
-           (*display-style* :table))
-       ,@body)))
-
-(defmacro with-table-row ((&rest options) &body body)
-  ;; Defined because we want a consistent syntax. Plus then we can make our own
-  ;; changes without anyone needing to rewrite anything (well, unless we add
-  ;; required arguments)
-  (declare (ignore options))
-  `(slim:row ,@body))
-
-(defmacro with-cell ((&optional (pane 'slim:*pane*) &rest options) &body body)
-  (declare (ignore options))
-  (alexandria:with-gensyms (cont)
-    `(flet ((,cont ()
-              ,@body))
-       (declare (dynamic-extent (function ,cont)))
-       (case *display-style*
-         ((:text) (funcall #',cont))
-         ((:table) (formatting-cell (,pane :align-x *align-x*)
-                     (funcall #',cont)))))))
-
 (defun display-mode-line-as-table (frame pane)
   (with-table (pane)
     (dolist (line (mode-line-formatters frame))
       (with-table-row ()
         (funcall (car line) frame pane (cdr line))))))
-
-(defmacro with-undrawn-output-record ((stream) &body body)
-  (let ((s (gensym)))
-    `(let ((,s ,stream))
-       (with-output-recording-options (,s :draw nil :record t)
-         (with-new-output-record (,s)
-           ,@body)))))
-
-(defmacro with-output-record-bounds ((x y width height) record &body body)
-  (alexandria:with-gensyms (rec)
-    `(let ((,rec ,record))
-       (multiple-value-bind (,x ,y) (output-record-position ,rec)
-         (declare (ignorable ,x ,y))
-         (multiple-value-bind (,width ,height) (bounding-rectangle-size ,rec)
-           (declare (ignorable ,width ,height))
-           ,@body)))))
-
-(defmacro with-right-alignment ((frame pane) &body body)
-  (alexandria:with-gensyms (stream width record)
-    `(let* ((,stream ,pane)
-            (,record
-              (with-output-recording-options (,stream :draw nil :record t)
-                (with-new-output-record (,stream)
-                  ,@body)))
-            (,width (mode-line-head-width ,frame)))
-       (multiple-value-bind (x y) (output-record-position ,record)
-         (declare (ignore x))
-         (multiple-value-bind (w h) (bounding-rectangle-size ,record)
-           (declare (ignore h))
-           (setf (output-record-position ,record)
-                 (values (- ,width w) y))))
-       (tree-recompute-extent ,record)
-       (replay ,record ,stream))))
 
 (defun display-mode-line-as-text (frame pane)
   (dolist (line (mode-line-formatters frame))
@@ -178,13 +112,8 @@
                                         :top 0
                                         :height 10
                                         :width total-width
-                                        :head-width total-width)
-                ;; (or *stumpwm-modeline-frame*
-                ;;     )
-                ))
-    ;; (unless *stumpwm-modeline-frame*
+                                        :head-width total-width)))
     (setf *stumpwm-modeline-frame* frame)
-    ;; )
     (stumpwm:add-hook stumpwm:*post-command-hook* 'update-mode-line-hanger)
     (sb-thread:make-thread
      (lambda () 
@@ -202,9 +131,6 @@
     (execute-frame-command *stumpwm-modeline-frame* '(com-quit)))
   (setf *stumpwm-modeline-frame* nil)
   (stumpwm:run-commands "restart-hard"))
-
-
-
 
 (defun redisp (frame)
   (sb-thread:with-mutex ((mode-line-mutex frame))
