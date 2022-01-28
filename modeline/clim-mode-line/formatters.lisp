@@ -166,39 +166,22 @@ called within a table, invoke CONTINUATION within a cell."
        (declare (dynamic-extent (function ,cont)))
        (invoke-with-formatting ,pane #',cont))))
 
-
 (defun format-groups (frame pane other-formatters)
   (declare (ignorable frame))
-  (let* ((current-group (stumpwm:current-group))
-         (groups (stumpwm::sort-groups (stumpwm:current-screen)))
-         (g1 (car groups)))
-    (with-stumpwm-highlighting (pane (eq current-group g1))
-      (present g1 'stumpwm::group :stream pane :single-box t))
-    (dolist (group (cdr groups))
-      (format pane " ")
+  (let ((current-group (stumpwm:current-group)))
+    (do-list-with-interspersed-element
+        (group (stumpwm::sort-groups (stumpwm:current-screen))
+          (format pane " "))
       (with-stumpwm-highlighting (pane (eq current-group group))
         (present group 'stumpwm::group :stream pane :single-box t))))
   (call-next-formatter other-formatters frame pane))
 
 (defun format-windows (frame pane other-formatters)
-  (let* ((current-window (stumpwm:current-window))
-         (windows (stumpwm::sort-windows-by-number
-                   (stumpwm:group-windows (stumpwm:current-group))))
-         (w1 (car windows)))
-    (when windows
-      (with-normal-stumpwm-highlighting (pane (eq current-window w1))
-        (present w1 'stumpwm::window :stream pane :single-box t))
-      (dolist (win (cdr windows))
-        (format pane " ")
-        (with-normal-stumpwm-highlighting (pane (eq current-window win))
-          (present win 'stumpwm::window :stream pane :single-box t)))))
+  (let ((current-window (stumpwm:current-window)))
+    (do-list-with-interspersed-element
+        (win (stumpwm::sort-windows-by-number
+              (stumpwm:group-windows (stumpwm:current-group)))
+          (format pane " "))
+      (with-normal-stumpwm-highlighting (pane (eq current-window win))
+        (present win 'stumpwm::window :stream pane :single-box t))))
   (call-next-formatter other-formatters frame pane))
-
-;; (defun format-windows-tableless (frame pane other-formatters)
-;;   (with-right-alignment (frame pane)
-;;     (dolist (win (stumpwm::sort-windows-by-number
-;;                   (stumpwm:group-windows (stumpwm:current-group))))
-;;       (with-stumpwm-highlighting (pane (eq current-window win))
-;;         (present win 'stumpwm::window :stream pane :single-box t)))
-;;     (call-next-formatter other-formatters frame pane)))
-

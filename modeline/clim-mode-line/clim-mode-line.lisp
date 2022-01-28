@@ -1,5 +1,18 @@
 (in-package #:clim-mode-line)
 
+(defmacro do-list-with-interspersed-element
+    ((var list &body interspersed-forms) &body body)
+  (alexandria:with-gensyms (initial rest hold cont tmp)
+    `(flet ((,cont (,var)
+              ,@body))
+       (let* ((,hold ,list)
+              (,initial (car ,hold))
+              (,rest (cdr ,hold)))
+         (,cont ,initial)
+         (dolist (,tmp ,rest)
+           ,@interspersed-forms
+           (,cont ,tmp))))))
+
 (defvar *stumpwm-modeline-frame* nil
   "Hold the single mode line")
 
@@ -45,6 +58,9 @@
                            (stumpwm::group-heads group)))
                  (stumpwm::screen-groups
                   (stumpwm:current-screen))))))))
+
+(defun mode-line-format ()
+  (mode-line-formatters *stumpwm-modeline-frame*))
 
 (defun set-mode-line-format (list)
   (setf (mode-line-formatters *stumpwm-modeline-frame*) list))
