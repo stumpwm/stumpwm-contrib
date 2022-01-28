@@ -8,14 +8,15 @@
 ;;; Define commands followed by their translators.
 
 ;; Click on a group to switch to it
-(define-mode-line-command (com-move-to-group)
+(define-mode-line-command (com-switch-to-group)
     ((group stumpwm::group))
   (stumpwm::switch-to-group group))
 
-(define-presentation-to-command-translator mode-line-select-group
-    (stumpwm::group com-move-to-group mode-line
+(define-presentation-to-command-translator mode-line-switch-to-group
+    (stumpwm::group com-switch-to-group mode-line
      :gesture :left-click
-     :priority 9)
+     :priority 9
+     :documentation "Switch to the group")
     (group)
   (list group))
 
@@ -38,7 +39,8 @@
 
 (define-drag-and-drop-translator mode-line-move-window-to-group
     (stumpwm::window command stumpwm::group mode-line
-                     :gesture :right-click)
+                     :gesture :left-click-control
+                     :menu nil)
     (window destination-object)
   `(com-move-window-to-group ,window ,destination-object))
 
@@ -54,7 +56,8 @@
 
 (define-drag-and-drop-translator mode-line-swap-windows
     (stumpwm::window command stumpwm::window mode-line
-                     :gesture :right-click)
+                     :gesture :left-click-control
+                     :menu nil)
     (window destination-object)
   `(com-swap-windows ,window ,destination-object))
 
@@ -68,7 +71,8 @@
 
 (define-drag-and-drop-translator mode-line-swap-window-numbers
     (stumpwm::window command stumpwm::window mode-line
-                     :gesture :right-click-meta)
+                     :gesture :right-click-meta
+                     :menu nil)
     (window destination-object)
   `(com-swap-window-numbers ,window ,destination-object))
 
@@ -82,7 +86,8 @@
 
 (define-drag-and-drop-translator mode-line-swap-group-numbers
     (stumpwm::group command stumpwm::group mode-line
-                    :gesture :right-click)
+                    :gesture :left-click-control
+                    :menu nil)
     (group destination-object)
   `(com-swap-group-numbers ,group ,destination-object))
 
@@ -94,7 +99,8 @@
 
 (define-drag-and-drop-translator mode-line-merge-groups
     (stumpwm::group command stumpwm::group mode-line
-                    :gesture :right-click-control)
+                    :gesture :right-click-control
+                    :menu nil)
     (group destination-object)
   `(com-merge-groups ,group ,destination-object))
 
@@ -105,7 +111,8 @@
 
 (define-drag-and-drop-translator mode-line-delete-group-merge-groups
     (stumpwm::group command stumpwm::group mode-line
-                    :gesture :right-click-meta)
+                    :gesture :right-click-meta
+                    :menu nil)
     (group destination-object)
   `(com-delete-group-merge-into ,group ,destination-object))
 

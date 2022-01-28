@@ -40,7 +40,7 @@
   macros are provided to ease the process of writing a formatter. 
 
 
-** Defining Formatters, Presentations, and Commands
+** Defining Formatters, Presentations, Commands, and Translators
    For defining a simple string formatter, the macro ~define-formatter~ is
    provided.
    
@@ -117,7 +117,41 @@
 
    This defines a presentation method, specifically the ~present~ method, for a
    window. The symbol ~window~ is the object being presented, and ~stream~ is
-   where it should be presented to. 
+   where it should be presented to.
+
+   Commands are written using the macro ~define-mode-line-command~. Much like
+   defun, this takes a name, an argument list, and a body. The name should begin
+   with ~com-~, followed by the name of the command. Each argument in the
+   argument list must be of the form ~(argument type)~, much like in
+   ~defmethod~.
+
+   Where it gets interesting is defining translators. A translator translates
+   from a presentation to a command. There are two types of translators used in
+   this application: presentation to command drag and drop translators. Each of
+   these take a gesture which is used to "activate" the translator. For example,
+   the command translator ~mode-line-switch-to-group~ translates from a
+   ~stumpwm::group~ presentation to the command ~com-switch-to-group~ with the
+   gesture ~:left-click~. This is why the use of ~present~ is so important, as
+   unless something is presented these translators wont be active.
+
+   The macro ~define-presentation-to-command-translator~ takes a name, a list of
+   options, an argument list, and a body. The options must begin with the
+   from-type, followed by the command to translate to, followed by the command
+   table it is present in. For the clim mode line this command table is
+   ~mode-line~. Following that is a set of keyword arguments. The most relevant
+   to this document are ~:gesture~, ~:priority~, ~:documentation~, and
+   ~:menu~. ~:gesture~ determines which gesture will trigger this translator,
+   ~:priority~ determines what order translations should be sorted in,
+   ~:documentation~ determines what is displayed when the operation menu is
+   brought up, and ~:menu~ determines if an entry will show up in the operation
+   menu. The argument list is a list of symbols (typically one), and the body
+   must generate a list which the command can be applied to.
+
+   The macro ~define-drag-and-drop-translator~ functions similarly, but also
+   takes a destination type, and must call the command in question explicitly.
+
+   See the file ~commands-and-translators.lisp~ for examples and more
+   information. 
      
 ** Files
    Herin lies a walkthrough and explanation of the various files present in this
