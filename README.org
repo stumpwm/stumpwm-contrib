@@ -85,7 +85,7 @@ Advertise your module here, open a PR and include a org-mode link!
 ** Modeline
 - [[./modeline/battery-portable/README.org][battery-portable]] :: Add battery information to the modeline in a portable way.
 - [[./modeline/bitcoin/README.org][bitcoin]] :: Display bitcoin price on StumpWM modeline.
-- [[./modeline/clim-mode-line/README.org][clim-mode-line]] :: A modeline inspired panel written with CLIM
+- [[./modeline/clim-mode-line/README.org][clim-mode-line]] :: A modeline written in CLIM
 - [[./modeline/cpu/README.org][cpu]] :: Add cpu info to the modeline.
 - [[./modeline/disk/README.org][disk]] :: Display filesystem information in the modeline
 - [[./modeline/hidden/README.org][hidden]] :: Add hidden window info to the modeline.
@@ -133,5 +133,6 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/ttf-fonts/README.org][ttf-fonts]] :: A pure lisp implementation of TTF font rendering.
 - [[./util/undocumented/README.org][undocumented]] :: Look for stuff that should probably be in the manual that isn't
 - [[./util/urgentwindows/README.org][urgentwindows]] :: Allows focusing application windows that need user attention
+- [[./util/wacom/README.org][wacom]] :: Map StumpWM frames to Wacom tablets using `xsetwacom`.
 - [[./util/windowtags/README.org][windowtags]] :: Add metadata to windows to manipulate them en mass.
 - [[./util/winner-mode/README.org][winner-mode]] :: Emacs' winner-mode for StumpWM
