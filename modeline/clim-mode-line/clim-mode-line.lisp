@@ -94,7 +94,6 @@ formatted to the output stream in between each formatter when in text mode.")
 
 (defun display-mode-line-as-text (frame pane)
   (dolist (line (mode-line-formatters frame))
-    (with-new-output-record )
     (funcall (car line) frame pane (cdr line))))
 
 ;; Glue between this and StumpWM
