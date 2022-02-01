@@ -6,7 +6,7 @@
   :license "GPLv3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:stumpwm #:clim #:clim-lisp)
+  :depends-on (#:stumpwm #:clim #:clim-lisp #:mcclim)
   :components ((:file "package")
                (:file "swm-clim-message")
                (:file "reimplementations")))
