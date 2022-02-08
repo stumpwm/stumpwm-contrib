@@ -69,6 +69,7 @@ Please see =README.org= files for each module for further details. Missing modul
 Advertise your module here, open a PR and include a org-mode link!
 - [[https://github.com/njkli/stumpwm-weather/blob/master/readme.org][stumpwm-weather]] :: Displays weather in the modeline
 - [[https://gitlab.com/sasanidas/stumpwm-dmenu][stumpwm-dmenu]]   :: StumpWM [[https://tools.suckless.org/dmenu/][dmenu]] integration
+- [[https://github.com/Junker/stumpwm-pamixer][stumpwm-pamixer]] :: Pulseaudio volume and microphone control module 
 * Current Modules
 (click for its respective README/docs)
 
