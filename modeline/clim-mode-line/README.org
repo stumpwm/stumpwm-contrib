@@ -1,34 +1,222 @@
-#+TITLE: CLIM-MODE-LINE
-#+AUTHOR: Shozo «szos at posteo dot net»
+#+TITLE: CLIM Base Mode Line for StumpWM
 
-* CLIM Mode Line
-  This is a project to write a dock using CLIM inspired by the emacs and StumpWM mode lines. 
+* Usage
+  This module depends on CLIM and SLIM, so please ensure they are somewhere that
+  they are somewhere that ASDF can find them. If you dont have a copy of CLIM
+  and SLIM, please evaluate ~(ql:quickload :clim)~ and ~(ql:quickload :slim)~ at
+  a repl before using this module.
 
-** Usage
-   Currently the (imo) best way to utilize this modeline is to launch StumpWM as normal and then start a swank/slynk server and connect to it. From the repl evaluate 
-   #+BEGIN_SRC lisp
-     (in-package :stumpwm)
-     (load-module "clim-mode-line")
-   #+END_SRC
-   - NB! this can take a while if you havent loaded mcclim before, as it will need to be downloaded and compiled. 
-   Now that the module is loaded, we need to ensure that 
-   1. No other panel applications are running
-   2. The mode line is hidden. 
-   Now open up a new repl (with sly this is ~sly-mrepl-new~) and evaluate 
-   #+BEGIN_SRC lisp
-     (in-package :clim-mode-line)
-     (run-mode-line)
-   #+END_SRC
-   At this point the mode line should pop up. 
-   - NB! If you kill the mode line process/thread, the built in stumpwm mode line wont return. To kill and restart the clim mode line interrupt the ~run-mode-line~ fuction we ran in our second repl (via =C-c C-c=) and abort the evaluation, then run the stumpwm command ~restart-soft~. This should bring back the built in mode line, and you can follow the steps above to reopen the clim mode line. If you dont have access to the second repl, you can evaluate the following in any repl connected to the image· ~(clim-mode-line::com-quit)~
+  It is highly recommended to run this module from a repl connected to the
+  StumpWM image, but if you want to play it risky, add the following to your
+  stumpwmrc. 
 
-* Goals
-  The initial goal is to get a mode line esq application written in CLIM, which doesnt hang, and allows for CLIM commands to be dispatched via clicking on elements in the mode line.
+  #+begin_src lisp
+    (load-module "clim-mode-line")
+    (clim-mode-line:app-main)
+  #+end_src
 
-  After that is completed, we can evaluate adding in a command reading system through the mode line. 
+  This must occur before any mode lines are created.
 
-* Todo List
-** TODO Fix Crashes
-   The mode line soft crashes when commands are executed. Sometimes it functions for a couple commands, other times a single command crashes it. A crash causes no condition to be signalled (they are possibly being caught in the refresh hook function) but rather causes the pane to go white - all output lost. 
-** TODO Solve Threading Issues
-   It is unclear whether crashes are caused by threading issues. This needs to be investigated and solved. 
+  If loading through a repl, eval the following forms.
+
+  #+begin_src lisp
+    (ql:quickload :clim)
+    (ql:quickload :slim)
+    (ql:quickload :clim-mode-line)
+
+    (clim-mode-line:app-main)
+  #+end_src
+
+  This mode line is very much a work in progress. Currently it displays groups
+  and the windows of the current group, and allows you to move/focus windows and
+  groups through click and dragging them.
+
+  While it would be a welcome addition, this mode line doesnt interpret the
+  stumpwm mode line format list.
+
+  The equivalent of the mode line screen format from StumpWM is the mode line
+  format slot of the frame. This is interacted with via the functions
+  ~mode-line-format~ and ~set-mode-line-format~. It should be a list of lists of
+  functions. Every function should be a formatter function, as described
+  below. By default this is bound to ~'((format-groups format-align-right
+  format-windows))~. All symbols reside in the ~clim-mode-line~ package. 
+
+* Walkthrough
+  When writing a formatter for this mode line, you can use the whole gamut of
+  CLIM formatting and drawing functionality. In addition to this, a set of
+  macros are provided to ease the process of writing a formatter. 
+
+** Defining Formatters, Presentations, Commands, and Translators
+   For defining a simple string formatter, the macro ~define-formatter~ is
+   provided.
+   
+   #+begin_src lisp
+     (define-formatter bar "|")
+   #+end_src
+   
+   The above defines a function called ~format-bar~ which formats ~|~ to the
+   mode line.
+
+   A formatter function is function which takes a frame, pane, and list of
+   formatters following it. The formatter should format some stuff to the pane,
+   and then call the function ~call-next-formatter~ with the list of following
+   formatters, the frame, and the pane. A simple example is the formatter
+   function ~format-align-right~. All of the logic of this formatter is wrapped
+   up in the macro ~with-right-alignment~, so the actual definition of this
+   function is:
+   
+   #+begin_src lisp
+     (defun format-align-right (frame pane other-formatters)
+       (with-right-alignment (frame pane)
+         (call-next-formatter other-formatters frame pane)))
+   #+end_src
+
+   Lets take a look at a slightly more complicated formatter, one which makes
+   use of the function ~present~.
+   
+   #+begin_src lisp
+     (defun format-groups (frame pane other-formatters)
+       (declare (ignorable frame))
+       (let ((current-group (stumpwm:current-group)))
+         (do-list-with-interspersed-element
+             (group (stumpwm::sort-groups (stumpwm:current-screen))
+               (format pane " "))
+           (with-stumpwm-highlighting (pane (eq current-group group))
+             (present group 'stumpwm::group :stream pane :single-box t))))
+       (call-next-formatter other-formatters frame pane))
+   #+end_src
+   
+   The ~format-groups~ function obtains the current group, and then uses the
+   macro ~do-list-with-interspersed-element~ to loop over the sorted groups,
+   binding each group to ~group~. This macro intersperses ~(format pane " ")~
+   with the body of the macro. This is important to avoid formatting ~" "~
+   before the first element. So, for each group we use
+   ~with-stumpwm-highlighting~ to, when the group is the current group, reverse
+   the background and foreground colors. The actual writing of the group to the
+   pane is handled by the ~present~ presentation method for the ~stumpwm::group~
+   type. Finally, we call ~call-next-formatter~ to advance to the next formatter
+   in the list.
+
+   All formatters which format something to the pane must do so within the macro
+   ~with-cell~. This macro handles formatting within a table when relevant. All
+   ~with-stumpwm-*~ macros eventually place all display within the ~with-cell~
+   macro.
+
+   The logic of how to display something is handled by defining a ~present~
+   method. These are needed in order to allow gestures to be active for the
+   presented object painlessly. For example, dragging a window onto a group with
+   the right pointer button moves the window to the group. In CLIM this is
+   called a translation, and it translates from a presentation to a command by
+   way of a gesture. The presentation method ~present~ is generally simple, just
+   formatting some text to a stream. For example, the ~present~ method for a
+   window is:
+
+   #+begin_src lisp
+     (define-presentation-method present
+         (window (type stumpwm::window) stream view &key)
+       (let ((str (string-trim '(#\space)
+                               (stumpwm::format-expand stumpwm::*window-formatters*
+                                                       stumpwm::*window-format*
+                                                       window))))
+         (format stream "~A" str)))
+   #+end_src
+
+   This defines a presentation method, specifically the ~present~ method, for a
+   window. The symbol ~window~ is the object being presented, and ~stream~ is
+   where it should be presented to.
+
+   Commands are written using the macro ~define-mode-line-command~. Much like
+   defun, this takes a name, an argument list, and a body. The name should begin
+   with ~com-~, followed by the name of the command. Each argument in the
+   argument list must be of the form ~(argument type)~, much like in
+   ~defmethod~.
+
+   Where it gets interesting is defining translators. A translator translates
+   from a presentation to a command. There are two types of translators used in
+   this application: presentation to command drag and drop translators. Each of
+   these take a gesture which is used to "activate" the translator. For example,
+   the command translator ~mode-line-switch-to-group~ translates from a
+   ~stumpwm::group~ presentation to the command ~com-switch-to-group~ with the
+   gesture ~:left-click~. This is why the use of ~present~ is so important, as
+   unless something is presented these translators wont be active.
+
+   The macro ~define-presentation-to-command-translator~ takes a name, a list of
+   options, an argument list, and a body. The options must begin with the
+   from-type, followed by the command to translate to, followed by the command
+   table it is present in. For the clim mode line this command table is
+   ~mode-line~. Following that is a set of keyword arguments. The most relevant
+   to this document are ~:gesture~, ~:priority~, ~:documentation~, and
+   ~:menu~. ~:gesture~ determines which gesture will trigger this translator,
+   ~:priority~ determines what order translations should be sorted in,
+   ~:documentation~ determines what is displayed when the operation menu is
+   brought up, and ~:menu~ determines if an entry will show up in the operation
+   menu. The argument list is a list of symbols (typically one), and the body
+   must generate a list which the command can be applied to.
+
+   The macro ~define-drag-and-drop-translator~ functions similarly, but also
+   takes a destination type, and must call the command in question explicitly.
+
+   Of note, if a gesture is used for both a presentation-to-command-translator
+   and a drag-and-drop-translator then whichever has the highest priority will
+   be active. It is unclear to me whether this is a limitation of clim or of my
+   own understanding. 
+
+   See the file ~commands-and-translators.lisp~ for examples and more
+   information. 
+     
+** Files
+   Herin lies a walkthrough and explanation of the various files present in this
+   module.
+
+*** macros.lisp
+    This file contains general macros that dont make sense to define
+    elsewhere. These include the clim-mode-line table formatting macros, ink
+    inversion macros, alignment macros, and looping macros.
+   
+*** patch-clim-clx.lisp
+    This file contains a simple patch to a mcclim function in the clim-clx
+    package. This is needed to register the window created as a panel. Without
+    it, the mode line would be created as a regular window. 
+
+*** clim-mode-line.lisp
+    This file contains the application frame definition and all glue
+    functions. The display function lies here, alongside an update function, and
+    the function to run the frame. 
+
+*** presentations.lisp
+    This file contains all presentation methods. Currently only group and window
+    presentation methods are present. The ~present~ presentation methods are only
+    in charge of writing the appropriate text to the stream given. These methods
+    should not call any of the ~slim~ table macros. 
+   
+*** formatters.lisp
+    This file contains all formatter functions. These functions correspond, at
+    least conceptually, to the mode line formatter functions of stumpwm, but take
+    different arguments and operate in a different manner.
+
+    The format of the mode line is represented by a list, where each element is
+    itself a list representing a row. Each of these row representing lists is a
+    list of formatter functions. These functions draw text to cells. 
+
+    When writing a formatter function, text is written to the mode line by
+    writing to the pane argument. All formats must occur within a ~slim:cell~.
+
+    Formatter functions may format plain text, or present an object. When
+    presenting an object the presentation method will format all text to the
+    pane, and the call to ~present~ must be within a ~slim:cell~.
+
+*** gestures.lisp
+    This file defines a set of gestures used to interact with the mode line. They
+    are all pointer gestures, and all combinations of control, meta, and super
+    are defined for both left and right pointer buttons. These gestures are used
+    for translators. Translators translate a gesture to a command. For example,
+    clicking on an object, or dragging an object onto another object.
+
+* Limitations
+  Currently, this module is developed on a machine with one screen and one head,
+  and as such multi head or multi screen setups are not explicitly
+  supported. While supporting multi head setups is a goal, the main goal is
+  getting the clim mode line to be on rough feature parity with the existing
+  mode line.
+
+  Background colors are currently not supported very well. 
