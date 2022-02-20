@@ -1,0 +1,31 @@
+#+TITLE: Wacom StumpWM
+
+* Requirements
+
+- [[https://linux.die.net/man/1/xsetwacom][xsetwacom]]
+- [[https://linuxwacom.github.io/][Linux Wacom Project]]
+
+* Installation
+
+Like any other module: Add ~(load-module "wacom")~ somewhere in your ~.stumpwmrc~.
+
+* Usage
+
+Focus the frame you want to use your wacom tablet. Run ~map-wacom-to-current-frame~.
+
+One thing that can't be detected is the physical orientation of your device. Even if we could detect landscape/portrait mode, we can't know which way is right-side-up.
+
+** Parameters
+
+There are a couple of parameters defined in ~wacom.lisp~ that you can edit to match the layout of your
+tablet on your desk.
+
+#+begin_src lisp
+(defparameter *portrait-rotate* "ccw"
+  "If you notice the directions are the reverse of what you desirte when your
+   frame is in portrait orientation, then change this parameter to 'cw'.")
+
+(defparameter *landscape-rotate* "half"
+  "If you notice directions are the reverse of what you desire when your
+   frame is in landscape orientation, then change this parameter to 'none'.")
+#+end_src

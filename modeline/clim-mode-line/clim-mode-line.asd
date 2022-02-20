@@ -1,15 +1,16 @@
 ;;;; clim-mode-line.asd
 
 (asdf:defsystem #:clim-mode-line
-  :description "A modeline inspired panel written with CLIM"
-  :author "Shozo <szos at posteo dot net>"
-  :license  "GPLv3"
+  :description "A modeline written in CLIM"
+  :author "szos at posteo dot net"
+  :license "GPLv3"
   :version "0.0.1"
-  :serial t
-  :depends-on (#:clim #:clim-lisp #:mcclim #:slim #:stumpwm)
+  :depends-on (#:clim #:clim-lisp #:slim #:stumpwm)
   :components ((:file "package")
-	       (:file "clim-clx-patch")
+               (:file "patch-clim-clx")
+               (:file "macros")
                (:file "clim-mode-line")
                (:file "presentations")
-               (:file "mode-line-formatters")
-	       (:file "stumpwm-patch")))
+               (:file "formatters")
+               (:file "gestures")
+               (:file "commands-and-translators")))
