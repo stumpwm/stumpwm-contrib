@@ -69,7 +69,7 @@ Please see =README.org= files for each module for further details. Missing modul
 Advertise your module here, open a PR and include a org-mode link!
 - [[https://github.com/njkli/stumpwm-weather/blob/master/readme.org][stumpwm-weather]] :: Displays weather in the modeline
 - [[https://gitlab.com/sasanidas/stumpwm-dmenu][stumpwm-dmenu]]   :: StumpWM [[https://tools.suckless.org/dmenu/][dmenu]] integration
-- [[https://github.com/Junker/stumpwm-pamixer][stumpwm-pamixer]] :: Pulseaudio volume and microphone control module 
+- [[https://github.com/Junker/stumpwm-pamixer][stumpwm-pamixer]] :: Pulseaudio volume and microphone control module
 * Current Modules
 (click for its respective README/docs)
 
@@ -124,6 +124,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/screenshot/README.org][screenshot]] :: Takes screenshots and stores them as png files
 - [[./util/searchengines/README.org][searchengines]] :: Allows searching text using prompt or clipboard contents with various search engines
 - [[./util/shell-command-history/README.org][shell-command-history]] :: Save and load the stumpwm::*input-shell-history* to a file
+- [[./util/spatial-groups/README][spatial-groups]] :: Spatial Groups navigation for StumpWM
 - [[./util/stump-backlight/README.org][stump-backlight]] :: Native backlight control from StumpWM
 - [[./util/stump-lock/README.org][stump-lock]] :: Screen locker in StumpWM
 - [[./util/stump-nm/README.org][stump-nm]] :: StumpWM integration with NetworkManager
