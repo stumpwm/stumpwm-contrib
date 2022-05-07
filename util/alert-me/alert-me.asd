@@ -3,6 +3,6 @@
   :description "Alert me that an event is coming"
   :author "Florian Margaine <florian@margaine.com>"
   :license "GPLv3"
-  :depends-on (:bordeaux-threads :stumpwm)
+  :depends-on (:uiop :bordeaux-threads :stumpwm :notifications)
   :components ((:file "package")
                (:file "alert-me")))

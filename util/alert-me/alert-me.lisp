@@ -18,7 +18,7 @@
 (defun ring-alert ()
   "Play the *ALERT-SOUND-FILE* if exists."
   (when (probe-file *alert-sound-file*)
-    (asdf:run-shell-command
+    (uiop:run-program
      "~a ~a" *sound-play-command* (namestring *alert-sound-file*))))
 
 
