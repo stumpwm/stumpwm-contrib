@@ -19,7 +19,7 @@
   "Play the *ALERT-SOUND-FILE* if exists."
   (when (probe-file *alert-sound-file*)
     (uiop:run-program
-     "~a ~a" *sound-play-command* (namestring *alert-sound-file*))))
+     (format nil "~a ~a" *sound-play-command* (namestring *alert-sound-file*)))))
 
 
 (defun alert-message (alert-hour alert-minute message)

@@ -72,7 +72,7 @@ at the end of each pomodoro.")
   "Play the *BELL-SOUND-FILE* if exists."
   (when (probe-file *bell-sound-file*)
     (uiop:run-program
-     "~a ~a" *sound-play-command* (namestring *bell-sound-file*))))
+     (format nil "~a ~a" *sound-play-command* (namestring *bell-sound-file*)))))
 
 
 (defun notify-break ()
