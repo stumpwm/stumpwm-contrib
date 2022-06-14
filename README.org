@@ -70,7 +70,8 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[https://github.com/njkli/stumpwm-weather/blob/master/readme.org][stumpwm-weather]] :: Displays weather in the modeline
 - [[https://gitlab.com/sasanidas/stumpwm-dmenu][stumpwm-dmenu]]   :: StumpWM [[https://tools.suckless.org/dmenu/][dmenu]] integration
 - [[https://github.com/Junker/stumpwm-pamixer][stumpwm-pamixer]] :: Pulseaudio volume and microphone control module 
-- [[https://github.com/Junker/stumpwm-kbdd][stumpwm-kbdd]] :: Per window XKB layout switcher module
+- [[https://github.com/Junker/stumpwm-acpi-backlight][stumpwm-acpi-backlight]] :: ACPI backlight control module for StumpWM
+
 * Current Modules
 (click for its respective README/docs)
 
