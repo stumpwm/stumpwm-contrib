@@ -6,6 +6,6 @@
   :license  "GPLv3"
   :version "0.2.0"
   :serial t
-  :depends-on (#:stumpwm)
+  :depends-on (#:uiop #:stumpwm #:notifications)
   :components ((:file "package")
                (:file "swm-pomodoro")))
