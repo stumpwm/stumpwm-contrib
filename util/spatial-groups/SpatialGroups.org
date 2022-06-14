@@ -1,0 +1,50 @@
+
+* Overview
+
+This is just my notes file.
+
+* Features
+
+** DONE Complete moving to a module
+CLOSED: [2022-03-08 Tue 18:03]
+
+[2022-03-08 Tue 17:07]
+nearly there, already used quickproject to create the basics
+
+trying to port my config to use the module.
+
+[2022-03-08 Tue 18:03]
+ok, my personal stumpwmrc is now using the module!
+
+here's a sample file:
+
+#+BEGIN_EXAMPLE
+  ;; -*-lisp-*-
+  ;; Load my Spatial groups module from ~/.stumpwm/modules/ symlink to repo
+  (in-package :stumpwm)
+  (load-module "spatial-groups")
+#+END_EXAMPLE
+
+** TODO Add screenshotting feature
+
+[2022-03-08 Tue 17:10]
+i already have a function to take screenshots and create a montage of
+the spatial environment in my dotfile.
+
+** TODO Multiple monitor support
+
+[2022-03-08 Tue 17:08]
+i've only used this single screen. I imagine multiple monitors would
+be like having adjacent screen cursors panning across the grid.
+
+For example, if I had 2 screens (left and right), they would be
+considered adjacent cursors. If I shifted the grid using
+control-right, both screens would move over one.
+
+This means that I may have to move one or more screens to "fake"
+groups in the mean time, because one group can never be on more than
+one screen.
+
+Required further thought, and I don't have multiple screens on my laptop.
+
+** TODO List windows in current desktop? Picker?

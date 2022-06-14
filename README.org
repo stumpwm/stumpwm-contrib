@@ -125,6 +125,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/screenshot/README.org][screenshot]] :: Takes screenshots and stores them as png files
 - [[./util/searchengines/README.org][searchengines]] :: Allows searching text using prompt or clipboard contents with various search engines
 - [[./util/shell-command-history/README.org][shell-command-history]] :: Save and load the stumpwm::*input-shell-history* to a file
+- [[./util/spatial-groups/README][spatial-groups]] :: Spatial Groups navigation for StumpWM
 - [[./util/stump-backlight/README.org][stump-backlight]] :: Native backlight control from StumpWM
 - [[./util/stump-lock/README.org][stump-lock]] :: Screen locker in StumpWM
 - [[./util/stump-nm/README.org][stump-nm]] :: StumpWM integration with NetworkManager
