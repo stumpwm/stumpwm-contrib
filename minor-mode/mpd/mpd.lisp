@@ -763,13 +763,17 @@ Passed an argument of zero and if crossfade is on, toggles crossfade off."
 
 (defcommand mpd-volume-up () ()
   (let* ((status (mpd-send-command "status"))
-         (vol (read-from-string (assoc-value :volume status))))
-    (mpd-send-command (format nil "setvol ~a" (+ vol *mpd-volume-step*)))))
+         (vol (read-from-string (assoc-value :volume status)))
+         (new-vol (+ vol *mpd-volume-step*)))
+    (mpd-send-command (format nil "setvol ~a" new-vol))
+    (message "~a" new-vol)))
 
 (defcommand mpd-volume-down () ()
   (let* ((status (mpd-send-command "status"))
-         (vol (read-from-string (assoc-value :volume status))))
-    (mpd-send-command (format nil "setvol ~a" (- vol *mpd-volume-step*)))))
+         (vol (read-from-string (assoc-value :volume status)))
+         (new-vol (- vol *mpd-volume-step*)))
+    (mpd-send-command (format nil "setvol ~a" new-vol))
+    (message "~a" new-vol)))
 
 (defcommand mpd-clear () ()
   (mpd-send-command "clear"))
