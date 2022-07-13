@@ -116,7 +116,8 @@
              (message "Error with mpd connection: ~a" c)
              (setf *mpd-socket* nil)
              (when *mpd-timer*
-               (cancel-timer *mpd-timer*)))))
+               (cancel-timer *mpd-timer*)
+               (setf *mpd-timer* nil)))))
      (message "Error: not connected to mpd")))
 
 (defun mpd-send (command)
@@ -204,7 +205,13 @@
   (when *mpd-socket*
     (when *mpd-timeout*
       (setf *mpd-timer*
-            (run-with-timer *mpd-timeout* *mpd-timeout* 'mpd-ping)))
+            (run-with-timer *mpd-timeout* *mpd-timeout*
+                            (lambda ()
+                              (if *mpd-socket*
+                                  (mpd-ping)
+                                  (when *mpd-timer*
+                                    (cancel-timer *mpd-timer*)
+                                    (setf *mpd-timer* nil)))))))
     (mpd-receive t)
     (when *mpd-password*
       (mpd-format-command "password \"~a\"" *mpd-password*))))
@@ -681,10 +688,12 @@ Volume
 
 (defcommand mpd-disconnect () ()
   "Disconnect from mpd server"
+  (when *mpd-timer*
+    (cancel-timer *mpd-timer*)
+    (setf *mpd-timer* nil))
   (with-mpd-connection
    (close *mpd-socket*)
-   (setf *mpd-socket* nil)
-   (when *mpd-timer* (cancel-timer *mpd-timer*))))
+   (setf *mpd-socket* nil)))
 
 (defcommand mpd-kill () ()
  (mpd-send-command "kill"))
