@@ -44,7 +44,7 @@ the code.
     =*top-map*= and their associated commands.
 ex:
 #+BEGIN_SRC lisp
-    (setf *productivity-keys*
+    (setf productivity::*productivity-keys*
           '(("H-t"   *root-map*)
             ("C-;"   *rat-map*)
             ("Print" "screenshot")))
