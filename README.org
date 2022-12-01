@@ -71,6 +71,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[https://gitlab.com/sasanidas/stumpwm-dmenu][stumpwm-dmenu]]   :: StumpWM [[https://tools.suckless.org/dmenu/][dmenu]] integration
 - [[https://github.com/Junker/stumpwm-pamixer][stumpwm-pamixer]] :: Pulseaudio volume and microphone control module 
 - [[https://github.com/Junker/stumpwm-acpi-backlight][stumpwm-acpi-backlight]] :: ACPI backlight control module for StumpWM
+- [[https://gitlab.com/sasanidas/stumpwm-mullvad][stumpwm-mullvad]]   :: StumpWM [[https://mullvad.net/en/][mullvad]] cli integration
 
 * Current Modules
 (click for its respective README/docs)
