@@ -26,27 +26,14 @@ positive because `*values-size*'.")
   "Localization code, `0' gives 1234.56, `1' gives 1,234.56, `2' gives
 1.234,56, and `3' gives 1 234,56.")
 
-;;; Get price
+(defparameter *decimals* 2
+  "Number of decimals, set to `0' for no decimals.")
 
-(defparameter *url* "https://api.coindesk.com/v1/bpi/currentprice.json"
-  "Location of price provider.")
+(defparameter *modeline-gauge* t
+  "Show the tendency graphical gauge.")
 
-(defvar *prev-time* 0
-  "Store previous time when got price.")
-
-(defun get-value-from-url ()
-  "Get the actual USD-BTC value."
-  ;; Just in case internet drops
-  (handler-case
-      (gethash "rate_float"
-               (gethash "USD"
-                        (gethash "bpi"
-                                 (yason:parse
-                                  (babel:octets-to-string
-                                   (dexador:get *url* :keep-alive t)
-                                   :encoding :utf-8)))))
-    ;; Return NIL in case some condition is triggered
-    (condition () nil)))
+(defparameter *gauge-width* 9
+  "Width of the graphical gauge in characters. Must be greater than 1.")
 
 ;;; Store prices
 
@@ -58,8 +45,64 @@ hours getting values: a new coin value is appended in `*values*' every
 `*time-delay*', so it is divided the desired n time in seconds by the
 time-delay in seconds.")
 
+(defvar *value* 0.0
+  "Last value got from `*url*'.")
+
+(defvar *values-low* 0.0
+  "The low value in `*values*'.")
+
+(defvar *values-high* 0.0
+  "The high value in `*values*'.")
+
 (defvar *values-average* 0.0
   "Average of values in `*values*'.")
+
+;;; Get price
+
+(defparameter *url* "https://api.kraken.com/0/public/Ticker?pair=btcusd"
+  "Location of price provider.")
+
+(defvar *prev-time* 0
+  "Store previous time when got price.")
+
+(defun get-values-from-url ()
+  "Get the USD-BTC, 24h LOW and 24h HIGH values."
+  (let ((response (handler-case
+                      (gethash "XXBTZUSD"
+                               (gethash "result"
+                                        (yason:parse
+                                         (dexador:get *url*
+                                                      :keep-alive nil))))
+                    ;; Return NIL in case some condition is triggered
+                    (condition () nil))))
+    (list (read-from-string (first (gethash "c" response)))
+          (read-from-string (second (gethash "l" response)))
+          (read-from-string (second (gethash "h" response))))))
+
+(defun refresh-values ()
+  "Refresh values from `*url*' if the `*time-delay*' has been reached.
+Get the actual USD-BTC value, store value in list, preserve list size
+popping first value, calculate average and set formatting depending on
+value vs average."
+  (let ((now (/ (get-internal-real-time) internal-time-units-per-second))
+        (values (get-values-from-url)))
+    (when t ;;(> (- now *prev-time*) *time-delay*)
+      (progn
+        (setf *prev-time* now)
+        (setf *value* (first values)
+              *values-low* (second values)
+              *values-high* (third values))
+        ;; Add value to values list, pushing to front
+        (push *value* *values*)
+        ;; Preserve values list size, popping from end
+        (setf *values* (nreverse *values*))
+        (pop *values*)
+        (setf *values* (nreverse *values*))
+        ;; Calculate average of values, excluding NIL values
+        ;; that could exist because network issues.
+        (let ((values-clean (remove-if-not #'numberp *values*)))
+          (setf *values-average* (/ (reduce #'+ values-clean)
+                                    (max 1 (length values-clean)))))))))
 
 ;;; Write on modeline
 
@@ -69,155 +112,68 @@ time-delay in seconds.")
 ;;; 1231231.0999) gives 1231231 and 0.125. Does NOT work with negative
 ;;; numbers.
 ;;; More in https://stackoverflow.com/questions/35012859
+(defun format-decimal (n sep int com)
+  "Return Number formated in groups of INTerval length every and
+separated by SEParator, with COMma character as decimal separator. The
+number of digits in the decimal part is defined by the global
+parameter `*decimals*'. All parameters but N are strings. COMma
+character should not be the tilde `~'."
+  (let* ((num-string (concatenate 'string "~,,'" sep "," int ":D"))
+         (decimals (format nil "~D" *decimals*))
+         (dec-string (concatenate 'string com "~" decimals ",'0D")))
+    (multiple-value-bind (i r) (truncate n)
+      (concatenate
+       'string
+       (format nil num-string i)
+       (when (< 0 *decimals*)
+         (format nil dec-string (truncate (* (expt 10 *decimals*) r))))))))
 
-(defun comma-point (stream arg &rest args)
-  (declare (ignore args))
-  (multiple-value-bind (i r) (truncate arg)
-    (format stream "~,,',,:D.~2,'0D" i (truncate (* 100 r)))))
-
-(defun point-comma (stream arg &rest args)
-  (declare (ignore args))
-  (multiple-value-bind (i r) (truncate arg)
-    (format stream "~,,'.,:D,~2,'0D" i (truncate (* 100 r)))))
-
-(defun space-comma (stream arg &rest args)
-  (declare (ignore args))
-  (multiple-value-bind (i r) (truncate arg)
-    (format stream "~,,' ,:D,~2,'0D" i (truncate (* 100 r)))))
+(defun gauge (v l h n)
+  "Draw a gauge control with Value at the point between Low and High in
+an N length control."
+  (if (and (< l h) (<= l v) (<= v h) (> n 1))
+      (let* ((line (make-sequence 'string n :initial-element #\-))
+             (segment (floor (* n (/ (- v l) (- h l)))))
+             (segment (if (= v h) (1- segment) segment)))
+        (replace line "*" :start1 segment))
+      "-*-*-"))
 
 (defun bitcoin-modeline (ml)
-  "Get the actual USD-BTC value, store value in list, preserve list size
-popping first value, calculate average and set formatting depending on
-value vs average. This function is evaluated on every modeline refresh."
+  "This function is evaluated on every modeline refresh and defines
+the modeline string, so the values exist as global variables and are
+updated with the `refresh-values' function."
   (declare (ignore ml))
-  (let ((now (/ (get-internal-real-time) internal-time-units-per-second)))
-    (when (> (- now *prev-time*) *time-delay*)
-      (progn (setf *prev-time* now)
-             ;; Add value to values list, pushing to front
-             (push (get-value-from-url) *values*)
-             ;; Preserve values list size, popping from end
-             (setf *values* (nreverse *values*))
-             (pop *values*)
-             (setf *values* (nreverse *values*))
-             ;; Calculate average of values, excluding NIL values
-             ;; that could exist because network issues.
-             (let ((clean (remove-if-not #'numberp *values*)))
-               (setf *values-average* (/ (reduce #'+ clean)
-                                         (if (zerop (length clean))
-                                             1
-                                             (length clean))))))))
+  (refresh-values)
   ;; Actual value must be positive number
-  (if (and (numberp (car *values*)) (plusp (car *values*)))
+  (if (and (numberp *value*) (plusp *value*))
       ;; Apply desired format to value
       (let ((value-string
-              (case *local-code*
-                (0 (format nil "~,2F" (car *values*)))
-                (1 (format nil "~/bitcoin::comma-point/" (car *values*)))
-                (2 (format nil "~/bitcoin::point-comma/" (car *values*)))
-                (3 (format nil "~/bitcoin::space-comma/" (car *values*)))
-                (otherwise (format nil "~,2F" (car *values*))))))
+              (concatenate
+               'string
+               (case *local-code*
+                 (0 (format nil "~,2F" *value*))
+                 (1 (format-decimal *value* "," "3" "."))
+                 (2 (format-decimal *value* "." "3" ","))
+                 (3 (format-decimal *value* " " "3" ","))
+                 (otherwise (format nil "~,2F" *value*)))
+               (when *modeline-gauge*
+                 (concatenate
+                  'string
+                  " "
+                  (gauge *value* *values-low* *values-high* *gauge-width*))))))
         ;; Return with color if desired
-        (if *modeline-use-colors*
-            (let* ((diff (- (car *values*) *values-average*))
-                   (pdiff (/ diff (if (zerop (car *values*))
-                                      1
-                                      (car *values*)))))
-              (cond ((> pdiff *threshold*)
-                     (format nil "^[^B^3*~A^]" value-string))
-                    ((< pdiff (- *threshold*))
-                     (format nil "^[^1*~A^]" value-string))
-                    (t (format nil "^[^7*~A^]" value-string))))
-            (format nil "^[^**~A^]" value-string)))
+        (concatenate
+         'string
+         (if *modeline-use-colors*
+             (let* ((diff (- *value* *values-average*))
+                    (pdiff (/ diff (max 1 *value*))))
+               (cond ((> pdiff *threshold*)
+                      (format nil "^[^B^3*~A^]" value-string))
+                     ((< pdiff (- *threshold*))
+                      (format nil "^[^1*~A^]" value-string))
+                     (t (format nil "^[^7*~A^]" value-string))))
+             (format nil "^[^**~A^]" value-string))))
+      ;; The value is not a positive number
       (format nil "-BTC-")))
 
-(stumpwm:add-screen-mode-line-formatter #\b 'bitcoin-modeline)
-
-;;; Debugging ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CL-USER > (declaim (optimize (speed 0) (debug 3) (safety 0)))
-;; CL-USER > (asdf:load-system :bitcoin)
-;; CL-USER > (in-package "BITCOIN")
-
-;;; Wile executing, swap to code buffers, and any re-compile-load-ed
-;;; changes will be visible. Recall `C-c C-b' stops loop in Sly REPL.
-
-;; (do () (nil)
-;;   (let* ((price (get-value-from-url))
-;;          (clean (remove-if-not #'numberp *values*))
-;;          (average (/ (reduce #'+ clean)
-;;                      (length clean)))
-;;          (diff (- price average)))
-;;     (format t "~&~2$ ~2$ ~2@$ ~4@$% ~a"
-;;             price
-;;             average
-;;             diff
-;;             (* 100 (/ diff price))
-;;             (bitcoin-modeline t)))
-;;   (force-output)
-;;   (sleep 3))
-
-;; (do () (nil)
-;;   (format t "~&~a" (bitcoin-modeline t))
-;;   (force-output)
-;;   (sleep 1))
-
-;;; Search optimized code to push/append/pop list. See time and conses.
-
-;; (time
-;;  (do ((i 1 (1+ i))
-;;       (l (make-list 10 :initial-element 0)))
-;;      ((> i 10))
-;;    (push i l)
-;;    (pop l)
-;;    (format t "~&~A" l)))
-
-;; (time
-;;  (do ((i 1 (1+ i))
-;;       (l (make-list 10 :initial-element 0)))
-;;      ((> i 1000000) (format t "~&~A" l))
-;;    (setf l (append l (list i)))
-;;    (pop l)))
-
-;;; Best option and the car is the last pushed element
-;; (time
-;;  (do ((i 1 (1+ i))
-;;       (l (make-list 10 :initial-element 0)))
-;;      ((> i 1000000) (format t "~&~A" l))
-;;    (push i l)
-;;    (setf l (nreverse l))
-;;    (pop l)
-;;    (setf l (nreverse l))))
-
-;;; Seek for optimal number formatting function
-;;; From https://stackoverflow.com/questions/35012859
-
-;; (defun comma-point (stream arg &rest args)
-;;   (declare (ignore args))
-;;   (format stream
-;;           "~,,',,:D.~A"
-;;           (truncate arg)
-;;           (let ((float-string (format nil "~,2F" arg)))
-;;             (subseq float-string (1+ (position #\. float-string))))))
-
-;; (defun point-comma (stream arg &rest args)
-;;   (declare (ignore args))
-;;   (format stream
-;;           "~,,'.,:D,~A"
-;;           (truncate arg)
-;;           (let ((float-string (format nil "~,2F" arg)))
-;;             (subseq float-string (1+ (position #\. float-string))))))
-
-;; (defun space-comma (stream arg &rest args)
-;;   (declare (ignore args))
-;;   (format stream
-;;           "~,,' ,:D,~A"
-;;           (truncate arg)
-;;           (let ((float-string (format nil "~,2F" arg)))
-;;             (subseq float-string (1+ (position #\. float-string))))))
-
-;; (defun custom (stream arg &rest args)
-;;   (declare (ignore args))
-;;   (multiple-value-bind (quotient remainder) (truncate arg)
-;;     (format stream
-;;             "~,,'.,:D,~D"
-;;             quotient
-;;             (truncate (* 100 remainder)))))
+(stumpwm:add-screen-mode-line-formatter #\₿ 'bitcoin-modeline)
