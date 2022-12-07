@@ -72,11 +72,11 @@
                  (when (> new-width w)
                    (setf w new-width)))
         (multiple-value-bind (x y)
-            (stumpwm::calculate-gravity (message-window-stumpwm-screen frame)
-                                        (message-window-stumpwm-head frame)
-                                        stumpwm:*message-window-gravity*
-                                        w
-                                        h)
+            (calculate-gravity (message-window-stumpwm-screen frame)
+                               (message-window-stumpwm-head frame)
+                               stumpwm:*message-window-gravity*
+                               w
+                               h)
           (move-and-resize-sheet (frame-top-level-sheet frame) x y w h))))))
 
 (defmacro bold ((stream) &body body)

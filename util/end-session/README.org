@@ -3,7 +3,7 @@
    and shutdown or reboot the computer. A logout command is also
    provided.
 
-   This module requires the use of =systemD=, and requires the =polkit=
+   This module requires the use of =logind= (or elogind), and requires the =polkit=
    package to be installed, as well as the =wmctl= command.
 ** Usage
    Add these lines to your =.stumprc= file:
