@@ -84,7 +84,7 @@ no decimals.
 The localization format is set by =*local-code*=, when =0= there is no
 thousand separator, gives =1234.56= and the =*decimals*= parameter
 does not work, when =1= the thousand separator is =comma= and gives
-=1,234.56=, when =2= the thousand separator is =dot= and gives
+=1,234.56=, when =2= the thousand separator is =period= and gives
 =1.234,56=, and when =3= the thousand separator is =space= and gives
 =1 234,56=. Can be customized too:
 
