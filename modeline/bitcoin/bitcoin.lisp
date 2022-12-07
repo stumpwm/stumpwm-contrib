@@ -86,7 +86,7 @@ popping first value, calculate average and set formatting depending on
 value vs average."
   (let ((now (/ (get-internal-real-time) internal-time-units-per-second))
         (values (get-values-from-url)))
-    (when t ;;(> (- now *prev-time*) *time-delay*)
+    (when (> (- now *prev-time*) *time-delay*)
       (progn
         (setf *prev-time* now)
         (setf *value* (first values)
