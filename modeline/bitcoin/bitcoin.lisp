@@ -59,7 +59,7 @@ time-delay in seconds.")
 
 ;;; Get price
 
-(defparameter *url* "https://api.kraken.com/0/public/Ticker?pair=btcusd"
+(defparameter *url* "https://api.kraken.com/0/public/Ticker?pair=xbtusd"
   "Location of price provider.")
 
 (defvar *prev-time* 0
