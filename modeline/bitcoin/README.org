@@ -6,7 +6,7 @@ Place the following in your =~/.stumpwmrc= file:
   (load-module "bitcoin")
 #+END_SRC
 
-Then you can use =%₿=, the ₿itcoin symbol =U+20BF= in your mode line
+Then you can use =%₿=, the ₿itcoin symbol =U+20BF=, in your mode line
 format:
 
 #+BEGIN_SRC lisp
@@ -21,13 +21,13 @@ format:
 And define some parameters:
 
 #+BEGIN_SRC lisp
-  (setf bitcoin:*modeline-use-colors* t ; use colors
-        bitcoin:*threshold* 0.001       ; 0.001 is a 0.1% deviation from average
-        bitcoin:*time-delay* 30         ; seconds
-        bitcoin:*decimals* 2            ; number of decimal digits
-        bitcoin:*local-code* 2          ; formatting code to use
-        bitcoin:*modeline-gauge* t      ; show gauge bar
-        bitcoin:*gauge-width* 9)        ; width of the gauge bar in characters
+  (setf bitcoin:*modeline-use-colors* t     ; use colors
+        bitcoin:*threshold*           0.001 ; 0.001 is a 0.1% deviation from average
+        bitcoin:*time-delay*          30    ; seconds
+        bitcoin:*decimals*            2     ; number of decimal digits
+        bitcoin:*local-code*          2     ; formatting code to use
+        bitcoin:*modeline-gauge*      t     ; show gauge bar
+        bitcoin:*gauge-width*         9)    ; width of the gauge bar in characters
 #+END_SRC
 
 It gets actual price through API, so needs =dexador= and =yason=.
