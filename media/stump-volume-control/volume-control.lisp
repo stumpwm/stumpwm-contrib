@@ -27,7 +27,7 @@
 (defcommand volume-up () ()
   (run-shell-command (format nil "amixer ~asset Master playback 2db+"
                              (translate-device-to-option *sound-card*)))
-  (message "Audio bit lowder."))
+  (message "Audio bit louder."))
 
 (defcommand volume-down () ()
   (run-shell-command (format nil "amixer ~asset Master playback 2db-"

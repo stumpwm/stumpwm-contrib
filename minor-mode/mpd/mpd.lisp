@@ -116,7 +116,8 @@
              (message "Error with mpd connection: ~a" c)
              (setf *mpd-socket* nil)
              (when *mpd-timer*
-               (cancel-timer *mpd-timer*)))))
+               (cancel-timer *mpd-timer*)
+               (setf *mpd-timer* nil)))))
      (message "Error: not connected to mpd")))
 
 (defun mpd-send (command)
@@ -204,7 +205,13 @@
   (when *mpd-socket*
     (when *mpd-timeout*
       (setf *mpd-timer*
-            (run-with-timer *mpd-timeout* *mpd-timeout* 'mpd-ping)))
+            (run-with-timer *mpd-timeout* *mpd-timeout*
+                            (lambda ()
+                              (if *mpd-socket*
+                                  (mpd-ping)
+                                  (when *mpd-timer*
+                                    (cancel-timer *mpd-timer*)
+                                    (setf *mpd-timer* nil)))))))
     (mpd-receive t)
     (when *mpd-password*
       (mpd-format-command "password \"~a\"" *mpd-password*))))
@@ -681,10 +688,12 @@ Volume
 
 (defcommand mpd-disconnect () ()
   "Disconnect from mpd server"
+  (when *mpd-timer*
+    (cancel-timer *mpd-timer*)
+    (setf *mpd-timer* nil))
   (with-mpd-connection
    (close *mpd-socket*)
-   (setf *mpd-socket* nil)
-   (when *mpd-timer* (cancel-timer *mpd-timer*))))
+   (setf *mpd-socket* nil)))
 
 (defcommand mpd-kill () ()
  (mpd-send-command "kill"))
@@ -763,13 +772,17 @@ Passed an argument of zero and if crossfade is on, toggles crossfade off."
 
 (defcommand mpd-volume-up () ()
   (let* ((status (mpd-send-command "status"))
-         (vol (read-from-string (assoc-value :volume status))))
-    (mpd-send-command (format nil "setvol ~a" (+ vol *mpd-volume-step*)))))
+         (vol (read-from-string (assoc-value :volume status)))
+         (new-vol (+ vol *mpd-volume-step*)))
+    (mpd-send-command (format nil "setvol ~a" new-vol))
+    (message "~a" new-vol)))
 
 (defcommand mpd-volume-down () ()
   (let* ((status (mpd-send-command "status"))
-         (vol (read-from-string (assoc-value :volume status))))
-    (mpd-send-command (format nil "setvol ~a" (- vol *mpd-volume-step*)))))
+         (vol (read-from-string (assoc-value :volume status)))
+         (new-vol (- vol *mpd-volume-step*)))
+    (mpd-send-command (format nil "setvol ~a" new-vol))
+    (message "~a" new-vol)))
 
 (defcommand mpd-clear () ()
   (mpd-send-command "clear"))

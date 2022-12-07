@@ -42,7 +42,7 @@ Returns true when yes is selected"
   (let ((choice (yes-no-diag "Really suspend?")))
     (when choice
       (echo-string (current-screen) "Suspending...")
-      (run-shell-command "systemctl suspend"))))
+      (run-shell-command "loginctl suspend"))))
 
 (defun close-all-apps ()
   "Closes all windows managed by stumpwm gracefully"
@@ -57,7 +57,7 @@ Returns true when yes is selected"
       (echo-string (current-screen) "Shutting down...")
       (close-all-apps)
       (run-hook *quit-hook*)
-      (run-shell-command "systemctl poweroff"))))
+      (run-shell-command "loginctl poweroff"))))
 
 ;; can't name the function "restart"
 (defcommand restart-computer () ()
@@ -66,7 +66,7 @@ Returns true when yes is selected"
       (echo-string (current-screen) "Restarting...")
       (close-all-apps)
       (run-hook *quit-hook*)
-      (run-shell-command "systemctl reboot"))))
+      (run-shell-command "loginctl reboot"))))
 
 (defcommand logout () ()
   (let ((choice (yes-no-diag "Close all programs and quit stumpwm?")))
