@@ -75,9 +75,10 @@ time-delay in seconds.")
                                                       :keep-alive nil))))
                     ;; Return NIL in case some condition is triggered
                     (condition () nil))))
-    (list (read-from-string (first (gethash "c" response)))
-          (read-from-string (second (gethash "l" response)))
-          (read-from-string (second (gethash "h" response))))))
+    (unless (null response)
+      (list (read-from-string (first (gethash "c" response)))
+            (read-from-string (second (gethash "l" response)))
+            (read-from-string (second (gethash "h" response)))))))
 
 (defun refresh-values ()
   "Refresh values from `*url*' if the `*time-delay*' has been reached.
