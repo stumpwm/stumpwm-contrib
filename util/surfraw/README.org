@@ -1,6 +1,6 @@
 ** Commentary
 
-I like surfraw (http://surfraw.alioth.debian.org). If you're
+I like [[https://gitlab.com/surfraw/Surfraw][surfraw]]. If you're
 reading this, you probably like surfraw. I've got surfraw-related
 code in my .stumpwmrc, and (judging from some judicious googling
 for RC files early on in my use of stumpwm) I know that I'm not the

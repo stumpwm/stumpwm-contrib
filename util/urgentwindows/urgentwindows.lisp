@@ -20,7 +20,7 @@
 (defun raise-urgent-window ()
   (let ((last-urgent (pop *urgent-windows-stack*)))
     (when last-urgent
-      (gselect (window-group last-urgent))
+      (gselect (group-name (window-group last-urgent)))
       (really-raise-window last-urgent))))
 
 (defcommand raise-urgent () ()

@@ -1,0 +1,198 @@
+#+TITLE: Clim Based Messaging for StumpWM
+
+* Usage
+  This module depends upon CLIM, so please ensure it is somewhere that ASDF can
+  find it. If you dont have a copy of CLIM where ASDF can find it, please
+  evaluate ~(ql:quickload :clim)~ at a repl before using this module.
+
+  To load this module, add the following to your stumpwmrc. 
+  #+begin_src lisp
+    (load-module "swm-clim-message")
+  #+end_src
+
+  Typical usage is to take a list of objects and pass them to
+  ~generate-clim-message~, and then pass the resulting list to ~clim-message~.
+  Here is an example of implementing an analog to ~windowlist~ using
+  ~clim-message~. This function is provided as ~swm-clim-message:windowlist~.
+
+  If you write a replacement to a StumpWM command (such as windowlist), please
+  add it to the file =reimplementations.lisp= and open a pull request.
+
+  #+begin_src lisp
+    (in-package :stumpwm)
+
+    (defun clim-message-windowlist (&key persist)
+      "Similar to the StumpWM WINDOWLIST command, this lists the windows of the
+    current group, formatted according to STUMPWM:*WINDOW-FORMAT*."
+      (let* ((fmt *window-format*)
+             (group (current-group))
+             (windows (sort-windows-by-number (group-windows group))))
+        (swm-clim-message:clim-message
+         (swm-clim-message:generate-clim-message 
+          windows
+          (lambda (w) (format-expand *window-formatters* fmt w))
+          (lambda (w) (group-focus-window group w) w))
+         :repeatable-actions persist
+         :highlight 0
+         :bind-keys t)))
+  #+end_src
+
+* Functions
+** Messaging
+   /Function/ *CLIM-MESSAGE, MESSAGE*
+   *Syntax:*
+   *clim-message* /messages/ &key /repeatable-actions screen head highlight bind-keys/ => /frame, process/
+   *message* /things/ &rest /rest/ &key /formatter operator/ => /frame, process/
+   *select-from-menu* /things/ &rest /keys/ => /value/
+
+   *Arguments and Values:*
+   /messages/---a list of conses whose car is a string and whose cdr is a thunk.
+   /repeatable-actions/---a generalized boolean. The default is false.
+   /screen/---a StumpWM screen object.
+   /head/---a StumpWM head object.
+   /highlight/---an integer. The default is -1.
+   /bind-keys/---a generalized boolean. The default is true.
+   /things/---a list of objects.
+   /rest/---a list of keyargs passed to *clim-message*.
+   /formatter/---a function of arity one.
+   /operator/---a function of arity one.
+   /keys/---a list of keyargs passed to *message*.
+   /frame/---a message-window CLIM frame.
+   /process/---a process (thread) object. 
+  
+   *Description:*
+
+   *message* takes a list of objects and passes it to *generate-clim-message*
+   alongside /formatter/ and /operator/. If /formatter/ is *NIL* the function
+   ~(lambda (x) (format nil "~A" x))~ is used. If /operator/ is *NIL* the
+   function ~#'identity~ is used. The resulting list is then passed to
+   *clim-message* alongside all other key arguments.
+
+   All other objects are the same between
+   *message* and *clim-message*. 
+
+   *clim-message* displays the car of every cons cell in /messages/ on /screen/
+   and /head/ such that each entry can be selected by either mouse click or
+   keyboard input.
+
+   When /repeatable-actions/ is *T* selection will not close the frame.
+
+   When provided, /highlight/ is the element of messages to display in bold,
+   indexed from zero.
+
+   When /bind-keys/ is *T*, the StumpWM keymap ~*clim-message-window-keymap*~
+   will be activated on running the frame and deactivated when the frame exits.
+
+   The frame being run (/frame/) is returned as the first value, while the
+   process it is running on (/process/) is returned as the second value. 
+
+   *Notes:*
+   In this context, frame denotes a CLIM frame, not a StumpWM frame. 
+** Obtain Return Values
+   /Function/ *MESSAGE-WINDOW-CURRENT-VALUE, MESSAGE-WINDOW-FINAL-VALUE*
+   *Syntax:*
+   *message-window-current-value* &key /default timeout wait/ => /result, freshness/
+   *message-window-final-value* &key /process default timeout/ => /result, freshness/
+
+   *Arguments and Values:*
+   /default/---a default return value.
+   /timeout/---an integer, or nil.
+   /wait/---a generalized boolean. The default value is *T*.
+   /process/---a process (thread) object. 
+   /result/---the value of the most recently chosen message window entry.
+   /freshness/---a keyword.
+
+   *Description:*
+
+   *message-window-current-value* returns the currently set value of the message
+   window frame. Because the place this is gotten from is a resource shared
+   between processes a mutex is used to ensure reading and writing cannot occur
+   simultaneously. If /wait/ is *T* then this function will wait until the mutex
+   can be aquired or /timeout/ seconds have passed. If the mutex cannot be
+   aquired within /timeout/ seconds /default/ and /freshness/ are returned. 
+
+   *message-window-final-value* returns the final value of a given execution of
+   a message window frame. This is done by attempting to join the process
+   /process/, or if none is provided the most recently run process for the
+   message window frame. If the process doesnt finish within /timeout/ seconds
+   /default/ is returned. Likewise, if no message window frame has been created
+   yet and /process/ is *NIL* /default/ and /freshness/ are returned.
+
+   The value /freshness/ is a keyword of either ~:stale~, ~:fresh~, ~:default~,
+   or ~:timeout~. When /result/ has not been retrieved before, /freshness/ is
+   ~:fresh~. When /result/ has been retrieved before /freshness/ is ~:stale~. If
+   the attempt timed out due to not aquiring the mutex or the thread not
+   returning within /timeout/ seconds then /freshness/ is ~:timeout~. If there
+   is no message window frame or /process/ is not a process (thread) object then
+   /freshness/ is ~:default~. If /result/ isnt retrieved before the /process/
+   finishes, *message-window-final-value* will always return /freshness/ as
+   ~:fresh~.
+      
+** Generate Message Lists
+   /Function/ *GENERATE-CLIM-MESSAGE* 
+   *Syntax:*
+   *generate-clim-message* /list-of-objects/ &optional /string-generation-function operation-function/ => /message-list/
+   
+   *Arguments and Values:*
+   /list-of-objects/---a list of arbitrary objects.
+   /string-generation-function/---a function of arity one that generates a string from an object.
+   /operation-function/---a function to call with the selected object.
+   /message-list/---a list suitable to pass to ~clim-message~.
+
+   *Description:*
+
+   Loop over each object in /list-of-objects/ collecting a cons cell whose car
+   is the result of calling /string-generation-function/ on the object and whose
+   cdr is a thunk which, when called, will call /operation-function/ on the
+   object.
+
+   The default value of /string-generation-function/ is
+   ~(lambda (x) (format nil "~A" x))~.
+
+   The default value of /operation-function/ is a no-op function of arity one.
+** Execute Frame Commands
+   /Function/ *SWM-CLIM-MESSAGE-COMMAND*
+   /Command/ *"swm-clim-message-command"*
+   *Syntax:*
+   *swm-clim-message-command* /cmd/ => /value/
+
+   *Arguments and Values:*
+   /cmd/---a string.
+   /value/---nil.
+
+   *Description:*
+
+   Read /cmd/ and pass it (unevaluated) to the message-window frame for
+   execution. The available commands are ~(com-select-next)~,
+   ~(com-select-prev)~, ~(com-select-choose)~, ~(com-select-choose-and-quit)~,
+   and ~(com-quit)~.
+
+   *Note:*
+
+   Because /cmd/ is not evaluated, the only way to compute values is to use the
+   #. reader macro. Computing values is not advised. 
+* Variables
+** Keymap
+   /Variable/ **CLIM-MESSAGE-WINDOW-KEYMAP**
+
+   *Value Type:*
+
+   A Stumpwm kmap object.
+
+   *Description:*
+
+   A keymap that is activated when the message window is active. This keymap is
+   used to execute commands within the message window frame by way of
+   /swm-clim-message-command/.
+
+   *Default Bindings:*
+
+   | Key   | Command                    | Description                            |
+   |-------+----------------------------+----------------------------------------|
+   | C-n   | com-select-next            | highlight the next entry               |
+   | C-p   | com-select-prev            | highlight the previous entry           |
+   | RET   | com-select-choose          | choose the highlighted entry           |
+   | C-RET | com-select-choose-and-quit | call com-select-choose, exit the frame |
+   | ESC   | com-quit                   | exit the frame                         |
+   | C-g   | com-quit                   | exit the frame                         |
+   

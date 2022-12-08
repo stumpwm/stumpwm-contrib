@@ -10,7 +10,7 @@
 
 (defvar *swm-ssh-config-path* #p"~/.ssh/config")
 
-(defvar *host-regex* "^Host[ \t]+")
+(defvar *host-regex* "^(?i)Host[ \t]+")
 
 (defvar *swm-ssh-default-term* "urxvtc")
 

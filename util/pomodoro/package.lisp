@@ -35,6 +35,10 @@ at the end of each pomodoro.")
   "Counter of finished pomodoros in a series.")
 
 
+(defparameter *pomodoro-timer* nil
+  "The pomodoro timer clock object.")
+
+
 (defun update-status-message ()
   (when notifications-loaded
     (notifications:notifications-delete status-message))
@@ -53,7 +57,7 @@ at the end of each pomodoro.")
   (ring-the-bell))
 
 
-(defparameter *pomodoro-timer*
+(setf *pomodoro-timer*
   (sb-ext:make-timer #'swm-pomodoro::finish-timer
                      :name :pomodoro-timer))
 
@@ -67,8 +71,8 @@ at the end of each pomodoro.")
 (defun ring-the-bell ()
   "Play the *BELL-SOUND-FILE* if exists."
   (when (probe-file *bell-sound-file*)
-    (asdf:run-shell-command
-     "~a ~a" *sound-play-command* (namestring *bell-sound-file*))))
+    (uiop:run-program
+     (format nil "~a ~a" *sound-play-command* (namestring *bell-sound-file*)))))
 
 
 (defun notify-break ()
