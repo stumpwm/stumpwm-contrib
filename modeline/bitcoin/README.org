@@ -6,7 +6,7 @@ Place the following in your =~/.stumpwmrc= file:
   (load-module "bitcoin")
 #+END_SRC
 
-Then you can use =%₿=, the ₿itcoin symbol =U+20BF=, in your mode line
+Then you can use =%b= in your mode line
 format:
 
 #+BEGIN_SRC lisp
@@ -14,7 +14,7 @@ format:
         (list "[%n]"                      ; Groups
               "%v"                        ; Windows
               "^>"                        ; Push right
-              " | %₿"                     ; Bitcoin
+              " | %b"                     ; Bitcoin
               " | %d"))                   ; Clock
 #+END_SRC
 

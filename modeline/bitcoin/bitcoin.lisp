@@ -177,4 +177,4 @@ updated with the `refresh-values' function."
       ;; The value is not a positive number
       (format nil "-BTC-")))
 
-(stumpwm:add-screen-mode-line-formatter #\₿ 'bitcoin-modeline)
+(stumpwm:add-screen-mode-line-formatter #\b 'bitcoin-modeline)
