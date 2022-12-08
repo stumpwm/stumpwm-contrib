@@ -62,14 +62,14 @@ The parameters that can be customized when defining a ticker and its
 default values are:
 
 #+begin_src lisp
-  :pair "XXBTZUSD"
-  :symbol "BTC"
-  :colors t
-  :threshold 0.001
-  :delay 30
-  :decimals 0
-  :localization 2
-  :gauge-width 7
+  :pair         "XXBTZUSD" ; pair to get from API
+  :symbol       "BTC"      ; label the ticker
+  :colors       t          ; use colors
+  :threshold    0.001      ; 0.1% deviation from average to colorize
+  :delay        30         ; seconds between updates
+  :decimals     0          ; number of decimal digits
+  :localization 2          ; formatting number
+  :gauge-width  7          ; width of the gauge bar in characters
 #+end_src
 
 The minimum parameters to define are the =:pair= to get the value from
@@ -78,7 +78,7 @@ the API, and the =:symbol= to label the ticker in the modeline. The
 
 + [[https://api.kraken.com/0/public/Ticker]]
 
-The =:symbol= is a string and can be blank =""=.
+The =:symbol= is a string and can be blank.
 
 Price format is colorized depending on the =:colors= flag. You can
 customize setting it to =t= or =nil= when defining the ticker.
