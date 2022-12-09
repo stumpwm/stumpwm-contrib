@@ -2,4 +2,5 @@
 
 (defpackage :ticker
   (:use :cl)
-  (:export #:define-ticker))
+  (:export #:define-ticker
+           #:*tickers-separator*))

@@ -118,7 +118,10 @@ It is possible to add a gauge bar with the tendency of the actual
 value between the low and high in the last 24 hours with
 =:gauge-width=. Value must be greater than =1= to be shown.
 
-There is an external parameter =*tickers-separator*= that defines the string to put between tickers, as a separator. Can be customized with:
+There is an external parameter =*tickers-separator*= that defines the
+string to put between tickers, as a separator. Can be customized, but
+be aware not to use tilde "~" or other combinations because it is
+interpreted by the =format= function:
 
 #+begin_src lisp
   (setf ticker:*tickers-separator* " | ")
