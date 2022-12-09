@@ -8,4 +8,5 @@
   :depends-on ("stumpwm"                ; Use add-screen-mode-line-formatter
                "dexador"                ; Get data from url
                "yason")                 ; Parse json
-  :components ((:file "ticker")))
+  :components ((:file "package")
+               (:file "ticker" :depends-on ("package"))))
