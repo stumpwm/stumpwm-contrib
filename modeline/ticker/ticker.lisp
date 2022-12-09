@@ -1,9 +1,5 @@
 ;;;; ticker.lisp
 
-(defpackage :ticker
-  (:use :cl)
-  (:export #:define-ticker
-           #:*tickers*))
 (in-package :ticker)
 
 ;;; CODE:
@@ -34,31 +30,28 @@
 
 ;;; Exported
 
-(defun define-ticker (&key
-                        (pair "XXBTZUSD")
-                        (symbol "BTC")
-                        (colors t)
-                        (threshold 0.001)
-                        (delay 30)
-                        (decimals 0)
-                        (localization 2)
-                        (gauge-width 7))
-  "Ticker constructor which defaults to Bitcoin and 3 hours historical values."
-  (make-ticker :pair pair
-               :symbol symbol
-               :colors colors
-               :threshold threshold
-               :delay delay
-               :decimals decimals
-               :localization localization
-               :gauge-width gauge-width
-               ;; Internal state variables
-               :values (make-list (truncate (/ (* 3 60 60) ; 3 hours
-                                               delay))
-                                  :initial-element NIL)))
-
 (defparameter *tickers* ()
   "List of tickers to show.")
+
+(defun define-ticker (&key (pair "XXBTZUSD") (symbol "BTC") (colors t)
+                        (threshold 0.001) (delay 30) (decimals 0)
+                        (localization 2) (gauge-width 7))
+  "Ticker constructor which defaults to Bitcoin and 3 hours historical values."
+  (setf *tickers*
+        (append *tickers*
+                (list (make-ticker
+                       :pair pair
+                       :symbol symbol
+                       :colors colors
+                       :threshold threshold
+                       :delay delay
+                       :decimals decimals
+                       :localization localization
+                       :gauge-width gauge-width
+                       ;; Internal state variables
+                       :values (make-list (truncate (/ (* 3 60 60) ; 3 hours
+                                                       delay))
+                                          :initial-element NIL))))))
 
 (defparameter *tickers-separator* " | "
   "String to separate between tickers in de modeline.")
@@ -169,28 +162,29 @@ modeline string, so the values are always printed off, but only
 updated when the `refresh-values' function allows it through the
 `:threshold' parameter."
   (declare (ignore ml))
-  (unless (null *tickers*)
-    (let ((results ()))
-      (dolist (tick *tickers*)
-        (refresh-values tick)
-        ;; Actual value must be positive number
-        (if (and (numberp (ticker-value tick)) (plusp (ticker-value tick)))
-            ;; Apply desired format to value
-            (let ((value-string (get-value-string tick)))
-              ;; Return with color if desired
-              (push (if (ticker-colors tick)
-                        (let* ((diff (- (ticker-value tick) (ticker-values-average tick)))
-                               (pdiff (/ diff (max 1 (ticker-value tick)))))
-                          (cond ((> pdiff (ticker-threshold tick))
-                                 (format nil "^[^B^3*~A^]" value-string))
-                                ((< pdiff (- (ticker-threshold tick)))
-                                 (format nil "^[^1*~A^]" value-string))
-                                (t (format nil "^[^7*~A^]" value-string))))
-                        (format nil "^[^**~A^]" value-string))
-                    results))
-            ;; The value is not a positive number
-            (format nil "-~A-" (ticker-pair tick))))
-      (let ((s (concatenate 'string "~{~A~^" *tickers-separator* "~}")))
-        (format nil s (nreverse results))))))
+  (if *tickers*
+      (let ((results ()))
+        (dolist (tick *tickers*)
+          (refresh-values tick)
+          ;; Actual value must be positive number
+          (if (and (numberp (ticker-value tick)) (plusp (ticker-value tick)))
+              ;; Apply desired format to value
+              (let ((value-string (get-value-string tick)))
+                ;; Return with color if desired
+                (push (if (ticker-colors tick)
+                          (let* ((diff (- (ticker-value tick) (ticker-values-average tick)))
+                                 (pdiff (/ diff (max 1 (ticker-value tick)))))
+                            (cond ((> pdiff (ticker-threshold tick))
+                                   (format nil "^[^B^3*~A^]" value-string))
+                                  ((< pdiff (- (ticker-threshold tick)))
+                                   (format nil "^[^1*~A^]" value-string))
+                                  (t (format nil "^[^7*~A^]" value-string))))
+                          (format nil "^[^**~A^]" value-string))
+                      results))
+              ;; The value is not a positive number
+              (format nil "-~A-" (ticker-pair tick))))
+        (let ((s (concatenate 'string "~{~A~^" *tickers-separator* "~}")))
+          (format nil s (nreverse results))))
+      "-Ticker-"))
 
 (stumpwm:add-screen-mode-line-formatter #\T 'ticker-modeline)

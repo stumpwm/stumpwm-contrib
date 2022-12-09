@@ -4,6 +4,8 @@ This module prints off values from stocks. It is developed with
 cryptocurrencies in mind, so the default API target is the [[https://kraken.com/][Kraken]]
 servers.
 
+[[./screenshot.png]]
+
 ** Dependencies
 
 It gets actual price through API, so needs =dexador= and =yason=.
@@ -31,30 +33,30 @@ Use =%T= in your mode line format:
               " | %d"))                   ; Clock
 #+END_SRC
 
-And define some tickers with its parameters. This defines only one ticker that defaults to the Bitcoin/USD pair:
+And define some tickers with its parameters. This line defines one
+ticker that defaults to the Bitcoin/USD pair:
 
 #+BEGIN_SRC lisp
-  (setf ticker:*tickers* (list (ticker:define-ticker)))
+  (ticker:define-ticker)
 #+END_SRC
 
 You can define more tickers and parameterize as desired:
 
 #+begin_src lisp
-  (setf ticker:*tickers*
-        (list (ticker:define-ticker
-                  :symbol "XBT" ;;"₿"   ; Bitcoin
-                  :threshold 0.01)
-              (ticker:define-ticker
-                  :pair "XETHZUSD"      ; Ethereum
-                  :symbol "ETH")
-              (ticker:define-ticker
-                  :pair "ADAUSD"        ; Cardano
-                  :symbol "ADA" ;;"₳"
-                  :threshold 0.0001
-                  :delay 60
-                  :decimals 3
-                  :gauge-width 9)))
-#+end_src
+  (ticker:define-ticker
+      :symbol "XBT" ;;"₿"   ; Bitcoin
+      :threshold 0.01)
+  (ticker:define-ticker
+      :pair "XETHZUSD"      ; Ethereum
+      :symbol "ETH")
+  (ticker:define-ticker
+      :pair "ADAUSD"        ; Cardano
+      :symbol "ADA" ;;"₳"
+      :threshold 0.0001
+      :delay 60
+      :decimals 3
+      :gauge-width 9)
+          #+end_src
 
 ** Notes
 
