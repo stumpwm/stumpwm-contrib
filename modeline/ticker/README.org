@@ -37,7 +37,7 @@ And define some tickers with its parameters. This line defines one
 ticker that defaults to the Bitcoin/USD pair:
 
 #+BEGIN_SRC lisp
-  (ticker:define-ticker)
+  (ticker:define-ticker)    ; Bitcoin as default
 #+END_SRC
 
 You can define more tickers and parameterize as desired:
