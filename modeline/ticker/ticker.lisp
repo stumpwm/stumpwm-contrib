@@ -28,10 +28,10 @@
   (values-average 0.0) ; average last 3 hours values
   (prev-time 0))       ; store last update time
 
-;;; Exported
-
 (defparameter *tickers* ()
   "List of tickers to show.")
+
+;;; Exported
 
 (defun define-ticker (&key (pair "XXBTZUSD") (symbol "BTC") (colors t)
                         (threshold 0.001) (delay 30) (decimals 0)
@@ -59,10 +59,10 @@
 ;;; Get price
 
 (defparameter *url* "https://api.kraken.com/0/public/Ticker?pair="
-  "Location of price provider, the ticker pair must be concatenated.")
+  "Location of price provider, the ticker pair will be concatenated.")
 
 (defun get-values-from-url (tick)
-  "Get the USD-BTC, 24h LOW and 24h HIGH values."
+  "Get the actual, 24h low and 24h high values from the `*url*' API."
   (let* ((url (concatenate 'string *url* (ticker-pair tick)))
          (response (handler-case
                        (gethash (ticker-pair tick)
@@ -103,16 +103,18 @@ popping first value, and calculate average."
 
 ;;; Write on modeline
 
-;;; Simple format positive numbers, using directive D for thousand
-;;; separator and direct value displacement in the decimal part. Uses
-;;; truncate, so there is some precission loss, e.g. (truncate
-;;; 1231231.0999) gives 1231231 and 0.125. Does NOT work with negative
-;;; numbers. More in https://stackoverflow.com/questions/35012859
 (defun format-decimal (n sep int com dec)
   "Return Number formated in groups of INTerval length every, and
 separated by SEParator, with COMma character as decimal separator.
 DECimals is the number of digits in the decimal part. All parameters
-but N are strings. COMma character should not be the tilde `~'."
+but N are strings. COMma character should not be the tilde `~'.
+
+Works as a simple formatting positive numbers using directive `~D',
+for thousand separator and direct value displacement in the decimal
+part. Uses `truncate' so there is some precission loss. Does NOT work
+with negative numbers.
+
+Based on https://stackoverflow.com/questions/35012859"
   (let* ((num-string (concatenate 'string "~,,'" sep "," int ":D"))
          (decimals (format nil "~D" dec))
          (dec-string (concatenate 'string com "~" decimals ",'0D")))
@@ -157,10 +159,10 @@ an N length control."
     (format nil "~{~A~^ ~}" (nreverse results))))
 
 (defun ticker-modeline (ml)
-  "This function is evaluated on every modeline refresh and defines the
-modeline string, so the values are always printed off, but only
-updated when the `refresh-values' function allows it through the
-`:threshold' parameter."
+  "This function is evaluated on every modeline refresh and returns the
+modeline string. The values are always printed off, but only updated
+when the `refresh-values' function allows it through the `:threshold'
+parameter."
   (declare (ignore ml))
   (if *tickers*
       (let ((results ()))
@@ -182,9 +184,12 @@ updated when the `refresh-values' function allows it through the
                           (format nil "^[^**~A^]" value-string))
                       results))
               ;; The value is not a positive number
-              (format nil "-~A-" (ticker-pair tick))))
+            (format nil "-~A-" (ticker-pair tick))))
+        ;; Return aggregated results with proper separator
         (let ((s (concatenate 'string "~{~A~^" *tickers-separator* "~}")))
           (format nil s (nreverse results))))
-      "-Ticker-"))
+    ;; There are no tickers defined
+    "-Ticker-"))
 
+;; Bind modeline formatter character to the drawer function
 (stumpwm:add-screen-mode-line-formatter #\T 'ticker-modeline)
