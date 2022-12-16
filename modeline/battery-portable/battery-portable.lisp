@@ -228,7 +228,9 @@
                              (state (or (and (stringp state)
                                              (cond ((string= state "Charging") :charging)
                                                    ((string= state "Discharging") :discharging)
-                                                   ((string= state "Full") :charged)
+                                                   ((or (string= state "Full")
+                                                        (string= state "Not charging"))
+                                                    :charged)
                                                    (t :unknown)))
                                         :unknown)))
                         (values state
