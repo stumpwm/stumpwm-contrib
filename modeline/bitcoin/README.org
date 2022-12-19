@@ -1,3 +1,7 @@
+* Bitcoin
+
+Show Bitcoin (₿) value in the modeline.
+
 ** Usage
 
 Place the following in your =~/.stumpwmrc= file:
@@ -30,10 +34,10 @@ And define some parameters:
         bitcoin:*gauge-width*         9)    ; width of the gauge bar in characters
 #+END_SRC
 
-It gets actual price through API, so needs =dexador= and =yason=.
+It gets actual price through API, so needs =dexador= and =yason=. Also, the price getter is asynchronous with the =lparallel= machinery.
 
 #+BEGIN_SRC lisp
-  (ql:quickload '("dexador" "yason"))
+  (ql:quickload '("dexador" "yason" "lparallel"))
 #+END_SRC
 
 ** Notes
@@ -105,3 +109,6 @@ The gauge bar width is set by =*gauge-width*=.
 
 Try to use conditions' =handler-case= machinery to avoid the internet
 timeouts or the computer sleeping process, to stuck the modeline.
+
+The =truncate= function is used when formatting the values, so some
+precission loss is expected.

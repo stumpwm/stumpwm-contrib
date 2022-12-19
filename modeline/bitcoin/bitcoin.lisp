@@ -35,7 +35,7 @@ positive because `*values-size*'.")
 (defparameter *gauge-width* 9
   "Width of the graphical gauge in characters. Must be greater than 1.")
 
-;;; Store prices
+;;; Global variables
 
 (defvar *values*
   (make-list (truncate (/ (* 3 60 60) *time-delay*)) ; 3 hours
@@ -57,13 +57,13 @@ time-delay in seconds.")
 (defvar *values-average* 0.0
   "Average of values in `*values*'.")
 
+(defvar *initialized* nil
+  "When not nil the lparallel kernel has been initialized.")
+
 ;;; Get price
 
 (defparameter *url* "https://api.kraken.com/0/public/Ticker?pair=xbtusd"
   "Location of price provider.")
-
-(defvar *prev-time* 0
-  "Store previous time when got price.")
 
 (defun get-values-from-url ()
   "Get the USD-BTC, 24h LOW and 24h HIGH values."
@@ -85,25 +85,24 @@ time-delay in seconds.")
 Get the actual USD-BTC value, store value in list, preserve list size
 popping first value, calculate average and set formatting depending on
 value vs average."
-  (let ((now (/ (get-internal-real-time) internal-time-units-per-second))
-        (values (get-values-from-url)))
-    (when (> (- now *prev-time*) *time-delay*)
-      (progn
-        (setf *prev-time* now)
-        (setf *value* (first values)
-              *values-low* (second values)
-              *values-high* (third values))
-        ;; Add value to values list, pushing to front
-        (push *value* *values*)
-        ;; Preserve values list size, popping from end
-        (setf *values* (nreverse *values*))
-        (pop *values*)
-        (setf *values* (nreverse *values*))
-        ;; Calculate average of values, excluding NIL values
-        ;; that could exist because network issues.
-        (let ((values-clean (remove-if-not #'numberp *values*)))
-          (setf *values-average* (/ (reduce #'+ values-clean)
-                                    (max 1 (length values-clean)))))))))
+  (do ()
+      (nil)
+    (let ((values (get-values-from-url)))
+      (setf *value* (first values)
+            *values-low* (second values)
+            *values-high* (third values)))
+    ;; Add value to values list, pushing to front
+    (push *value* *values*)
+    ;; Preserve values list size, popping from end
+    (setf *values* (nreverse *values*))
+    (pop *values*)
+    (setf *values* (nreverse *values*))
+    ;; Calculate average of values, excluding NIL values
+    ;; that could exist because network issues.
+    (let ((values-clean (remove-if-not #'numberp *values*)))
+      (setf *values-average* (/ (reduce #'+ values-clean)
+                                (max 1 (length values-clean)))))
+    (sleep *time-delay*)))
 
 ;;; Write on modeline
 
@@ -144,7 +143,14 @@ an N length control."
 the modeline string, so the values exist as global variables and are
 updated with the `refresh-values' function."
   (declare (ignore ml))
-  (refresh-values)
+  ;; Launch asynchronous process to capture values
+  (unless *initialized*
+    (setf *initialized* t)
+    (let ((lparallel:*kernel*
+            (lparallel:make-kernel 1 :name "bitcoin-kernel")))
+      (lparallel:submit-task (lparallel:make-channel)
+                             (lambda ()
+                               (refresh-values)))))
   ;; Actual value must be positive number
   (if (and (numberp *value*) (plusp *value*))
       ;; Apply desired format to value
