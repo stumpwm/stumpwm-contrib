@@ -33,6 +33,12 @@ Signal quality (without percentage sign)
 @end table
 ")
 
+(defvar *wifi-signal-quality-fmt* "^[~A~D^]"
+  "The default formatting of the signal quality")
+
+(defvar *wifi-signal-quality-fmt-pc* "^[~A~D%^]"
+  "The default formatting of the signal quality as percentage")
+
 (defvar *use-colors* t
   "Use colors to indicate signal quality.")
 
@@ -47,11 +53,11 @@ Signal quality (without percentage sign)
 
 (defun wifi-get-signal-quality-pc (pair)
   (let ((qual (cdr pair)))
-    (format nil "^[~A~D%^]" (sig-quality-fmt qual) qual)))
+    (format nil *wifi-signal-quality-fmt-pc* (sig-quality-fmt qual) qual)))
 
 (defun wifi-get-signal-quality (pair)
   (let ((qual (cdr pair)))
-    (format nil "^[~A~D^]" (sig-quality-fmt qual) qual)))
+    (format nil *wifi-signal-quality-fmt* (sig-quality-fmt qual) qual)))
 
 (defvar *wifi-formatters-alist*
   '((#\e wifi-get-essid)
