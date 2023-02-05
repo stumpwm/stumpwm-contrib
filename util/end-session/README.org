@@ -4,7 +4,7 @@
    provided.
 
    This module requires the use of =logind= (or elogind), and requires the =polkit=
-   package to be installed, as well as the =wmctl= command.
+   package to be installed, as well as the =wmctrl= command.
 ** Usage
    Add these lines to your =.stumprc= file:
    #+BEGIN_SRC lisp
@@ -15,7 +15,7 @@
    #+END_SRC
 *** Commands Provided:
   - =end-session= Prompts for shutdown, restart, or logoff. You can
-     customize what this shows with =*end-session-menu*=. See [[file:session-ending.lisp::77]]
+     customize what this shows with =*end-session-menu*=. See [[file:end-session.lisp::86]]
   - shutdown-computer
   - restart-computer
   - logout
