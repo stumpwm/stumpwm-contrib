@@ -16,7 +16,7 @@ configuring some non-lispy external tool.
 
 To start using Binwarp, just load it into your StumpWM setup by adding either
 #+BEGIN_SRC lisp
-(load-module "binwarp)
+(load-module "binwarp")
 #+END_SRC
 or
 #+BEGIN_SRC lisp 
