@@ -28,7 +28,7 @@
 ;;; DEALINGS IN THE SOFTWARE.
 ;;;
 
-(defvar *base-command* "systemctl")
+(defvar *end-session-command* "systemctl")
 
 (defun yes-no-diag (query-string)
   "Presents a yes-no dialog to the user asking query-string.
@@ -43,7 +43,7 @@ Returns true when yes is selected"
   (let ((choice (yes-no-diag "Really suspend?")))
     (when choice
       (echo-string (current-screen) "Suspending...")
-      (run-shell-command (concat *base-command* " suspend")))))
+      (run-shell-command (concat *end-session-command* " suspend")))))
 
 (defun close-all-apps ()
   "Closes all windows managed by stumpwm gracefully"
@@ -58,7 +58,7 @@ Returns true when yes is selected"
       (echo-string (current-screen) "Shutting down...")
       (close-all-apps)
       (run-hook *quit-hook*)
-      (run-shell-command (concat *base-command* " poweroff")))))
+      (run-shell-command (concat *end-session-command* " poweroff")))))
 
 ;; can't name the function "restart"
 (defcommand restart-computer () ()
@@ -67,7 +67,7 @@ Returns true when yes is selected"
       (echo-string (current-screen) "Restarting...")
       (close-all-apps)
       (run-hook *quit-hook*)
-      (run-shell-command (concat *base-command* " reboot")))))
+      (run-shell-command (concat *end-session-command* " reboot")))))
 
 (defcommand logout () ()
   (let ((choice (yes-no-diag "Close all programs and quit stumpwm?")))

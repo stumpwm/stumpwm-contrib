@@ -12,6 +12,8 @@
      (add-to-load-path #p"path-to-contrib/util/end-session")
      ;; actually load the module
      (load-module "end-session")
+     ;; Use loginctl instead of the default systemctl
+     (setf end-session:*end-session-command* "loginctl")
    #+END_SRC
 *** Commands Provided:
   - =end-session= Prompts for shutdown, restart, or logoff. You can
