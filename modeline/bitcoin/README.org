@@ -1,3 +1,7 @@
+* Bitcoin
+
+Show Bitcoin (₿) value in the modeline.
+
 ** Usage
 
 Place the following in your =~/.stumpwmrc= file:
@@ -6,15 +10,34 @@ Place the following in your =~/.stumpwmrc= file:
   (load-module "bitcoin")
 #+END_SRC
 
-Then you can use =%b= in your mode line format:
+Then you can use =%b= in your mode line
+format:
 
 #+BEGIN_SRC lisp
-(setf *screen-mode-line-format*
-      (list "[%n]"                      ; Groups
-            "%v"                        ; Windows
-            "^>"                        ; Push right
-            " | %b"                     ; Bitcoin
-            " | %d"))                   ; Clock
+  (setf *screen-mode-line-format*
+        (list "[%n]"                      ; Groups
+              "%v"                        ; Windows
+              "^>"                        ; Push right
+              " | %b"                     ; Bitcoin
+              " | %d"))                   ; Clock
+#+END_SRC
+
+And define some parameters:
+
+#+BEGIN_SRC lisp
+  (setf bitcoin:*modeline-use-colors* t     ; use colors
+        bitcoin:*threshold*           0.001 ; 0.001 is a 0.1% deviation from average
+        bitcoin:*time-delay*          30    ; seconds
+        bitcoin:*decimals*            2     ; number of decimal digits
+        bitcoin:*local-code*          2     ; formatting code to use
+        bitcoin:*modeline-gauge*      t     ; show gauge bar
+        bitcoin:*gauge-width*         9)    ; width of the gauge bar in characters
+#+END_SRC
+
+It gets actual price through API, so needs =dexador= and =yason=. Also, the price getter is asynchronous with the =lparallel= machinery.
+
+#+BEGIN_SRC lisp
+  (ql:quickload '("dexador" "yason" "lparallel"))
 #+END_SRC
 
 ** Notes
@@ -23,11 +46,11 @@ Price format is colorized depending on =*modeline-use-colors*=
 flag. You can customize setting =t= or =nil= in =~/.stumpwmrc=:
 
 #+BEGIN_SRC lisp
-  (setf bitcoin:*modeline-use-colors* t)
+  (setf bitcoin:*modeline-use-colors* t) ; use colors
 #+END_SRC
 
-Colors depends on a comparison between actual value and last values
-average:
+Colors depends on a comparison between actual value and the last
+values average:
 
 | Color         | Code    | Description                       |
 |---------------+---------+-----------------------------------|
@@ -47,13 +70,6 @@ Last values average is calculated over a 3 hours values list
 =*values*=, where values are stored on every modeline refresh in a
 FIFO fashion.
 
-Get actual price through Coinbase(TM) API, so needs =dexador=, =babel=
-and =yason=.
-
-#+BEGIN_SRC lisp
-  (ql:quickload '("dexador" "babel" "yason"))
-#+END_SRC
-
 Connection to =*url*= price server is limited by a =*time-delay*=
 interval, in seconds.  So connection attempts between interval time
 are blocked. Interval can be customized too:
@@ -62,17 +78,37 @@ are blocked. Interval can be customized too:
   (setf bitcoin:*time-delay* 30) ; seconds
 #+END_SRC
 
+The number of decimal places is set by =*decimals*=, when =0= there is
+no decimals.
+
+#+BEGIN_SRC lisp
+  (setf bitcoin:*decimals* 2) ; number of decimal digits
+#+END_SRC
+
 The localization format is set by =*local-code*=, when =0= there is no
-thousand separator and gives =1234.56=, when =1= the thousand separator
-is =#\,= and gives =1,234.56=, when =2= the thousand separator is =#\.=
-and gives =1.234,56=, and when =3= the thousand separator is =#\Space=
-and gives =1 234,56=. Can be customized too:
+thousand separator, gives =1234.56= and the =*decimals*= parameter
+does not work, when =1= the thousand separator is =comma= and gives
+=1,234.56=, when =2= the thousand separator is =period= and gives
+=1.234,56=, and when =3= the thousand separator is =space= and gives
+=1 234,56=. Can be customized too:
 
 #+BEGIN_SRC lisp
   (setf bitcoin:*local-code* 2) ; formatting code to use
+#+END_SRC
+
+It is possible to add a gauge bar with the tendency of the actual value
+between the low and high in the last 24 hours with =*modeline-gauge*=.
+The gauge bar width is set by =*gauge-width*=.
+
+#+BEGIN_SRC lisp
+  (setf bitcoin:*modeline-gauge* t) ; show gauge bar
+  (setf bitcoin:*gauge-width* 9)    ; width of the gauge bar in characters
 #+END_SRC
 
 ** Issues
 
 Try to use conditions' =handler-case= machinery to avoid the internet
 timeouts or the computer sleeping process, to stuck the modeline.
+
+The =truncate= function is used when formatting the values, so some
+precission loss is expected.

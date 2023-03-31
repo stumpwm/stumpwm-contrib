@@ -6,8 +6,8 @@
   :license "GPLv3"
   :homepage "https://github.com/stumpwm/stumpwm-contrib/"
   :depends-on ("stumpwm"                ; Use add-screen-mode-line-formatter
+               "lparallel"              ; Connect to API with concurrency
                "dexador"                ; Get data from url
-               "babel"                  ; Translate data to string
                "yason")                 ; Parse json
   :components ((:file "package")
                (:file "bitcoin" :depends-on ("package"))))
