@@ -1,5 +1,7 @@
 * Bitcoin
 
+*THIS MODULE HAS BEEN DEPRECATED, AND SUPERSEDED BY THE  =ticker= MODULE*.
+
 Show Bitcoin (₿) value in the modeline.
 
 ** Usage
