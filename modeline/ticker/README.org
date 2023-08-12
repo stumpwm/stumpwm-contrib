@@ -137,6 +137,8 @@ The =truncate= function is used when formatting the values, so some
 precission loss is expected.
 
 There is an internal function =ticker::reset-tickers= that closes all
-=lparallel= tasks and kernels and resets the =*tickers*= list. Once
-called, if you want to redefine new tickers, should wait up to the
-maximum =delay= interval.
+=lparallel= tasks and kernels and resets the =*tickers*= list. Also
+the =ticker::purge-tickers= function that closes all =lparallel= tasks
+but does not resets the =*tickers*= list, and once called if you want
+to redefine new tickers, should wait up to the maximum =delay=
+interval.
