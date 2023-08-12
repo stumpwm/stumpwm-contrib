@@ -32,6 +32,18 @@
   (values-high 0.0)     ; high value last 24h
   (values-average 0.0)) ; average last 3 hours values
 
+;;; Global variables
+
+(defparameter *tickers* ()
+  "List of tickers to show.")
+
+(defparameter *url* "https://api.kraken.com/0/public/Ticker?pair="
+  "Location of price provider, the ticker pair will be concatenated.")
+
+(defparameter *stop-parallel-getters* nil
+  "When `t' stop and close all asynchronous loops that get the tickers
+values.")
+
 ;;; Exported
 
 (defun define-ticker (&key (pair "XXBTZUSD") (symbol "BTC") (colors t)
@@ -63,18 +75,6 @@
 
 (defparameter *tickers-separator* " | "
   "String to separate between tickers in de modeline.")
-
-;;; Global variables
-
-(defparameter *tickers* ()
-  "List of tickers to show.")
-
-(defparameter *url* "https://api.kraken.com/0/public/Ticker?pair="
-  "Location of price provider, the ticker pair will be concatenated.")
-
-(defparameter *stop-parallel-getters* nil
-  "When `t' stop and close all asynchronous loops that get the tickers
-values.")
 
 ;;; Get the values
 
