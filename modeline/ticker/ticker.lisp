@@ -120,7 +120,7 @@ read by the `ticker-modeline' function."
     ;; And again
     (sleep (ticker-delay tick))))
 
-(defun reset-tickers ()
+(defun purge-tickers ()
   "Stop the getters and reset the list of tickers."
   (let ((max-delay (reduce 'max
                            *tickers*
@@ -128,15 +128,28 @@ read by the `ticker-modeline' function."
                            :initial-value 0)))
     (setf *stop-parallel-getters* t)
     ;; Reset the flag to nil after some time
-    (let ((lparallel:*kernel* (lparallel:make-kernel 1)))
-      (lparallel:submit-task
-       (lparallel:make-channel)
-       (lambda ()
-         (sleep (1+ max-delay))
-         (setf *stop-parallel-getters* nil)
-         (lparallel:end-kernel))))
+    (sleep (1+ max-delay))
+    (setf *stop-parallel-getters* nil)
     ;; Reset the *tickers* list
     (setf *tickers* ())))
+
+(defun reset-tickers ()
+  "Reset the tickers, purging and restoring the list of tickers."
+  (let ((tickers-backup (reverse *tickers*)))
+    ;; Remove getters and *tickers* list
+    (purge-tickers)
+    ;; Restore the *tickers* list from its copy
+    (mapcar (lambda (tk)
+              (define-ticker
+                :pair (ticker-pair tk)
+                :symbol (ticker-symbol tk)
+                :colors (ticker-colors tk)
+                :threshold (ticker-threshold tk)
+                :delay (ticker-delay tk)
+                :decimals (ticker-decimals tk)
+                :localization (ticker-localization tk)
+                :gauge-width (ticker-gauge-width tk)))
+            tickers-backup)))
 
 ;;; Write on modeline
 
