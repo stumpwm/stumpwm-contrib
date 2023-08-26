@@ -42,9 +42,9 @@
 (defparameter *url* "https://api.kraken.com/0/public/Ticker?pair="
   "Location of price provider, the ticker pair will be concatenated.")
 
-(defparameter *stop-parallel-getters* nil
+(defparameter *stop-ticker-threads* nil
   "When `t' stop and close all asynchronous loops that get the tickers
-values.")
+values, and the sentinel thread.")
 
 (defparameter *ticker-sentinel* nil
   "A control thread to re-launch stuck threads.")
@@ -58,17 +58,20 @@ values.")
              :initial-element NIL))
 
 (defun purge-all-tickers ()
-  "Stop the getters and reset the list of tickers."
-  (let ((max-delay (reduce 'max
-                           *tickers*
-                           :key 'ticker-delay
-                           :initial-value 0)))
-    (setf *stop-parallel-getters* t)
-    ;; Reset the flag to nil after some time
-    (sleep (1+ max-delay))
-    (setf *stop-parallel-getters* nil)
-    ;; Reset the *tickers* list
-    (setf *tickers* ())))
+  "Stop the threads and reset the list of tickers."
+  ;; Stop the sentinel thread
+  (when (and *ticker-sentinel*
+             (bt2:thread-alive-p *ticker-sentinel*))
+    (bt2:destroy-thread *ticker-sentinel*))
+  (setf *ticker-sentinel* nil)
+  ;; Stop all ticker threads hard way
+  (mapcar (lambda (tick)
+            (when (and (ticker-thread tick)
+                  (bt2:thread-alive-p (ticker-thread tick)))
+              (bt2:destroy-thread (ticker-thread tick))))
+          *tickers*)
+  ;; Reset the *tickers* list
+  (setf *tickers* ()))
 
 (defun reset-all-tickers ()
   "Reset the tickers, purging and restoring the list of tickers."
@@ -111,20 +114,22 @@ values.")
         (bt2:make-thread
          (lambda ()
            (do ()
-               (*stop-parallel-getters*
+               (*stop-ticker-threads*
                 (setf *ticker-sentinel* nil))
+             ;; Wait some time to check threads
+             (sleep (* 5 60))           ; 5 minutes
+             ;; Just check if last thread update is so old
              (mapcar (lambda (tick)
                        (when (< (* 2 (ticker-delay tick))
                                 (floor (- (get-internal-real-time)
                                           (ticker-timestamp tick))
                                        internal-time-units-per-second))
                          (reset-ticker tick)
-                         (when (bt2:thread-alive-p (ticker-thread tick))
+                         (when (and (ticker-thread tick)
+                                    (bt2:thread-alive-p (ticker-thread tick)))
                            (bt2:destroy-thread (ticker-thread tick)))
                          (start-ticker tick)))
-                     *tickers*)
-             ;; And again
-             (sleep (* 5 60))))         ; 5 minutes
+                     *tickers*)))
          :name "TICKER-SENTINEL")))
 
 ;; (defun test-timestamp ()
@@ -172,7 +177,7 @@ values.")
   "The values are stored in the `*tickers*' structure, from where can be
 read by the `ticker-modeline' function."
   (do ()
-      (*stop-parallel-getters*
+      (*stop-ticker-threads*
        (reset-ticker tick))
     ;; Store actual, 24h low, and 24h high values from the `*url*' API.
     ;; If there is no response, store just `nil' values.
