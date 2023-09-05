@@ -97,6 +97,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./modeline/maildir/README.org][maildir]] :: Display maildir information in the modeline (%M conflicts with mem).
 - [[./modeline/mem/README.org][mem]] :: Display memory in the modeline, %M conflicts with maildir.
 - [[./modeline/net/README.org][net]] :: Displays information about the current network connection.
+- [[./modeline/pianobar/README.org][pianobar]] :: Display Pianobar's now playing info in modeline
 - [[./modeline/stumptray/README.org][stumptray]] :: System Tray for stumpwm.
 - [[./modeline/ticker/README.org][ticker]] :: Display ticker price on StumpWM modeline.
 - [[./modeline/wifi/README.org][wifi]] :: Display information about your wifi.

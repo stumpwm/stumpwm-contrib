@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:pianobar
   :serial t
-  :description "Display Pandora song in modeline"
+  :description "Display Pianobar's now playing info in modeline"
   :author "Ahmed Khanzada"
   :license "GPLv3"
   :depends-on (#:stumpwm)
