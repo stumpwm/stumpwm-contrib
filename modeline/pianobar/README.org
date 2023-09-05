@@ -51,3 +51,5 @@ Put:
 In your =~/.stumpwmrc=
 
 Then you can use "%P" in your modeline format for now playing info.
+
+You can customize the path to the nowplaying file with *pianobar-now-playing-path*
