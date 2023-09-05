@@ -12,15 +12,16 @@
 ;;;
 
 ;; Install formatters.
+
 (add-screen-mode-line-formatter #\P 'pianobar-modeline)
+
+;; Usage
 
 (defun pianobar-read-file-as-string (file-path)
   (with-open-file (stream file-path :direction :input)
     (let ((contents (make-string (file-length stream))))
       (read-sequence contents stream)
       contents)))
-
-;; Usage
 
 (defun pianobar-now-playing ()
   (let ((file-path "~/.config/pianobar/nowplaying"))
