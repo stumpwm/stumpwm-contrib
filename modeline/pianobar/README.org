@@ -3,7 +3,7 @@
 Add to your .config/pianobar/config this line:
 
 #+BEGIN_SRC conf
-event_command = ~/.config/pianobar/event_command.py
+    event_command = ~/.config/pianobar/event_command.py
 #+END_SRC
 
 event_command.py should be executable and look like this:
