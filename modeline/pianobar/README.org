@@ -1,0 +1,55 @@
+** Setup
+
+Add to your .config/pianobar/config this line:
+
+#+BEGIN_SRC conf
+    event_command = ~/.config/pianobar/event_command.py
+#+END_SRC
+
+event_command.py should be executable and look like this:
+
+#+BEGIN_SRC python
+  #!/usr/bin/python
+
+  import os
+  import sys
+  from os.path import expanduser, join
+
+  path = os.environ.get('XDG_CONFIG_HOME')
+  if not path:
+      path = expanduser("~/.config")
+  else:
+      path = expanduser(path)
+  fn = join(path, 'pianobar', 'nowplaying')
+
+  lines = sys.stdin.readlines()
+  cmd = sys.argv[1]
+
+  if cmd == 'songstart':
+      with open(fn, 'w') as f:
+          title = None
+          artist = None
+          for line in lines:
+              if "title" in line:
+                  split = line.split("=")
+                  title = split[1]
+              elif "artist" in line:
+                  split = line.split("=")
+                  artist = split[1]
+          if title and artist:
+              nowplaying = "{} - {}".format(artist, title).replace("\n", "")
+              f.write(nowplaying)
+#+END_SRC
+
+** Usage
+
+Put:
+#+BEGIN_SRC lisp
+  (load-module "pianobar")
+#+END_SRC
+
+In your =~/.stumpwmrc=
+
+Then you can use "%P" in your modeline format for now playing info.
+
+You can customize the path to the nowplaying file with *pianobar-now-playing-path*
