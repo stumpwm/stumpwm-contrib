@@ -82,6 +82,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./media/amixer/README.org][amixer]] :: Manipulate the volume using amixer
 - [[./media/stump-radio/README][stump-radio]] :: Minimalistic mplayer-based radio for StumpWM.
 - [[./media/stump-volume-control/README][stump-volume-control]] :: Minimalistic amixer-based volume control for StumpWM.
+- [[./media/stumpwm-mixer/README.md][stumpwm-mixer]] :: Interface to FreeBSD's built-in sound mixer
 - [[./media/stumpwm-sndioctl/README.md][stumpwm-sndioctl]] :: Interface to OpenBSD's sndioctl from StumpWM.
 ** Minor Modes
 - [[./minor-mode/mpd/README.org][mpd]] :: Displays information about the music player daemon (MPD).
