@@ -5,14 +5,35 @@ Put:
 #+END_SRC
 In your =~/.stumpwmrc=
 
-Then you can use:
+Then you can use ~%C~ in your mode line format:
 
-%c (CPU usage as %)
-%C (CPU usage as bar graph)
-%t (CPU temperature)
-%f (CPU frequency)
+#+BEGIN_SRC lisp
+  (setf *screen-mode-line-format*
+        (list "[%n]"                      ; Groups
+              "%v"                        ; Windows
+              "^>"                        ; Push right
+              " | %C"                     ; CPU module
+              " | %d"))                   ; Clock
+#+END_SRC
 
-in your mode line format.
+You can customize what's displayed in CPU module by changing the ~cpu::*cpu-modeline-fmt*~ variable in your =init.lisp=:
+
+#+BEGIN_SRC lisp
+  (setf cpu::*cpu-modeline-fmt* "%c %t") ; default is "%c (%f) %t"
+#+END_SRC
+
+|------+---------------------|
+| Code | Result              |
+|------+---------------------|
+| %%   | A literal '%'       |
+| %c   | CPU usage           |
+| %C   | CPU usage graph     |
+| %f   | CPU frequency       |
+| %r   | CPU frequency range |
+| %t   | CPU temperature     |
+|------+---------------------|
+
+You can see the rest of the variables in the =cpu.lisp= file.
 
 ** Notes
 
