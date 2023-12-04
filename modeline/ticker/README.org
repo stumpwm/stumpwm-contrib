@@ -137,6 +137,6 @@ The =truncate= function is used when formatting the values, so some
 precission loss is expected.
 
 There is an internal function =ticker::reset-all-tickers= that closes
-all threads tasks and kernels and resets the =*tickers*= list. Also
-the =ticker::purge-all-tickers= function that closes all threads tasks
-and purges the =*tickers*= list.
+all threads tasks and resets the =*tickers*= list. Also the
+=ticker::purge-all-tickers= function that closes all threads tasks and
+purges the =*tickers*= list.
