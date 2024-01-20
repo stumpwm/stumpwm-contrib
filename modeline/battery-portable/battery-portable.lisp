@@ -63,13 +63,13 @@
   (:documentation "Returns all recognized batteries."))
 
 (defun preferred-battery-method (&optional (sysfs t))
-  #- (or linux openbsd)
+  #- (or linux bsd)
   nil
   #+ linux
   (if sysfs
       (make-instance 'sysfs-method)
       (make-instance 'procfs-method))
-  #+ openbsd
+  #+ bsd
   (make-instance 'usr-sbin-apm-method))
 
 ;;; Battery class
@@ -253,19 +253,48 @@
 
 ;;; OpenBSD /usr/sbin/apm implementation
 
-#+ openbsd
+#+ bsd
 (progn
   (defclass usr-sbin-apm-method (battery-method) ()
-    (:documentation "Collect battery information through OpenBSD' /usr/sbin/apm program."))
+    (:documentation "Collect battery information through BSD's /usr/sbin/apm
+program."))
 
   (defclass usr-sbin-apm-battery (battery) ())
 
+  (defun parse-apm (apm)
+    "This wrapper is needed because FreeBSD's APM output is in a different
+order from OpenBSD and NetBSD's"
+    (flet ((parser ()
+             (ignore-errors (parse-integer (read-line apm)))))
+      #+ (or openbsd netbsd)
+      (list :state (parser)
+            :percent (parser)
+            :minutes (parser)
+            :ac (parser))
+      #+ freebsd
+      (list :ac (parser)
+            :state (parser)
+            ;; FreeBSD outputs in seconds rather than minutes, so we need
+            ;; to convert it. Cautiously rounds down to display slightly
+            ;; less time than is actually remaining. It also outputs -1
+            ;; if it's charging.
+            :percent (parser)
+            :minutes (let ((sec (parser)))
+                       (if (= -1 sec)
+                           nil
+                           (floor (/ sec 60)))))))
+
   (defun read-usr-sbin-apm-info ()
-    (with-input-from-string (apm (run-shell-command "/usr/sbin/apm -ablm" t))
-      (let* ((state (ignore-errors (parse-integer (read-line apm))))
-             (percent (ignore-errors (parse-integer (read-line apm))))
-             (minutes (ignore-errors (parse-integer (read-line apm))))
-             (ac (ignore-errors (parse-integer (read-line apm)))))
+    (with-input-from-string (apm (run-shell-command
+                                  #+ (or openbsd netbsd)
+                                  "/usr/sbin/apm -ablm"
+                                  #+ freebsd
+                                  "/usr/sbin/apm -ablt" t))
+      (let* ((parsed (parse-apm apm))
+             (state (getf parsed :state))
+             (percent (getf parsed :percent))
+             (minutes (getf parsed :minutes))
+             (ac (getf parsed :ac)))
         (unless (and (or (null state) (eql state 4))
                      (or (null ac) (eql ac 255)))
           (values (case state
