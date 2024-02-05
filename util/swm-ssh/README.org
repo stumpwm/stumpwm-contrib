@@ -31,8 +31,9 @@ Default terminal to open an ssh connection is ~urxvtc~. To change it, use
 (setq swm-ssh:*swm-ssh-default-term* "xterm")
 #+END_SRC
 
-** *swm-ssh-config-path*
-Ssh config file path. Defaults to =~/.ssh/config=. Change it with
+** *swm-ssh-known-host-path*
+Path to thee list of know host bz SSH client. Defaults to =~/.ssh/known_hosts=.
+Change it with
 #+BEGIN_SRC lisp
-(setq swm-ssh:*swm-ssh-config-path* "/path/to/ssh/config")
+(setq swm-ssh:*swm-ssh-known-hosts-path* "/path/to/ssh/known_hosts")
 #+END_SRC
