@@ -26,43 +26,13 @@
   localization ; thousands/comma format
   gauge-width  ; width of gauge in characters
   ;; Internal state variables
-  (values ())           ; store the last 3 hours values
-  (value 0.0)           ; last value got from url
-  (values-low 0.0)      ; low value last 24h
-  (values-high 0.0)     ; high value last 24h
-  (values-average 0.0)) ; average last 3 hours values
-
-;;; Exported
-
-(defun define-ticker (&key (pair "XXBTZUSD") (symbol "BTC") (colors t)
-                        (threshold 0.001) (delay 30) (decimals 0)
-                        (localization 2) (gauge-width 7))
-  "Ticker constructor which defaults to Bitcoin and 3 hours historical values."
-  (let ((ticker (make-ticker
-                 :pair pair
-                 :symbol symbol
-                 :colors colors
-                 :threshold threshold
-                 :delay delay
-                 :decimals decimals
-                 :localization localization
-                 :gauge-width gauge-width
-                 ;; Internal state variable
-                 :values (make-list (truncate (/ (* 3 60 60) ; 3 hours
-                                                 delay))
-                                    :initial-element NIL))))
-    ;; Push the `ticker' into the `*tickers*' list, and launch the
-    ;; asynchronous process that will update the values from the API
-    ;; every `delay' seconds.
-    (push ticker *tickers*)
-    (let ((lparallel:*kernel*
-            (lparallel:make-kernel 1 :name pair)))
-      (lparallel:submit-task (lparallel:make-channel)
-                             (lambda ()
-                               (parallel-getter (car *tickers*)))))))
-
-(defparameter *tickers-separator* " | "
-  "String to separate between tickers in de modeline.")
+  (values ())          ; store the last values
+  (value 0.0)          ; last value got from url
+  (values-low 0.0)     ; low value last 24h
+  (values-high 0.0)    ; high value last 24h
+  (values-average 0.0) ; average last 3 hours values
+  (timestamp 0.0)      ; got value timestamp
+  (thread nil))        ; thread where this ticker runs
 
 ;;; Global variables
 
@@ -72,9 +42,134 @@
 (defparameter *url* "https://api.kraken.com/0/public/Ticker?pair="
   "Location of price provider, the ticker pair will be concatenated.")
 
-(defparameter *stop-parallel-getters* nil
+(defparameter *stop-ticker-threads* nil
   "When `t' stop and close all asynchronous loops that get the tickers
-values.")
+values, and the sentinel thread.")
+
+(defparameter *ticker-sentinel* nil
+  "A control thread to re-launch stuck threads.")
+
+;;; Internal
+
+(defun reset-ticker-values (delay)
+  "Fullfill the values list with DELAY depending length of nil values."
+  (make-list (truncate (/ (* 3 60 60)   ; 3 hours
+                          delay))
+             :initial-element NIL))
+
+(defun purge-all-tickers ()
+  "Stop the threads and reset the list of tickers."
+  ;; Stop the sentinel thread
+  (when (and *ticker-sentinel*
+             (bt2:thread-alive-p *ticker-sentinel*))
+    (bt2:destroy-thread *ticker-sentinel*))
+  (setf *ticker-sentinel* nil)
+  ;; Stop all ticker threads hard way
+  (mapcar (lambda (tick)
+            (when (and (ticker-thread tick)
+                  (bt2:thread-alive-p (ticker-thread tick)))
+              (bt2:destroy-thread (ticker-thread tick))))
+          *tickers*)
+  ;; Reset the *tickers* list
+  (setf *tickers* ()))
+
+(defun reset-all-tickers ()
+  "Reset the tickers, purging and restoring the list of tickers."
+  (let ((tickers-backup (reverse *tickers*)))
+    ;; Remove getters and *tickers* list
+    (purge-all-tickers)
+    ;; Restore the *tickers* list from its copy
+    (mapcar (lambda (tick)
+              (define-ticker
+                  :pair (ticker-pair tick)
+                :symbol (ticker-symbol tick)
+                :colors (ticker-colors tick)
+                :threshold (ticker-threshold tick)
+                :delay (ticker-delay tick)
+                :decimals (ticker-decimals tick)
+                :localization (ticker-localization tick)
+                :gauge-width (ticker-gauge-width tick)))
+            tickers-backup)))
+
+(defun start-ticker (tick)
+  "Starts thread getting TICK ticker values."
+  (setf (ticker-thread tick)
+        (bt2:make-thread
+         (lambda ()
+           (parallel-getter tick))
+         :name (ticker-pair tick))))
+
+(defun reset-ticker (tick)
+  "Reset the ticker TICK values."
+  (setf (ticker-values tick) (reset-ticker-values (ticker-delay tick)))
+  (setf (ticker-value tick) 0.0)
+  (setf (ticker-values-low tick) 0.0)
+  (setf (ticker-values-high tick) 0.0)
+  (setf (ticker-values-average tick) 0.0)
+  (setf (ticker-timestamp tick) 0.0))
+
+(defun ticker-sentinel ()
+  "Check periodically if any thread is stuck, and restart it."
+  (setf *ticker-sentinel*
+        (bt2:make-thread
+         (lambda ()
+           (do ()
+               (*stop-ticker-threads*
+                (setf *ticker-sentinel* nil))
+             ;; Wait some time to check threads
+             (sleep (* 5 60))           ; 5 minutes
+             ;; Just check if last thread update is so old
+             (mapcar (lambda (tick)
+                       (when (< (* 2 (ticker-delay tick))
+                                (floor (- (get-internal-real-time)
+                                          (ticker-timestamp tick))
+                                       internal-time-units-per-second))
+                         (reset-ticker tick)
+                         (when (and (ticker-thread tick)
+                                    (bt2:thread-alive-p (ticker-thread tick)))
+                           (bt2:destroy-thread (ticker-thread tick)))
+                         (start-ticker tick)))
+                     *tickers*)))
+         :name "TICKER-SENTINEL")))
+
+;; (defun test-timestamp ()
+;;   (mapcar (lambda (tick)
+;;             (format t "~&~A: ~A ~A"
+;;                     (ticker-pair tick)
+;;                     (floor (ticker-timestamp tick)
+;;                            internal-time-units-per-second)
+;;                     (ticker-values tick)))
+;;           *tickers*)
+;;   (format nil "~&~A" (floor (get-internal-real-time)
+;;                             internal-time-units-per-second)))
+
+;;; Exported
+
+(defun define-ticker (&key (pair "XXBTZUSD") (symbol "BTC") (colors t)
+                        (threshold 0.001) (delay 30) (decimals 0)
+                        (localization 2) (gauge-width 7))
+  "Ticker constructor which defaults to Bitcoin."
+  (let ((tick (make-ticker
+               :pair pair
+               :symbol symbol
+               :colors colors
+               :threshold threshold
+               :delay delay
+               :decimals decimals
+               :localization localization
+               :gauge-width gauge-width
+               ;; Internal state variable
+               :values (reset-ticker-values delay))))
+    ;; Push the `ticker' into the `*tickers*' list, and launch the
+    ;; asynchronous process that will update the values from the API
+    ;; every `delay' seconds.
+    (push tick *tickers*)
+    (start-ticker tick))
+  ;; Launch control process for stuck threads.
+  (unless *ticker-sentinel* (ticker-sentinel)))
+
+(defparameter *tickers-separator* " | "
+  "String to separate between tickers in de modeline.")
 
 ;;; Get the values
 
@@ -82,8 +177,8 @@ values.")
   "The values are stored in the `*tickers*' structure, from where can be
 read by the `ticker-modeline' function."
   (do ()
-      (*stop-parallel-getters*
-       (lparallel:end-kernel))
+      (*stop-ticker-threads*
+       (reset-ticker tick))
     ;; Store actual, 24h low, and 24h high values from the `*url*' API.
     ;; If there is no response, store just `nil' values.
     (let ((values
@@ -105,7 +200,8 @@ read by the `ticker-modeline' function."
       ;; store all in the `*tickers*' ticker.
       (setf (ticker-value tick) (first values)
             (ticker-values-low tick) (second values)
-            (ticker-values-high tick) (third values))
+            (ticker-values-high tick) (third values)
+            (ticker-timestamp tick) (get-internal-real-time))
       ;; Add value to values list, pushing to front
       (push (ticker-value tick) (ticker-values tick))
       ;; Preserve values list size, popping from end
@@ -119,24 +215,6 @@ read by the `ticker-modeline' function."
                                               (max 1 (length values-clean))))))
     ;; And again
     (sleep (ticker-delay tick))))
-
-(defun reset-tickers ()
-  "Stop the getters and reset the list of tickers."
-  (let ((max-delay (reduce 'max
-                           *tickers*
-                           :key 'ticker-delay
-                           :initial-value 0)))
-    (setf *stop-parallel-getters* t)
-    ;; Reset the flag to nil after some time
-    (let ((lparallel:*kernel* (lparallel:make-kernel 1)))
-      (lparallel:submit-task
-       (lparallel:make-channel)
-       (lambda ()
-         (sleep (1+ max-delay))
-         (setf *stop-parallel-getters* nil)
-         (lparallel:end-kernel))))
-    ;; Reset the *tickers* list
-    (setf *tickers* ())))
 
 ;;; Write on modeline
 
