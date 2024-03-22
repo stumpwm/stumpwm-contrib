@@ -180,7 +180,7 @@ else
         tput me sgr0
         echo \ for a list of commands.
 
-	while read -p '> ' REPLY
+	while (echo -n '> '; read -r REPLY)
 	do
 	    tput md bold
 	    tput AF setaf 2
