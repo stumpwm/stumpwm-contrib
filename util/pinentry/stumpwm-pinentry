@@ -12,7 +12,7 @@ while IFS="\n" read -r command; do
     elif [[ "$command" == SETPROMPT* ]]; then
         prompt=${command:10}
     elif [ "$command" == GETPIN ]; then
-        password=$(printf "%s\n%s\n" "$description" "$prompt" | nc 127.0.0.1 22222)
+        password=$(stumpish eval "(pinentry:getpin \"$description\" \"$prompt\")" | cut -d '""' -f 2)
         if [ -z "$password" ]; then
             echo S close_button
         fi
