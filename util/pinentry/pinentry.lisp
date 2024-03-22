@@ -4,12 +4,15 @@
 (in-package #:pinentry)
 
 (defun main (stream)
-  (let ((description (percent:decode (read-line stream)))
-        (prompt (read-line stream)))
-    (format stream (or (stumpwm:read-one-line (stumpwm:current-screen)
-                                              (format nil "~a~%~a " description prompt)
-                                              :password t)
-                       ""))))
+  (ignore-errors
+   (let ((description (percent:decode (read-line stream)))
+         (prompt (read-line stream)))
+     (format stream
+             (percent:encode
+              (or (stumpwm:read-one-line (stumpwm:current-screen)
+                                         (format nil "~a~%~a " description prompt)
+                                         :password t)
+                  ""))))))
 
 (handler-case (usocket:socket-server "127.0.0.1" 22222 #'main nil
                         :in-new-thread t
