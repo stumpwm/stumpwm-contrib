@@ -20,6 +20,7 @@
   (:use #:cl #:stumpwm)
   (:export #:*terse*
 	   #:*step*
+	   #:*doas*
 	   #:volume-up
 	   #:volume-down
 	   #:toggle-mute

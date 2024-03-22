@@ -22,10 +22,13 @@
 
 (defvar *step* 0.05)
 (defvar *terse* nil "If t, this will supress messages that get shown on changes to volume.")
+(defvar *doas* nil "If t, this will use doas to run sndioctl.")
 
 (defun call-sndioctl (args captive)
   "Calls sndioctl with the required arguments."
-  (run-shell-command (format nil "sndioctl ~a" args) captive))
+  (run-shell-command
+   (format nil "~asndioctl ~a" (if *doas* "doas " "") args)
+   captive))
 
 (defun make-step-cmd (direction)
   "Helpful wrapper for generating command strings for incrementing/decrementing volume."
