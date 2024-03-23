@@ -1,7 +1,6 @@
 * Requirements
 
-- netcat
-- port 22222 available.
+- stumpish in =PATH=
 
 * Usage
 
@@ -23,4 +22,3 @@ GnuPG Agent will now use StumpWM to ask for your password.
 
 - Better error management (pinentry protocol has a SETERROR command,
   cancelling the prompt has undefined behavior)
-- Randomized port (or configurable)
