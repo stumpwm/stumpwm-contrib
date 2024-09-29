@@ -14,24 +14,27 @@
 
 ;;; Code:
 
-(defun split-by-- (str)
-  (let ((pos (position #\- str :start (1+ (position #\- str)))))
-    (list (subseq str 0 (1- pos))
-          (subseq str (1+ pos)))))
-
 (defun surfraw-elvis-list ()
-  (mapcar (lambda (x)
-            (mapcar (lambda (x) (string-trim '(#\Space #\Tab #\Newline) x))
-                    (split-by-- x)))
-          (remove-if-not #'(lambda (string) (search "--" string))
-                         (split-string (run-shell-command "surfraw -elvi" :collect-output-p)
-                                       '(#\Newline)))))
+  (macrolet ((trim (str) `(string-trim '(#\Space #\Tab) ,str)))
+    (loop :for line :in (run-program '("surfraw" "-elvi") :output :lines)
+          :for pos = (search "--" line)
+          :when pos
+            :collect (list (trim (subseq line 0 pos))
+                           (trim (subseq line (+ pos 2)))))))
 
-(auto-define-surfraw-commands-from-elvis-list)
 ;;; Regular surfraw commands
 
+(define-stumpwm-type :surfraw-elvi (input prompt)
+  (let ((elvis (mapcar 'car (surfraw-elvis-list))))
+    (or (find (or (argument-pop input)
+                  (completing-read (current-screen) prompt elvis :require-match t)
+                  (throw 'error "Abort"))
+              elvis :test 'string=)
+        (throw 'error "Such elvi doesn't exist"))))
+
 (defcommand surfraw (engine search)
-  ((:string "What engine? ") (:string "Search for what? "))
+    ((:surfraw-elvi "What engine? ")
+     (:string "Search for what? "))
   "Use SURFRAW to surf the net; reclaim heathen lands."
   (check-type engine string)
   (check-type search string)
@@ -39,19 +42,15 @@
 
 ;;; Bookmarks
 
-(defun display-file (file)
-  "Display a file in the message area."
-  (if (probe-file file)
-      (run-shell-command (concat "cat " file) t)
-    (message "The file ~a does not exist." file)))
-
 (defvar *surfraw-bookmark-file* nil
   "The surfraw bookmark file")
 
 (defcommand sr-bookmark (bmk) ((:string "Bookmark: "))
-  (surfraw "" bmk))
+  (run-shell-command (concat "exec surfraw -g " bmk)))
 
 (defcommand sr-bookmark-file-display () ()
-  (display-file *surfraw-bookmark-file*))
+  (if-let ((path (file-exists-p *surfraw-bookmark-file*)))
+    (read-file-string path)
+    (message "The file ~a does not exist." file)))
 
 ;;; surfraw.lisp ends here
