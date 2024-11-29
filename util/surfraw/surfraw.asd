@@ -5,7 +5,7 @@
   :description "Integrates surfraw with stumpwm."
   :author "Ivy Foster"
   :license "GPLv3"
-  :depends-on (#:stumpwm)
+  :depends-on (#:stumpwm #:alexandria #:uiop)
   :components ((:file "package")
-               (:file "macros" :depends-on ("package"))
-               (:file "surfraw" :depends-on ("macros"))))
+               (:file "surfraw")
+               (:file "auto-commands")))
