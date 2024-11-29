@@ -24,37 +24,45 @@
 (defvar *terse* nil "If t, this will supress messages that get shown on changes to volume.")
 (defvar *doas* nil "If t, this will use doas to run sndioctl.")
 
-(defun call-sndioctl (args captive)
+(defun call-sndioctl (args)
   "Calls sndioctl with the required arguments."
   (run-shell-command
    (format nil "~asndioctl ~a" (if *doas* "doas " "") args)
-   captive))
-
-(defun make-step-cmd (direction)
-  "Helpful wrapper for generating command strings for incrementing/decrementing volume."
-  (cond 
-    ((string= "+" direction)
-     (format nil "-q output.level=+~a" *step*))
-    ((string= "-" direction) 
-     (format nil "-q output.level=-~a" *step*))
-    (t (error "Not a valid step direction!"))))
+   t))
 
 (defun get-mute-state-string ()
   "Returns a nicely formatted string containing the current mute state."
-  (let ((state (aref (call-sndioctl "-n output.mute" t) 0)))
-    (cond 
-      ((string= "0" state)
-       (format nil "Muted: No"))
-      ((string= "1" state)
-       (format nil "Muted: Yes"))
-      (t (error "Unknown output from sndioctl -n output.mute")))))
+  (let* ((code-to-str
+           (lambda (c)
+             (cond
+               ((string= "0" c) "No")
+               ((string= "1" c) "Yes")
+               (t "Err"))))
+         (get-state
+           (lambda (key)
+             (handler-case
+                 (funcall code-to-str
+                          (aref (call-sndioctl (format nil "-n ~a" key)) 0))
+               (error (c) (declare (ignore c)) "N/A"))
+             ))
+         (in-state (funcall get-state "input.mute"))
+         (out-state (funcall get-state "output.mute")))
+    (format nil "Muted in: ~a Muted out: ~a" in-state out-state)))
 
 (defun get-volume-level-string ()
   "Returns a nicely formatted string containing the current volume level."
-  (let ((level
-	  (with-input-from-string (vol-str (call-sndioctl "-n output.level" t))
-	    (read vol-str))))
-    (format nil "Volume: ~2$%" (* 100.0 level))))
+  (let*  ((get-volume
+            (lambda (key)
+              (handler-case
+                  (format nil "~2$%"
+                          (* 100
+                             (with-input-from-string
+                                 (vol-str (call-sndioctl (format nil "-n ~a" key)))
+                               (read vol-str))))
+                (error (c) (declare (ignore c)) "N/A"))))
+          (in-volume (funcall get-volume "input.level"))
+          (out-volume (funcall get-volume "output.level")))
+    (format nil "Volume in: ~a Volume out: ~a" in-volume out-volume)))
 
 (defun sndioctl-status-message ()
   "Returns a string indicating currrent sndioctl state."
@@ -62,30 +70,35 @@
        
 (defcommand volume-up () ()
   "Volume goes up"
-  (call-sndioctl (make-step-cmd "+") nil)
+  (call-sndioctl (format nil "-q input.level=+~a" *step*))
+  (call-sndioctl (format nil "-q output.level=+~a" *step*))
   (if (not *terse*)
       (message (sndioctl-status-message))))
 
 (defcommand volume-down () ()
   "Volume goes down"
-  (call-sndioctl (make-step-cmd "-") nil)
+  (call-sndioctl (format nil "-q input.level=-~a" *step*))
+  (call-sndioctl (format nil "-q output.level=-~a" *step*))
   (if (not *terse*)
       (message (sndioctl-status-message))))
 
 (defcommand toggle-mute () ()
   "Toggles mute"
-  (call-sndioctl "-q output.mute=!" nil)
+  (call-sndioctl "-n input.mute=!")
+  (call-sndioctl "-n output.mute=!")
   (if (not *terse*)
       (message (sndioctl-status-message))))
 
 (defcommand set-mute () ()
   "Force sets mute to ON"
-  (call-sndioctl "-q output.mute=1" nil)
+  (call-sndioctl "-q input.mute=1")
+  (call-sndioctl "-q output.mute=1")
   (if (not *terse*)
       (message (sndioctl-status-message))))
 
 (defcommand unset-mute () ()
   "Force sets mute to OFF"
-  (call-sndioctl "-q output.mute=0" nil)
+  (call-sndioctl "-q inout.mute=0")
+  (call-sndioctl "-q output.mute=0")
   (if (not *terse*)
       (message (sndioctl-status-message))))
