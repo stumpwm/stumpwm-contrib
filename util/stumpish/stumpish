@@ -20,6 +20,7 @@
 
 ### STUMPwm Interactive SHell.
 
+# use a busy-waiting delay of 1 second if floats are not supported by sleep
 DELAY=0.01
 
 if ! sleep $DELAY 2>/dev/null >&2
@@ -37,11 +38,34 @@ if [ "$(echo -e foo)" = foo ]; then
     echo() { builtin echo -e "$@"; }
 fi
 
+stumpwm_pid ()
+{
+    local pid=$$
+
+    while :
+    do
+      if [ $pid -eq 1 ]
+      then
+          echo "StumpWM not found in the process tree, are you sure a graphical " 1>&2
+          echo "session is running and StumpWM is your WM? If you think this is " 1>&2
+          echo "a bug in stumpish, please report it." 1>&2
+          echo 1>&2
+          exit 1
+      elif [ "$(cat /proc/${pid}/comm)" = "stumpwm" ]
+      then
+          STUMPWM_PID=$pid
+          break
+      else
+          pid=$(cut -f 4 -d " " < /proc/$pid/stat)
+      fi
+    done
+}
+
 wait_result ()
 {
     while true
     do
-	RESULT=$(xprop -root -f STUMPWM_COMMAND_RESULT 8s \
+	RESULT=$(xprop -root -f STUMPWM_COMMAND_RESULT 8u \
 	    STUMPWM_COMMAND_RESULT 2>/dev/null |
 	    sed -E 's/\\([[:digit:]]+)/\\0\1/g')
 	if echo "$RESULT" | grep -v -q 'not found.$'
@@ -70,6 +94,9 @@ wait_result ()
 
 send_cmd ()
 {
+  (
+    flock -n 3 || fail "Cannot obtain a file lock to exclusively talk to StumpWM."
+
     local cmd="$1"
 
     if [ "$cmd" = "stumpwm-quit" ]
@@ -80,9 +107,10 @@ send_cmd ()
 	exit
     fi
 
-    xprop -root -f STUMPWM_COMMAND 8s -set STUMPWM_COMMAND "$cmd"
+    xprop -root -f STUMPWM_COMMAND 8u -set STUMPWM_COMMAND "$cmd"
 
     wait_result
+  ) 3>"${TMPDIR:-/tmp}/.stumpish.lock.$STUMPWM_PID"
 }
 
 usage ()
@@ -138,6 +166,9 @@ fi
 if [ $# -gt 0 ]
 then
     [ "$1" = "--help" ] && usage
+
+    stumpwm_pid
+
     if [ "$1" = "-e" ]
     then
 	if [ $# -ne 2 ]
@@ -154,6 +185,8 @@ then
 	send_cmd "$*"
     fi
 else
+    stumpwm_pid
+
     if [ -t 0 ]
     then
 	if ! type rlwrap 2>/dev/null >&2
@@ -180,7 +213,7 @@ else
         tput me sgr0
         echo \ for a list of commands.
 
-	while (echo -n '> '; read -r REPLY)
+	while { echo -n '> '; read -r REPLY; }
 	do
 	    tput md bold
 	    tput AF setaf 2
