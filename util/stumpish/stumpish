@@ -40,25 +40,32 @@ fi
 
 stumpwm_pid ()
 {
-    local pid=$$
+    if command -v pgrep 2>&1 >/dev/null; then
+        STUMPWM_PID=$(pgrep -u $(id -u) stumpwm)
+    elif [ -d /proc ]; then
+        # Go up the process chain until we locate StumpWM's process using
+        # the /proc virtual file system.
 
-    while :
-    do
-      if [ $pid -eq 1 ]
-      then
-          echo "StumpWM not found in the process tree, are you sure a graphical " 1>&2
-          echo "session is running and StumpWM is your WM? If you think this is " 1>&2
-          echo "a bug in stumpish, please report it." 1>&2
-          echo 1>&2
-          exit 1
-      elif [ "$(cat /proc/${pid}/comm)" = "stumpwm" ]
-      then
-          STUMPWM_PID=$pid
-          break
-      else
-          pid=$(cut -f 4 -d " " < /proc/$pid/stat)
-      fi
-    done
+        local pid=$$
+
+        while [ $pid -ne 1 ]
+        do
+            if [ "$(cat /proc/${pid}/comm)" = "stumpwm" ]; then
+                STUMPWM_PID=$pid
+                break
+            else
+                pid=$(cut -f 4 -d " " < /proc/$pid/stat)
+            fi
+        done
+    fi
+
+    if [ -z "$STUMPWM_PID" ]; then
+        echo "StumpWM not found in the process tree, are you sure a graphical " 1>&2
+        echo "session is running and StumpWM is your WM? If you think this is " 1>&2
+        echo "a bug in stumpish, please report it." 1>&2
+        echo 1>&2
+        exit 1
+    fi
 }
 
 wait_result ()
