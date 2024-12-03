@@ -30,4 +30,6 @@
                                            :test #'equal))
                 "Open ssh connection to: ")))
     (when entry
-      (stumpwm:run-shell-command (format nil "~A -e ssh ~A" *swm-ssh-default-term* (car entry))))))
+      (let ((host (car entry)))
+        (stumpwm:run-shell-command
+         (format nil "~A -T ~A -e ssh ~A" *swm-ssh-default-term* host host))))))
