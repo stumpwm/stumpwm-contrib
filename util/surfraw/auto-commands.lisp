@@ -5,12 +5,14 @@
     (dolist (elvi (surfraw-elvis-list))
       (let ((key (first elvi))
             (description (second elvi)))
-        (push `(defcommand ,(intern (concat "sr-" key)) (search)
+        (push `(defcommand ,(format-symbol t "~@:(sr-~a~)" key) (search)
                  ((:string ,(concat description ": ")))
                  ,description
                  (surfraw ,key search))
               commands)
-        (push `(defcommand ,(intern (concat "sr-sel-" key)) () ()
+        (push `(defcommand ,(format-symbol t "~@:(sr-sel-~a~)" key) () ()
                  (surfraw ,key (get-x-selection)))
               commands)))
     (cons 'progn (reverse commands))))
+
+(auto-define-surfraw-commands-from-elvis-list)

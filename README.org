@@ -68,9 +68,10 @@ Please see =README.org= files for each module for further details. Missing modul
 * Third Party Modules
 Advertise your module here, open a PR and include a org-mode link!
 - [[https://github.com/njkli/stumpwm-weather/blob/master/readme.org][stumpwm-weather]] :: Displays weather in the modeline
-- [[https://gitlab.com/sasanidas/stumpwm-dmenu][stumpwm-dmenu]]   :: StumpWM [[https://tools.suckless.org/dmenu/][dmenu]] integration
+- [[https://codeberg.org/sasanidas/stumpwm-dmenu][stumpwm-dmenu]]   :: StumpWM [[https://tools.suckless.org/dmenu/][dmenu]] integration
 - [[https://github.com/Junker/stumpwm-pamixer][stumpwm-pamixer]] :: Pulseaudio volume and microphone control module 
 - [[https://github.com/Junker/stumpwm-acpi-backlight][stumpwm-acpi-backlight]] :: ACPI backlight control module for StumpWM
+- [[https://codeberg.org/sasanidas/stumpwm-mullvad][stumpwm-mullvad]]   :: StumpWM [[https://mullvad.net/en/][mullvad]] cli integration
 
 * Current Modules
 (click for its respective README/docs)
@@ -81,6 +82,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./media/amixer/README.org][amixer]] :: Manipulate the volume using amixer
 - [[./media/stump-radio/README][stump-radio]] :: Minimalistic mplayer-based radio for StumpWM.
 - [[./media/stump-volume-control/README][stump-volume-control]] :: Minimalistic amixer-based volume control for StumpWM.
+- [[./media/stumpwm-mixer/README.md][stumpwm-mixer]] :: Interface to FreeBSD's built-in sound mixer
 - [[./media/stumpwm-sndioctl/README.md][stumpwm-sndioctl]] :: Interface to OpenBSD's sndioctl from StumpWM.
 ** Minor Modes
 - [[./minor-mode/mpd/README.org][mpd]] :: Displays information about the music player daemon (MPD).
@@ -96,7 +98,9 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./modeline/maildir/README.org][maildir]] :: Display maildir information in the modeline (%M conflicts with mem).
 - [[./modeline/mem/README.org][mem]] :: Display memory in the modeline, %M conflicts with maildir.
 - [[./modeline/net/README.org][net]] :: Displays information about the current network connection.
+- [[./modeline/pianobar/README.org][pianobar]] :: Display Pianobar's now playing info in modeline
 - [[./modeline/stumptray/README.org][stumptray]] :: System Tray for stumpwm.
+- [[./modeline/ticker/README.org][ticker]] :: Display ticker price on StumpWM modeline.
 - [[./modeline/wifi/README.org][wifi]] :: Display information about your wifi.
 ** Utilities
 - [[./util/alert-me/README.org][alert-me]] :: Alert me that an event is coming

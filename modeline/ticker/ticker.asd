@@ -1,13 +1,13 @@
 ;;;; bitcoin.asd
 
-(asdf:defsystem "bitcoin"
-  :description "Display bitcoin price on StumpWM modeline."
+(asdf:defsystem "ticker"
+  :description "Display ticker price on StumpWM modeline."
   :author "Santiago Payà Miralta @santiagopim"
-  :license "GPLv3"
+  :license "MIT"
   :homepage "https://github.com/stumpwm/stumpwm-contrib/"
   :depends-on ("stumpwm"                ; Use add-screen-mode-line-formatter
-               "lparallel"              ; Connect to API with concurrency
+               "bordeaux-threads"       ; Use a thread per ticker
                "dexador"                ; Get data from url
                "yason")                 ; Parse json
   :components ((:file "package")
-               (:file "bitcoin" :depends-on ("package"))))
+               (:file "ticker" :depends-on ("package"))))

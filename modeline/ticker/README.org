@@ -1,0 +1,142 @@
+* Ticker
+
+This module prints off values from stocks. It is developed with
+cryptocurrencies in mind, so the default API target is the [[https://kraken.com/][Kraken]]
+servers.
+
+[[./screenshot.png]]
+
+** Dependencies
+
+It gets actual price through API, so needs =dexador= and =yason=.
+Also, the price getter is asynchronous with the =bordeaux-threads= machinery.
+
+#+begin_src lisp
+  (ql:quickload '("dexador" "yason" "bordeaux-threads"))
+#+end_src
+
+** Usage
+
+Place the following in your =~/.stumpwmrc= file:
+
+#+begin_src lisp
+  (load-module "ticker")
+#+end_src
+
+Use =%T= in your mode line format, for example:
+
+#+begin_src lisp
+  (setf *screen-mode-line-format*
+        (list "[%n]"                      ; Groups
+              "%v"                        ; Windows
+              "^>"                        ; Push right
+              " | %T"                     ; Ticker      <<<--- this module
+              " | %d"))                   ; Clock
+#+end_src
+
+And define some tickers with its parameters. This line defines one
+ticker that defaults to the Bitcoin/USD pair:
+
+#+begin_src lisp
+  (ticker:define-ticker)    ; Bitcoin as default
+#+end_src
+
+You can define more tickers and parameterize as desired, see the [[Notes]]:
+
+#+begin_src lisp
+  (ticker:define-ticker
+      :symbol "XBT" ;;"₿"   ; Bitcoin
+      :threshold 0.01)
+  (ticker:define-ticker
+      :pair "XETHZUSD"      ; Ethereum
+      :symbol "ETH")
+  (ticker:define-ticker
+      :pair "ADAUSD"        ; Cardano
+      :symbol "ADA" ;;"₳"
+      :threshold 0.0001
+      :delay 60
+      :decimals 3
+      :gauge-width 9)
+#+end_src
+
+** Notes
+
+The parameters that can be customized when defining a ticker and its
+default values are:
+
+#+begin_src lisp
+  :pair         "XXBTZUSD" ; pair to get from API
+  :symbol       "BTC"      ; label the ticker
+  :colors       t          ; use colors
+  :threshold    0.001      ; 0.1% deviation from average to colorize
+  :delay        30         ; seconds between updates
+  :decimals     0          ; number of decimal digits
+  :localization 2          ; formatting number
+  :gauge-width  7          ; width of the gauge bar in characters
+#+end_src
+
+The minimum parameters to define are the =:pair= to get the value from
+the API, and the =:symbol= to label the ticker in the modeline. The
+=:pair= is one of the listed at:
+
++ [[https://api.kraken.com/0/public/Ticker]]
+
+The =:symbol= is a string and can be blank.
+
+Price format is colorized depending on the =:colors= flag. You can
+customize setting it to =t= or =nil= when defining the ticker.
+
+Colors depends on a comparison between actual value and the last
+values average:
+
+| Color         | Code    | Description                       |
+|---------------+---------+-----------------------------------|
+| Bright yellow | =^B^3*= | Price is higher than average      |
+| Red           | =^1*=   | Price is below average            |
+| White         | =^7*=   | Price is similar to average       |
+| Default color | =^**=   | When *modeline-use-colors* is nil |
+
+There is a threshold around average, so the increasing or decreasing
+color is only applied if =:threshold= is passed.
+
+Last values average is calculated over a 3 hours values list, where
+values are stored on every modeline refresh in a FIFO fashion.
+
+Connection to the API price server is limited by a =:delay= interval,
+in seconds. So connection attempts between interval time are blocked.
+
+The number of decimal places is set by =:decimals=, when =0= there is
+no decimals.
+
+The localization format is set by =:localization= code, when =0= there
+is no thousand separator, gives =1234.56= and the =:decimals=
+parameter does not work, when =1= the thousand separator is =comma=
+and gives =1,234.56=, when =2= the thousand separator is =period= and
+gives =1.234,56=, and when =3= the thousand separator is =space= and
+gives =1 234,56=.
+
+It is possible to add a gauge bar with the tendency of the actual
+value between the low and high in the last 24 hours with
+=:gauge-width=. Value must be greater than =1= to be shown.
+
+There is an exported parameter =*tickers-separator*= that defines the
+string to put between tickers, as a separator. Can be customized, but
+be aware not to use tilde "~" or other combinations because it is
+interpreted by the =format= function:
+
+#+begin_src lisp
+  (setf ticker:*tickers-separator* " | ")
+#+end_src
+
+** Issues
+
+Try to use conditions' =handler-case= machinery to avoid the internet
+timeouts or the computer sleeping process, to stuck the modeline.
+
+The =truncate= function is used when formatting the values, so some
+precission loss is expected.
+
+There is an internal function =ticker::reset-all-tickers= that closes
+all threads tasks and resets the =*tickers*= list. Also the
+=ticker::purge-all-tickers= function that closes all threads tasks and
+purges the =*tickers*= list.

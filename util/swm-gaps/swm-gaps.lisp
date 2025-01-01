@@ -64,7 +64,7 @@ HEIGHT are subtracted."
                  (>= width (- (frame-width frame) ow)))
         (setf width (- width ow)))
       (when (and (< oh height)
-                 (>= height (- (frame-height frame) oh)))
+                 (>= height (- (stumpwm::frame-display-height (window-group win) frame) oh)))
         (setf height (- height oh)))
 
       (setf x (+ x ox)

@@ -19,7 +19,7 @@
 (asdf:defsystem #:stumpwm-sndioctl
   :description "Interface to OpenBSD's sndioctl from StumpWM."
   :author "Dr Ashton Fagg <ashton@fagg.id.au>"
-  :license  "ISC""
+  :license  "ISC"
   :version "0.0.1"
   :homepage "https://github.com/fagg/stumpwm-sndioctl"
   :serial t
