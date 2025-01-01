@@ -85,6 +85,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./media/stumpwm-mixer/README.md][stumpwm-mixer]] :: Interface to FreeBSD's built-in sound mixer
 - [[./media/stumpwm-sndioctl/README.md][stumpwm-sndioctl]] :: Interface to OpenBSD's sndioctl from StumpWM.
 ** Minor Modes
+- [[./minor-mode/grabbable-modifier-keys/README.md][grabbable-modifier-keys]] :: Allow StumpWM users to grab modifier keys and bind them
 - [[./minor-mode/mpd/README.org][mpd]] :: Displays information about the music player daemon (MPD).
 - [[./minor-mode/notifications/README.org][notifications]] :: A notification library that sends notifications to the modeline via stumpish or from stumpwm itself.
 ** Modeline
