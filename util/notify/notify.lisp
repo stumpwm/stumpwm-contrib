@@ -53,20 +53,31 @@
                   (append fst (list "..."))
                   fst)))))
 
+(defun escape-special-chars (text)
+  (stumpwm::escape-caret text))
+
 (defun show-notification (app icon summary body)
   "Show the notification using standard STUMPWM::MESSAGE function"
   (declare (ignore app icon))
-  (stumpwm:message "~A~A^0~% ~%~A~A^0"
+  ; Use ^[ and ^] to preserve the selected colors and include
+  ; the noop ^[^] between the color and the text to make sure
+  ; that the notification's texts are separated from StumpWM's
+  ; color modifier. This becomes an issue when the text begins
+  ; with a digit. Also, escape all special chars in the texts
+  ; to make sure no funny things happen.
+  (stumpwm:message "^[~A^[^]~A^]~% ~%^[~A^[^]~A^]"
                    *notify-server-title-color*
-                   (rewrap-body
-                    summary
-                    :max-lines *notify-server-max-title-lines*
-                    :show-ellipsis t)
+                   (escape-special-chars
+                     (rewrap-body
+                      summary
+                      :max-lines *notify-server-max-title-lines*
+                      :show-ellipsis t))
                    *notify-server-body-color*
-                   (rewrap-body
-                    body
-                    :max-lines *notify-server-max-body-lines*
-                    :show-ellipsis t)))
+                   (escape-special-chars
+                     (rewrap-body
+                      body
+                      :max-lines *notify-server-max-body-lines*
+                      :show-ellipsis t))))
 
 (define-dbus-object notify-dbus-service
     (:path "/org/freedesktop/Notifications"))
