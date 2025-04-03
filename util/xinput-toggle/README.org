@@ -1,0 +1,117 @@
+** xinput-toggle
+
+Enable, disable or toggle devices such as the mouse, touchpad, etc...
+
+Specify devices using ~cl-ppcre~ regular expressions:
+https://edicl.github.io/cl-ppcre/.
+
+This module depends on ~xinput~ which is part of the ~X.Org~ suite of tools.
+
+** Usage
+
+Add something like the following to your =~/.stumpwmrc=:
+
+#+BEGIN_SRC lisp
+  (load "xinput-toggle")
+
+  ;; disable all devices whose names match the regex "touchpad".
+  (xinput-toggle:xinput-disable-devices "touchpad")
+
+  ;; enable all devices whose names match the regex "wireless mouse".
+  (xinput-toggle:xinput-enable-devices "wireless mouse")
+
+  ;; bind a key to toggle all devices whose names match the regex "touchpad"
+  (define-key *top-map* (kbd "XF86TouchpadToggle")
+    "xinput-toggle-devices touchpad")
+#+END_SRC
+
+~touchpad~ and ~wireless mouse~ are regular expressions matching device names.
+
+On my system the touchpad device name is ~FTCS1000:00 2808:0101 Touchpad~. The
+regex ~touchpad~ matches it.
+
+*** ~*case-insensitive-regex*~
+
+~xinput-toggle:*case-insensitive-regex*~ allows case-insensitive matching. By
+default its value is ~T~ and can be set to ~NIL~ for case-sensitive matching.
+
+** Discover device names
+
+To specify a device you need its name.  Hence the first step is to discover the
+device name.  You can then decide suitable regular expressions.
+
+*** Using StumpWM command xinput-list-devices
+
+One way to discover device names is to run the command (StumpWM command (colon))
+~xinput-list-devices~ passing NAME-REGEX as an argument. It lists devices whose
+names match NAME-REGEX.
+
+List all devices:
+
+#+begin_src
+  xinput-list-devices ""
+#+end_src
+
+List all devices whose names matche ~mouse~ or ~touchpad~:
+
+#+begin_src
+  xinput-list-devices "mouse|touchpad"
+#+end_src
+
+*** Using the xinput utility program
+
+Alternatively list devices using the ~xinput~ program via the command line:
+
+#+BEGIN_SRC bash :results output
+  xinput list --name-only
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Virtual core pointer
+Virtual core XTEST pointer
+Logitech Wireless Mouse
+FTCS1000:00 2808:0101 Mouse
+ImPS/2 Logitech Wheel Mouse
+Virtual core keyboard
+Virtual core XTEST keyboard
+Power Button
+Video Bus
+Power Button
+Sleep Button
+BisonCam,NB Pro: BisonCam,NB Pr
+AT Translated Set 2 keyboard
+∼ FTCS1000:00 2808:0101 Touchpad
+#+end_example
+
+See https://linux.die.net/man/1/xinput.
+
+** Excluding keyboards
+
+The following example would have disabled all devices including keyboards.
+However if keyboards get disabled by mistake, there might be no way to interact
+with StumpWM.
+
+Hence there is a guard in place to exclude device names containing "keyboard".
+
+#+BEGIN_SRC lisp
+  (xinput-toggle:xinput-disable-devices "")
+#+END_SRC
+
+~xinput:*exclude-keyboards*~ acts as a guard against disabling keyboards by
+mistake. By default its value is ~T~ during which ~xinput-toggle~ excludes
+devices whose name contains the string ~keyboard~ (always case insensitive). It
+can be set to ~NIL~ to disable the guard.
+
+The below will not list keyboard devices as the guard is enabled.
+
+#+BEGIN_SRC lisp
+  (xinput-toggle:xinput-list-devices "keyboard")
+#+END_SRC
+
+This below lists device names matching "keyboard" as we disable the guard.
+
+#+BEGIN_SRC lisp
+  (let ((xinput-toggle:*exclude-keyboards* NIL))
+    (xinput-toggle:xinput-list-devices "keyboard"))
+#+END_SRC

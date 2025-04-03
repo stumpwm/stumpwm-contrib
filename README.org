@@ -146,3 +146,4 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/wacom/README.org][wacom]] :: Map StumpWM frames to Wacom tablets using `xsetwacom`.
 - [[./util/windowtags/README.org][windowtags]] :: Add metadata to windows to manipulate them en mass.
 - [[./util/winner-mode/README.org][winner-mode]] :: Emacs' winner-mode for StumpWM
+- [[./util/xinput-toggle/README.org][xinput-toggle]] :: Toggle (on/off) devices such as the touchpad, mouse, etc.
