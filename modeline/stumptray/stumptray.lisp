@@ -65,6 +65,8 @@ first on the list by default.")
 ;;; stumpwm there is a modeline for every X screen.
 (defvar *tray-cursor-thickness* 2)
 (defvar *tray-cursor-icon-distance* 1)
+(defparameter *tray-icon-spacing* 10
+  "The number of pixels between each icon")
 
 (defun trayicon-height (tray)
   "Returns the height of the icons embedded in the TRAY."
@@ -133,7 +135,9 @@ window coordinates.")
 	 (tray-height (screen-tray-height screen))
 	 (win (xlib:create-window :parent parent
                                   :x x
-                                  :y y
+                                  :y (if (= y 0)
+					 (setf y (floor (/ (- tray-height icon-height) 2)))
+					 y)
                                   :depth depth
                                   :width icon-height
                                   :height tray-height
@@ -306,7 +310,7 @@ protocol."
   (let ((x 0))
     (dolist (icon icons)
       (setf (xlib:drawable-x icon) x)
-      (incf x (xlib:drawable-width icon)))))
+      (incf x (+ (xlib:drawable-width icon) *tray-icon-spacing*)))))
 
 (defun tray-tile-icons (tray)
   "Repositions the icons embedded in TRAY one next to the other."
@@ -350,7 +354,8 @@ protocol."
   "Returns the width of the appropriate TRAY icon container
 based on VISIBILITY."
   (max (trayicon-height tray)
-       (reduce #'+ (tray-icons tray visibility) :key #'xlib:drawable-width)))
+       (+ (* *tray-icon-spacing* (length (tray-icons tray visibility)))
+	  (reduce #'+ (tray-icons tray visibility) :key #'xlib:drawable-width))))
 
 (defun update-icon-containers-geometry (tray)
   "Appropriately resizes the TRAY's icon containers (visible and hidden icons)."
