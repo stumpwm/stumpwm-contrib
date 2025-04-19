@@ -20,5 +20,6 @@
           cffi:foreign-slot-value
           cffi:with-foreign-object
           cffi:foreign-type-size
+          cffi:null-pointer-p
           cffi:mem-ref
           cffi:inc-pointer))

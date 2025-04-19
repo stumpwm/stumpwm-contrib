@@ -54,28 +54,30 @@
 (deftype hinting-mode () `(member ,@*hinting-flags*))
 
 (defcfun "SDL_Init" :int (flags :long))
+(defcfun "SDL_Quit" :void)
 (defcfun "SDL_WasInit" :int (flags :long))
 (defcfun "SDL_LockSurface" :void (surf :pointer))
 (defcfun "SDL_UnlockSurface" :void (surf :pointer))
 (defcfun "SDL_FreeSurface" :void (surf :pointer))
+(defcfun "SDL_GetError" :string)
 (defcfun "TTF_Init" :int)
+(defcfun "TTF_Quit" :void)
 (defcfun "TTF_WasInit" :int)
 (defcfun "TTF_OpenFont" :pointer (file :string) (ptsize :int))
 (defcfun "TTF_SizeUTF8" :int (font :pointer)
                              (text :string)
                              (w :pointer)
                              (h :pointer))
-(defcfun "TTF_RenderUTF8_Blended" :pointer
-                                  (font :pointer)
-                                  (text :string)
-                                  (fg (:struct sdl-color)))
+(defcfun "TTF_RenderUTF8_Blended" :pointer (font :pointer)
+                                           (text :string)
+                                           (fg (:struct sdl-color)))
 (defcfun "TTF_FontAscent" :int (font :pointer))
 (defcfun "TTF_FontDescent" :int (font :pointer))
 (defcfun "TTF_FontHeight" :int (font :pointer))
 (defcfun "TTF_SetFontSizeDPI" :int (font :pointer)
-                              (ptsize :int)
-                              (hdpi :unsigned-int)
-                              (vdpi :unsigned-int))
+                                   (ptsize :int)
+                                   (hdpi :unsigned-int)
+                                   (vdpi :unsigned-int))
 (defcfun "TTF_SetFontHinting" :int (font :pointer) (hinting :int))
 (defcfun "TTF_SetFontKerning" :int (font :pointer) (allowed :int))
 
@@ -97,20 +99,35 @@
 
 (defun load-font (path size &key hinting (kerning t kerning-p))
   (declare (type (or null hinting-mode) hinting))
-  (when (zerop (sdl-wasinit SDL_INIT_VIDEO))
-    (sdl-init SDL_INIT_VIDEO))
-  (when (zerop (ttf-wasinit))
-    (ttf-init))
-  (let ((font (make-instance 'font
-                             :sdl2-ptr (ttf-openfont path size)
-                             :size size)))
-    (when hinting
-      (ttf-setfonthinting (sdl2-ptr font)
-                          (position hinting *hinting-flags*)))
-    (when kerning-p
-      (ttf-setfontkerning (sdl2-ptr font)
-                          (if kerning 1 0)))
-    font))
+  (let ((sdl-initialized nil)
+        (ttf-initialized nil))
+    (when (zerop (sdl-wasinit SDL_INIT_VIDEO))
+      (if (zerop (sdl-init SDL_INIT_VIDEO))
+        (setf sdl-initialized t)
+        (error (sdl-geterror))))
+    (when (zerop (ttf-wasinit))
+      (if (zerop (ttf-init))
+        (setf ttf-initialized t)
+        (let ((err (sdl-geterror)))
+          (when sdl-initialized
+            (sdl-quit))
+          (error err))))
+    (let ((ptr (ttf-openfont path size)))
+      (when (null-pointer-p ptr)
+        (let ((err (sdl-geterror)))
+          (when ttf-initialized
+            (ttf-quit))
+          (when sdl-initialized
+            (sdl-quit))
+          (error err)))
+      (let ((font (make-instance 'font :sdl2-ptr ptr :size size)))
+        (when hinting
+          (ttf-setfonthinting (sdl2-ptr font)
+                              (position hinting *hinting-flags*)))
+        (when kerning-p
+          (ttf-setfontkerning (sdl2-ptr font)
+                              (if kerning 1 0)))
+        font))))
 
 (defmethod font-exists-p ((font font))
   t)
@@ -189,12 +206,12 @@
 (defmethod text-line-width ((font font) text &rest keys &key (start 0) end translate)
   (declare (ignorable keys start end translate))
   (with-foreign-object (sizes :int 2)
-                       (ttf-sizeutf8
-                         (sdl2-ptr font)
-                         text
-                         sizes
-                         (inc-pointer sizes (foreign-type-size :int)))
-                       (mem-ref sizes :int 0)))
+    (if (zerop (ttf-sizeutf8 (sdl2-ptr font)
+                             text
+                             sizes
+                             (inc-pointer sizes (foreign-type-size :int))))
+      (mem-ref sizes :int 0)
+      (error (sdl-geterror)))))
 
 (defmethod draw-image-glyphs (drawable
                                gcontext
@@ -212,59 +229,58 @@
   ; we use the alpha channel of the rendered glyphs to stencil out a rectangle
   ; in the foreground color onto a rectangle of the background color. This is
   ; the only way to properly handle all possible cases.
-  (let* ((surf (ttf-renderutf8-blended
-                 (sdl2-ptr font)
-                 text
-                 '(r 0 b 0 g 0 a 0)))
-         (width (foreign-slot-value surf '(:struct sdl-surface) 'w))
-         (height (foreign-slot-value surf '(:struct sdl-surface) 'h))
-         (pitch (foreign-slot-value surf '(:struct sdl-surface) 'pitch))
-         (data (make-array (list height width) :element-type '(unsigned-byte 8))))
-    (sdl-locksurface surf)
-    (let ((pixels (foreign-slot-value surf '(:struct sdl-surface) 'pixels)))
-      (dotimes (jj height)
-        (dotimes (ii width)
-          (let ((alpha (mem-ref pixels :uint8 (+ (* jj pitch) (* ii 4) 3))))
-            (setf (aref data jj ii) alpha)))))
-    (sdl-unlocksurface surf)
-    (sdl-freesurface surf)
-    (let* ((display (xlib:drawable-display drawable))
-           (image (xlib:create-image
-                    :depth 8
-                    :width width
-                    :height height
-                    :data data))
-           (alpha-pixmap (xlib:create-pixmap :width width
-                                             :height height
-                                             :depth 8
-                                             :drawable drawable))
-           (alpha-gc (xlib:create-gcontext :drawable alpha-pixmap))
-           (alpha-pic
-             (progn
-               (xlib:put-image alpha-pixmap alpha-gc image :x 0 :y 0)
-               (xlib:render-create-picture alpha-pixmap
-                                           :format (display-alpha-picture-format display))))
-           (src-pic (get-source-picture drawable))
-           (dst-pic (get-destination-picture drawable)))
-      (xlib:free-gcontext alpha-gc)
-      ; Paint the source & destination surfaces in the foreground and
-      ; background colors of the context.
-      (xlib:draw-point (get-source-pixmap drawable) gcontext 0 0)
-      (let ((fg (xlib:gcontext-foreground gcontext)))
-        (setf (xlib:gcontext-foreground gcontext) (xlib:gcontext-background gcontext))
-        (xlib:draw-rectangle drawable gcontext x (- y (font-ascent font)) width height t)
-        (setf (xlib:gcontext-foreground gcontext) fg))
-      (xlib:render-composite :over
-                             src-pic
-                             alpha-pic
-                             dst-pic
-                             0
-                             0
-                             0
-                             0
-                             x
-                             (- y (font-ascent font))
-                             width
-                             height)
-      (xlib:render-free-picture alpha-pic)
-      (xlib:free-pixmap alpha-pixmap))))
+  (let ((surf (ttf-renderutf8-blended (sdl2-ptr font) text '(r 0 b 0 g 0 a 0))))
+    (when (null-pointer-p surf)
+      (error (sdl-geterror)))
+    (let* ((width (foreign-slot-value surf '(:struct sdl-surface) 'w))
+           (height (foreign-slot-value surf '(:struct sdl-surface) 'h))
+           (pitch (foreign-slot-value surf '(:struct sdl-surface) 'pitch))
+           (data (make-array (list height width) :element-type '(unsigned-byte 8))))
+      (sdl-locksurface surf)
+      (let ((pixels (foreign-slot-value surf '(:struct sdl-surface) 'pixels)))
+        (dotimes (jj height)
+          (dotimes (ii width)
+            (let ((alpha (mem-ref pixels :uint8 (+ (* jj pitch) (* ii 4) 3))))
+              (setf (aref data jj ii) alpha)))))
+      (sdl-unlocksurface surf)
+      (sdl-freesurface surf)
+      (let* ((display (xlib:drawable-display drawable))
+             (image (xlib:create-image
+                      :depth 8
+                      :width width
+                      :height height
+                      :data data))
+             (alpha-pixmap (xlib:create-pixmap :width width
+                                               :height height
+                                               :depth 8
+                                               :drawable drawable))
+             (alpha-gc (xlib:create-gcontext :drawable alpha-pixmap))
+             (alpha-pic
+               (progn
+                 (xlib:put-image alpha-pixmap alpha-gc image :x 0 :y 0)
+                 (xlib:render-create-picture alpha-pixmap
+                                             :format (display-alpha-picture-format display))))
+             (src-pic (get-source-picture drawable))
+             (dst-pic (get-destination-picture drawable)))
+        (xlib:free-gcontext alpha-gc)
+        ; Paint the source & destination surfaces in the foreground and
+        ; background colors of the context.
+        (xlib:draw-point (get-source-pixmap drawable) gcontext 0 0)
+        (let ((fg (xlib:gcontext-foreground gcontext)))
+          (setf (xlib:gcontext-foreground gcontext) (xlib:gcontext-background gcontext))
+          (xlib:draw-rectangle drawable gcontext x (- y (font-ascent font)) width height t)
+          (setf (xlib:gcontext-foreground gcontext) fg))
+        (xlib:render-composite :over
+                               src-pic
+                               alpha-pic
+                               dst-pic
+                               0
+                               0
+                               0
+                               0
+                               x
+                               (- y (font-ascent font))
+                               width
+                               height)
+        (xlib:render-free-picture alpha-pic)
+        (xlib:free-pixmap alpha-pixmap)))))
