@@ -209,7 +209,7 @@
                              (sysfs-int-field path "charge_now")))
                        (consumption ()
                          (or (sysfs-int-field path "power_now")
-                             (sysfs-int-field path "current_now")))
+                             (abs (sysfs-int-field path "current_now"))))
                        (capacity-native ()
                          (sysfs-int-field path "capacity"))
                        (capacity-calculate ()
