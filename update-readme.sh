@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 sed '/# --/q' README.org > tmpReadme
 
