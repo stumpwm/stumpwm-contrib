@@ -40,7 +40,9 @@ fi
 
 stumpwm_pid ()
 {
-    if command -v pgrep 2>&1 >/dev/null; then
+    if test $(uname -s) = "FreeBSD" && command -v pgrep 2>&1 > /dev/null; then
+        STUMPWM_PID=$(pgrep -a -u $(id -u) stumpwm)
+    elif command -v pgrep 2>&1 >/dev/null; then
         STUMPWM_PID=$(pgrep -u $(id -u) stumpwm)
     elif [ -d /proc ]; then
         # Go up the process chain until we locate StumpWM's process using
