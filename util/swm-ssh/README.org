@@ -31,6 +31,14 @@ Default terminal to open an ssh connection is ~urxvtc~. To change it, use
 (setq swm-ssh:*swm-ssh-default-term* "xterm")
 #+END_SRC
 
+** *swm-ssh-default-term-title-opt*
+Default terminal's title option is ~-T~ which is used to setup title to
+a connection host. It works with both ~xterm~ and ~urxvtc~ out of the
+box. ~nil~ disable it. To change it, use
+#+BEGIN_SRC lisp
+(setq swm-ssh:*swm-ssh-default-termt-itle-opt* "--title")
+#+END_SRC
+
 ** *swm-ssh-known-host-path*
 Path to thee list of know host bz SSH client. Defaults to =~/.ssh/known_hosts=.
 Change it with
