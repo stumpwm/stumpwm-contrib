@@ -1,0 +1,56 @@
+* Requirements
+
+- cl-ppcre
+- ykman (Yubikey Manager CLI)
+- xclip
+- maim (for QR capture)
+- zbarimg (for QR decoding)
+
+Install cl-ppcre from the REPL:
+#+BEGIN_SRC lisp
+(ql:quickload :cl-ppcre)
+#+END_SRC
+
+Install system dependencies (OpenBSD):
+#+BEGIN_SRC shell
+pkg_add yubikey-manager xclip maim zbar
+#+END_SRC
+
+* Usage
+
+This module provides commands for managing OATH TOTP accounts on a Yubikey.
+
+Put the following in your =~/.stumpwmrc=:
+#+BEGIN_SRC lisp
+(load-module "swm-ykman")
+#+END_SRC
+
+Define keybindings:
+#+BEGIN_SRC lisp
+(define-key *root-map* (kbd "y") "swm-ykman-totp")
+(define-key *root-map* (kbd "Y") "swm-ykman-add-qr")
+#+END_SRC
+
+* Commands
+
+** swm-ykman-totp
+Opens a menu to select an OATH account from your Yubikey. The TOTP code
+is generated and copied to the clipboard.
+
+** swm-ykman-add-qr
+Allows you to select a screen region containing a QR code (using maim).
+The QR code is decoded and the OATH account is added to your Yubikey.
+
+If the account already exists, you will be prompted to:
+- Overwrite the existing account
+- Save with a different name
+- Cancel the operation
+
+* Variables
+
+** *swm-ykman-xclip-selection*
+X selection to use for clipboard operations. Default is ="clipboard"=.
+Can also be ="primary"= for middle-click paste.
+#+BEGIN_SRC lisp
+(setf swm-ykman:*swm-ykman-xclip-selection* "primary")
+#+END_SRC
