@@ -140,6 +140,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/swm-emacs/README.txt][swm-emacs]] :: A set of utilities for launching the beast.
 - [[./util/swm-gaps/README.org][swm-gaps]] :: Pretty (useless) gaps for StumpWM
 - [[./util/swm-ssh/README.org][swm-ssh]] :: A simple menu selector for ssh to a remote host for stumpwm that parses your ssh config to get available hosts
+- [[./util/swm-tmux/README.org][swm-tmux]] :: Tmux session manager for StumpWM
 - [[./util/ttf-fonts/README.txt][ttf-fonts]] :: A pure lisp implementation of TTF font rendering.
 - [[./util/undocumented/README.org][undocumented]] :: Look for stuff that should probably be in the manual that isn't
 - [[./util/urgentwindows/README.org][urgentwindows]] :: Allows focusing application windows that need user attention

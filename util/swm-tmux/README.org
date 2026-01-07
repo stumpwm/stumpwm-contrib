@@ -1,0 +1,55 @@
+* Requirements
+
+- cl-ppcre
+
+  Install cl-ppcre from the REPL:
+  #+BEGIN_SRC lisp
+  (ql:quickload :cl-ppcre)
+  #+END_SRC
+
+* Usage
+
+This module provides a menu interface for managing tmux sessions. You can
+attach to existing sessions or create new ones. Session names default to
+the current StumpWM group name.
+
+Put the following in your =~/.stumpwmrc=
+#+BEGIN_SRC lisp
+(load-module "swm-tmux")
+#+END_SRC
+
+And define a keybind in your =~/.stumpwmrc=
+#+BEGIN_SRC lisp
+(define-key *root-map* (kbd "t") "swm-tmux-session")
+#+END_SRC
+
+* Commands
+
+** swm-tmux-session
+Opens a menu to select an existing tmux session or create a new one.
+The session name defaults to the current group name.
+
+** swm-tmux-new-session
+Quickly creates a new tmux session with an auto-generated name based
+on the current group.
+
+* Variables
+
+** *swm-tmux-default-term*
+Terminal emulator to use. Default is =xterm=.
+#+BEGIN_SRC lisp
+(setf swm-tmux:*swm-tmux-default-term* "urxvtc")
+#+END_SRC
+
+** *swm-tmux-default-term-title-opt*
+Command line option for setting the terminal title. Default is =-T=.
+Set to =NIL= if your terminal does not support a title option.
+#+BEGIN_SRC lisp
+(setf swm-tmux:*swm-tmux-default-term-title-opt* "-title")
+#+END_SRC
+
+** *swm-tmux-default-term-exec-opt*
+Command line option for executing a command in the terminal. Default is =-e=.
+#+BEGIN_SRC lisp
+(setf swm-tmux:*swm-tmux-default-term-exec-opt* "-e")
+#+END_SRC
