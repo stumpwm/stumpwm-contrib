@@ -129,6 +129,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/productivity/README.org][productivity]] :: Lock StumpWM down so you have to get work done.
 - [[./util/qubes/README.org][qubes]] :: Integration to Qubes OS (https://www.qubes-os.org)
 - [[./util/screenshot/README.org][screenshot]] :: Takes screenshots and stores them as png files
+- [[./util/sdl-fonts/README.md][sdl-fonts]] :: SDL-based TTF font rendering for StumpWM.
 - [[./util/searchengines/README.org][searchengines]] :: Allows searching text using prompt or clipboard contents with various search engines
 - [[./util/shell-command-history/README.org][shell-command-history]] :: Save and load the stumpwm::*input-shell-history* to a file
 - [[./util/spatial-groups/README][spatial-groups]] :: Spatial Groups navigation for StumpWM
