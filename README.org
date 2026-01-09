@@ -85,6 +85,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./media/stumpwm-mixer/README.md][stumpwm-mixer]] :: Interface to FreeBSD's built-in sound mixer
 - [[./media/stumpwm-sndioctl/README.md][stumpwm-sndioctl]] :: Interface to OpenBSD's sndioctl from StumpWM.
 ** Minor Modes
+- [[./minor-mode/fml/README.md][swm-frame-mode-line]] :: Mode line per frame
 - [[./minor-mode/grabbable-modifier-keys/README.md][grabbable-modifier-keys]] :: Allow StumpWM users to grab modifier keys and bind them
 - [[./minor-mode/mpd/README.org][mpd]] :: Displays information about the music player daemon (MPD).
 - [[./minor-mode/notifications/README.org][notifications]] :: A notification library that sends notifications to the modeline via stumpish or from stumpwm itself.
@@ -129,6 +130,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/productivity/README.org][productivity]] :: Lock StumpWM down so you have to get work done.
 - [[./util/qubes/README.org][qubes]] :: Integration to Qubes OS (https://www.qubes-os.org)
 - [[./util/screenshot/README.org][screenshot]] :: Takes screenshots and stores them as png files
+- [[./util/sdl-fonts/README.md][sdl-fonts]] :: SDL-based TTF font rendering for StumpWM.
 - [[./util/searchengines/README.org][searchengines]] :: Allows searching text using prompt or clipboard contents with various search engines
 - [[./util/shell-command-history/README.org][shell-command-history]] :: Save and load the stumpwm::*input-shell-history* to a file
 - [[./util/spatial-groups/README][spatial-groups]] :: Spatial Groups navigation for StumpWM
@@ -141,6 +143,7 @@ Advertise your module here, open a PR and include a org-mode link!
 - [[./util/swm-gaps/README.org][swm-gaps]] :: Pretty (useless) gaps for StumpWM
 - [[./util/swm-ssh/README.org][swm-ssh]] :: A simple menu selector for ssh to a remote host for stumpwm that parses your ssh config to get available hosts
 - [[./util/swm-ykman/README.org][swm-ykman]] :: Yubikey OATH TOTP manager for StumpWM
+- [[./util/swm-tmux/README.org][swm-tmux]] :: Tmux session manager for StumpWM
 - [[./util/ttf-fonts/README.txt][ttf-fonts]] :: A pure lisp implementation of TTF font rendering.
 - [[./util/undocumented/README.org][undocumented]] :: Look for stuff that should probably be in the manual that isn't
 - [[./util/urgentwindows/README.org][urgentwindows]] :: Allows focusing application windows that need user attention
