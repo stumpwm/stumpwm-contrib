@@ -99,7 +99,7 @@
   (:string :string :string :string)
   (:interface "org.freedesktop.Notifications")
   (:name "GetServerInformation")
-  (values "StumpWM" "StumpWM" "localhost" "0.1"))
+  (values "StumpWM" "StumpWM" "1.0" "1.2"))
 
 (define-dbus-method (notify-dbus-service get-capabilities) ()
     ((:array :string))
